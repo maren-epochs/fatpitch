@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+.pytest_cache/
+.claude/settings.local.json
+cases/UNSEAL_LOG.txt
+*.egg-info/
+build/
+dist/
+results/*
+!results/versions/
+results/versions/*
+!results/versions/LEADERBOARD.md
+!results/versions/trials.jsonl

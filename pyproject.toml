@@ -1,0 +1,35 @@
+[project]
+name = "fatpitch"
+version = "0.0.1"
+description = "Fat Pitch: point-in-time process model of a documented discretionary macro decision process (evaluation lift)."
+requires-python = ">=3.12"
+dependencies = [
+    "polars>=1.5,<2",
+    "pyarrow>=17",
+    "numpy>=2.0",
+    "scipy>=1.13",
+    "pyyaml>=6",
+    "tzdata>=2024.1",  # zoneinfo has no system tz database on Windows; America/New_York needs it
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-p no:cacheprovider"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = ["library", "spec"]
+
+[tool.ruff.lint]
+extend-select = ["I"]
