@@ -1,0 +1,286 @@
+# Fat Pitch — transition -> thesis table (step 2), v1
+#
+# Authored 2026-10-06 BEFORE case scoring and BEFORE reading the case notes'
+# "Outcome" / "Market calls made" columns (designer-leakage rule, PLAN E.2;
+# PLAN_REVIEW finding 14). Inputs used while writing: PLAN.md E.1 principles,
+# reference doc §2/§3, PLAN_REVIEW §A. Library notes were read only afterwards
+# (for spec\process.md citations and spec\cases_seed.md). Any edit after case
+# scoring is a design change: re-register via prereg and issue a new report.
+#
+# Semantics
+#   trigger      : condition on the regime vector (step 1) and/or internals
+#                  vector (step 1b) that must CHANGE state at asof (change, not
+#                  level, R-21). Parameter ids refer to spec\registry.yaml.
+#   class        : rates | fx | equity | commodity | credit | crypto | cash
+#   direction    : long | short | flat | reduce | relative (A vs B)
+#   region       : US | XUS (non-US region resolved by cross-region block R-12)
+#                  | REL (relative, two regions) | ANY
+#   premises     : conditions the thesis depends on; checked daily (R-50)
+#   invalidation : events/states that break a premise -> exit/reverse (R-49, R-50)
+#   rules        : rule ids in spec\process.md
+#   mech         : yes = fully mechanizable from free data; partial = needs an
+#                  event/peg flag or discretionary input
+# Notation: LIQ = active liquidity impulse from rule family R-02/R-03/R-04
+# (era-dependent, PLAN E.4a); TG = policy-error gap (R-06, FF minus u-gap
+# Taylor rate, vintaged); RS = relative strength.
+
+- id: T01
+  trigger: "LIQ impulse crosses above 0 AND policy direction = easing"
+  class: equity
+  direction: long
+  region: US
+  premises: ["policy direction easing", "LIQ impulse > 0"]
+  invalidation: ["first tightening signal (FF hike or QE taper announcement)", "LIQ impulse < 0 for liq.confirm_periods"]
+  rules: [R-01, R-02, R-03, R-04, R-14, R-21]
+  mech: yes
+
+- id: T02
+  trigger: "policy direction flips easing -> tightening OR LIQ impulse crosses below 0"
+  class: equity
+  direction: reduce
+  region: US
+  premises: ["Fed tightening or LIQ impulse < 0"]
+  invalidation: ["Fed pause/pivot signal", "LIQ impulse > 0"]
+  rules: [R-01, R-02, R-03, R-14]
+  mech: yes
+
+- id: T03
+  trigger: "TG < -policy.tg_threshold_pp (policy too loose) newly true AND CPI trend rising"
+  class: rates
+  direction: short
+  region: US
+  premises: ["Fed below data-implied rate", "inflation trend up"]
+  invalidation: ["TG >= 0 (Fed catches up)", "CPI 6m annualised turns down below infl.soft_landing_pct"]
+  rules: [R-05, R-06, R-20]
+  mech: yes
+
+- id: T04
+  trigger: "same as T03"
+  class: commodity
+  direction: long
+  region: US
+  premises: ["policy too loose", "real FF negative"]
+  invalidation: ["TG >= 0", "real FF > 0"]
+  rules: [R-05, R-06, R-26, R-27]
+  mech: yes
+  notes: "gold first in expression ranking (asset that rises when equities fall, R-26)"
+
+- id: T05
+  trigger: "TG > +policy.tg_threshold_pp (policy too tight) AND internals turning down (leading-industry RS turn down)"
+  class: rates
+  direction: long
+  region: US
+  premises: ["Fed above data-implied rate", "growth internals weakening"]
+  invalidation: ["internals turn up", "inflation re-accelerates above infl.soft_landing_pct"]
+  rules: [R-05, R-06, R-15, R-16, R-23]
+  mech: yes
+  notes: "front end (2y) ranked first when DGS2-FF < -curve.cut_pricing_bp (R-23)"
+
+- id: T06
+  trigger: "CPI yoy > infl.persist_pct AND FF < CPI (inflation veto newly true)"
+  class: equity
+  direction: short
+  region: US
+  premises: ["inflation above 5% not yet met by FF above CPI"]
+  invalidation: ["FF >= CPI", "CPI yoy < infl.persist_pct"]
+  rules: [R-08, R-09, R-07]
+  mech: yes
+  notes: "R-08 carries the source's own expectation that the rule could break this cycle; tag stated with that caveat"
+
+- id: T07
+  trigger: "CPI yoy > infl.soft_landing_pct AND policy direction = tightening"
+  class: equity
+  direction: short
+  region: US
+  premises: ["Fed tightening into >4.5% inflation (no-soft-landing rule)"]
+  invalidation: ["Fed pivot to easing", "unemployment rises (recession arrives; hand off to T05/T01)"]
+  rules: [R-07, R-09]
+  mech: yes
+
+- id: T08
+  trigger: "10y yield, WTI and USD all rising over xasset.window_m (warning newly true)"
+  class: equity
+  direction: reduce
+  region: US
+  premises: ["rates, oil and USD rising together"]
+  invalidation: ["any of the three reverses over xasset.window_m"]
+  rules: [R-10]
+  mech: yes
+
+- id: T09
+  trigger: "Fed balance-sheet rate of change turns down (QE taper/end) while equities extended"
+  class: equity
+  direction: reduce
+  region: US
+  premises: ["QE rate of change negative"]
+  invalidation: ["balance-sheet growth re-accelerates"]
+  rules: [R-14, R-03]
+  mech: yes
+
+- id: T10
+  trigger: "net Treasury issuance exceeds Fed purchases (R-04 impulse < 0) while Fed balance sheet grows"
+  class: equity
+  direction: reduce
+  region: US
+  premises: ["private sector absorbing net issuance"]
+  invalidation: ["Fed purchases exceed net issuance"]
+  rules: [R-04, R-01]
+  mech: yes
+
+- id: T11
+  trigger: "region X begins easing/QE (cross-region block) while US neutral or tightening"
+  class: equity
+  direction: long
+  region: XUS
+  premises: ["region X liquidity impulse rising relative to US"]
+  invalidation: ["region X stops QE or tightens"]
+  rules: [R-12, R-24, R-27]
+  mech: yes
+  notes: "expression: region X equities currency-hedged; second-order: short region X currency (T12)"
+
+- id: T12
+  trigger: "same as T11"
+  class: fx
+  direction: short
+  region: XUS
+  premises: ["relative policy easing in region X"]
+  invalidation: ["region X policy reversal", "US eases faster than region X"]
+  rules: [R-12, R-24, R-27]
+  mech: yes
+
+- id: T13
+  trigger: "currency peg/band flag set AND domestic policy needs diverge from anchor (domestic TG sign opposite to anchor's)"
+  class: fx
+  direction: short
+  region: XUS
+  premises: ["peg maintained under incompatible policy"]
+  invalidation: ["anchor central bank eases", "realignment executed (thesis complete)"]
+  rules: [R-12, R-22, R-27]
+  mech: partial
+  notes: "peg flag is a manual/event input; size escalation needs catalyst (R-38)"
+
+- id: T14
+  trigger: "US policy too loose (TG < -policy.tg_threshold_pp) AND US relative LIQ rising vs other regions"
+  class: fx
+  direction: short
+  region: US
+  premises: ["US policy looser than peers"]
+  invalidation: ["TG >= 0", "peers ease faster"]
+  rules: [R-06, R-12, R-24]
+  mech: yes
+
+- id: T15
+  trigger: "leading-industry RS turns down (R-16, internals.rs_lookback_m) while regime not yet tightening"
+  class: equity
+  direction: reduce
+  region: US
+  premises: ["leading industries weakening ahead of economy"]
+  invalidation: ["leading-industry RS turns back up"]
+  rules: [R-15, R-16, R-18]
+  mech: yes
+
+- id: T16
+  trigger: "leading-industry RS turns up from depressed level during easing (momentum bottom)"
+  class: equity
+  direction: long
+  region: US
+  premises: ["easing regime", "momentum leads fundamentals 12-18m"]
+  invalidation: ["RS turn fails (re-crosses down)", "policy tightening"]
+  rules: [R-15, R-16, R-18, R-01]
+  mech: yes
+  notes: "cyclical/leading industries ranked first in expression"
+
+- id: T17
+  trigger: "DGS2 - FF < -curve.cut_pricing_bp newly true AND internals or credit weakening"
+  class: rates
+  direction: long
+  region: US
+  premises: ["market pricing cuts", "growth weakening"]
+  invalidation: ["DGS2 - FF > 0", "inflation re-accelerates"]
+  rules: [R-17, R-23, R-15]
+  mech: yes
+
+- id: T18
+  trigger: "DGS2 - FF > +curve.cut_pricing_bp newly true AND inflation rising"
+  class: rates
+  direction: short
+  region: US
+  premises: ["market pricing hikes Fed has not delivered"]
+  invalidation: ["DGS2 - FF < 0"]
+  rules: [R-17, R-23, R-06]
+  mech: yes
+
+- id: T19
+  trigger: "credit spread (BAA-DGS10 or HY OAS) widening trend newly true AND leading-industry RS down"
+  class: credit
+  direction: short
+  region: US
+  premises: ["credit stress rising with weak internals"]
+  invalidation: ["spread trend reverses"]
+  rules: [R-17, R-15]
+  mech: yes
+
+- id: T20
+  trigger: "fragility_level = high AND (T02 or T09 or T10 fires)"
+  class: equity
+  direction: short
+  region: US
+  premises: ["excess present", "liquidity withdrawal under way"]
+  invalidation: ["liquidity impulse turns positive"]
+  rules: [R-11, R-48, R-05]
+  mech: yes
+  notes: "fragility never creates a thesis alone (non-gating); raises short-side tier only"
+
+- id: T21
+  trigger: "policy easing AND USD trend down AND real FF falling"
+  class: commodity
+  direction: long
+  region: US
+  premises: ["loose policy", "weak USD"]
+  invalidation: ["USD trend up", "real FF rising"]
+  rules: [R-01, R-26, R-14]
+  mech: yes
+  notes: "gold; copper/industrials only if internals up"
+
+- id: T22
+  trigger: "market leadership narrowing (breadth of industries above trend falls while index rises) in late easing"
+  class: equity
+  direction: reduce
+  region: US
+  premises: ["narrow leadership"]
+  invalidation: ["breadth broadens"]
+  rules: [R-15, R-16]
+  mech: yes
+
+- id: T23
+  trigger: "scheduled or unscheduled event breaks a recorded premise (election, peg change, tariff, policy statement)"
+  class: ANY
+  direction: flat
+  region: ANY
+  premises: []
+  invalidation: []
+  rules: [R-49, R-50, R-22]
+  mech: partial
+  notes: "exit/reverse the thesis whose premise broke; event outcome is an input, not generated"
+
+- id: T24
+  trigger: "no transition at asof; regime/internals persist"
+  class: ANY
+  direction: flat
+  region: ANY
+  premises: []
+  invalidation: []
+  rules: [R-21, R-54]
+  mech: yes
+  notes: "hold existing theses whose premises hold; generate no new thesis"
+
+- id: T25
+  trigger: "conflicting transitions (long and short theses on same class/region) OR no thesis passes step 4"
+  class: cash
+  direction: flat
+  region: ANY
+  premises: []
+  invalidation: []
+  rules: [R-54, R-55]
+  mech: yes
+  notes: "cash default with nearest misses and blocking vetoes"

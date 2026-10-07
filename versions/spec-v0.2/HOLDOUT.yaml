@@ -1,0 +1,127 @@
+version: 4
+purpose: Sealed holdout for the final Gate 1 / Gate 2 test (spec/HOLDOUT.md). Do not edit.
+seed: 20261006
+method: 'Episode-level draw, numpy.random.default_rng(seed); every list sorted before each draw. n_target = round(n_episodes
+  / 3). (1) Gate 1 episodes (episodes with an era-A turning-point case with a regime target; turning points by turning_point_ids
+  on the full corpus): ceil(n / 2) drawn by rng.permutation. (2) If exactly two episodes contain 13F cases (targets.tilt):
+  exactly one is held out; if step 1 took none, one is drawn by rng.permutation; if it took both, the one drawn
+  second by rng.permutation is returned to research and replaced by an undrawn non-13F Gate 1 episode drawn by rng.permutation.
+  (3) If no held-out episode is era B (all cases era B), one era-B episode is drawn by rng.permutation. (4) The
+  remaining episodes (13F episodes excluded when step 2 applied) are permuted and added in that order until n_target
+  is reached. Hash: fatpitch.cases.schema.corpus_sha256.'
+created_utc: '2026-10-07T05:35:12+00:00'
+hash_method: sha256 over sorted 'relative_path NUL sha256(file bytes) LF' lines (fatpitch.cases.schema.corpus_sha256),
+  paths relative to cases/
+holdout_episodes:
+- EP02-1988-BEAR
+- EP07-2000-RATES
+- EP10-2009-LIQ
+- EP14-2018-QT
+- EP16-2020-COVID
+- EP17-2021-MANIA
+- EP19-2023-RATES
+holdout_n_cases: 24
+holdout_sha256: 891120244c786d0b3cb90bf290a5085b26b4975ea6374adcf25a929260913269
+research_n_cases: 48
+research_sha256: cbc5936cac10280066e0c8fdd2a55175a1bf4b93a8a38b8e593bb8d46c206fb3
+full_sha256: bd2c44cbc91ffdd1bece3f1a4c1469a5f677869f4fc7d4f58c23ca68b6c6c1c1
+counts_full_corpus_turning:
+  research:
+    cases: 48
+    episodes: 13
+    era_A_cases: 39
+    era_B_cases: 9
+    era_A_episodes: 9
+    era_B_episodes: 4
+    turning_points: 11
+    turning_with_regime_target: 4
+    gate1_cases: 4
+    gate1_episodes: 3
+    thesis_target_cases: 35
+    gate2_cases: 29
+    gate2_episodes: 9
+    thirteen_f_cases: 1
+    truth_process: 6
+    truth_action: 42
+    mechanizable_yes: 38
+    mechanizable_partial: 2
+    mechanizable_no: 8
+    reliability_primary: 4
+    reliability_near-primary: 33
+    reliability_secondary: 11
+  holdout:
+    cases: 24
+    episodes: 7
+    era_A_cases: 22
+    era_B_cases: 2
+    era_A_episodes: 5
+    era_B_episodes: 2
+    turning_points: 4
+    turning_with_regime_target: 4
+    gate1_cases: 4
+    gate1_episodes: 3
+    thesis_target_cases: 17
+    gate2_cases: 15
+    gate2_episodes: 5
+    thirteen_f_cases: 1
+    truth_process: 1
+    truth_action: 23
+    mechanizable_yes: 24
+    mechanizable_partial: 0
+    mechanizable_no: 0
+    reliability_primary: 2
+    reliability_near-primary: 13
+    reliability_secondary: 9
+reseal_reason: 'spec-v0.2: add 2018-12-18 Treasury-long case (owner decision 2026-10-07); holdout never opened'
+unseal_log_absent_at_reseal: true
+previous:
+- version: 1
+  seed: 20261006
+  created_utc: '2026-10-06T19:59:33+00:00'
+  holdout_episodes:
+  - EP01-1981-BONDS
+  - EP09-2008-CRISIS
+  - EP13-2016-REGIME
+  - EP15-2019-TARIFF
+  - EP16-2020-COVID
+  - EP17-2021-MANIA
+  holdout_n_cases: 19
+  holdout_sha256: 867913efb0ba0fb67a59051b5563fc809adbdf2fc7f8fa72480b7c6eab061807
+  research_n_cases: 37
+  research_sha256: 907861d5fab5cf2b4e510c12713b100edd46abc72a2aa268a567b732ae517430
+  full_sha256: 8ff13ad73aceed22cfcb86180946c485d6c35547153966bd5f0b342eb3f87bae
+  holdout_yaml_sha256: 902bf4aae713d566d2b1a0f8cbdc46a40badbfe7a3078f2f57f0b3eb3f9a896a
+- version: 2
+  seed: 20261006
+  created_utc: '2026-10-06T20:14:51+00:00'
+  holdout_episodes:
+  - EP07-2000-RATES
+  - EP09-2008-CRISIS
+  - EP11-2012-13-QE
+  - EP14-2018-QT
+  - EP15-2019-TARIFF
+  - EP16-2020-COVID
+  - EP18-2022-INFL
+  holdout_n_cases: 26
+  holdout_sha256: 9d33be6b3a853f7d6b54df94c5aa2c3e1d6634329cc76af0316f0a26e5f54c1b
+  research_n_cases: 42
+  research_sha256: 113024a092cda35461186507b7713886db4040262900ae3e63732845ebf504af
+  full_sha256: f22261e8d9727ca2ffde328b8a7954710e1a27d18135a00e7308c4460ac1dc73
+  holdout_yaml_sha256: 49e48edb139e65a675f9e9617cd578117e5831cfcfb0e9df5081d9331dfda2b8
+- version: 3
+  seed: 20261006
+  created_utc: '2026-10-06T21:01:57+00:00'
+  holdout_episodes:
+  - EP02-1988-BEAR
+  - EP07-2000-RATES
+  - EP10-2009-LIQ
+  - EP14-2018-QT
+  - EP16-2020-COVID
+  - EP17-2021-MANIA
+  - EP19-2023-RATES
+  holdout_n_cases: 23
+  holdout_sha256: e2a0f283c1cee71d7360525c51a3406993056a7d4aafff16e2c2fbfcda4152fd
+  research_n_cases: 48
+  research_sha256: cbc5936cac10280066e0c8fdd2a55175a1bf4b93a8a38b8e593bb8d46c206fb3
+  full_sha256: 7117930e54ff4518b362431157958ac0c473eae1da50486bce6c9e89b064e904
+  holdout_yaml_sha256: f72f81a2d52d1bb18ed49cca2e0ceb1d5fdf1c913e26a342089b73a1b3c0e079

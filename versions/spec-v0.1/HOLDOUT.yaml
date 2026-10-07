@@ -1,0 +1,94 @@
+version: 2
+purpose: Sealed holdout for the final Gate 1 / Gate 2 test (spec/HOLDOUT.md). Do not edit.
+seed: 20261006
+method: 'Episode-level draw, numpy.random.default_rng(seed); every list sorted before each draw. n_target = round(n_episodes
+  / 3). (1) Gate 1 episodes (episodes with an era-A turning-point case with a regime target; turning points by turning_point_ids
+  on the full corpus): ceil(n / 2) drawn by rng.permutation. (2) If exactly two episodes contain 13F cases (targets.tilt):
+  exactly one is held out; if step 1 took none, one is drawn by rng.permutation; if it took both, the one drawn
+  second by rng.permutation is returned to research and replaced by an undrawn non-13F Gate 1 episode drawn by rng.permutation.
+  (3) If no held-out episode is era B (all cases era B), one era-B episode is drawn by rng.permutation. (4) The
+  remaining episodes (13F episodes excluded when step 2 applied) are permuted and added in that order until n_target
+  is reached. Hash: fatpitch.cases.schema.corpus_sha256.'
+created_utc: '2026-10-06T20:14:51+00:00'
+hash_method: sha256 over sorted 'relative_path NUL sha256(file bytes) LF' lines (fatpitch.cases.schema.corpus_sha256),
+  paths relative to cases/
+holdout_episodes:
+- EP07-2000-RATES
+- EP09-2008-CRISIS
+- EP11-2012-13-QE
+- EP14-2018-QT
+- EP15-2019-TARIFF
+- EP16-2020-COVID
+- EP18-2022-INFL
+holdout_n_cases: 26
+holdout_sha256: 9d33be6b3a853f7d6b54df94c5aa2c3e1d6634329cc76af0316f0a26e5f54c1b
+research_n_cases: 42
+research_sha256: 113024a092cda35461186507b7713886db4040262900ae3e63732845ebf504af
+full_sha256: f22261e8d9727ca2ffde328b8a7954710e1a27d18135a00e7308c4460ac1dc73
+counts_full_corpus_turning:
+  research:
+    cases: 42
+    episodes: 13
+    era_A_cases: 32
+    era_B_cases: 10
+    era_A_episodes: 8
+    era_B_episodes: 5
+    turning_points: 11
+    turning_with_regime_target: 6
+    gate1_cases: 6
+    gate1_episodes: 4
+    thesis_target_cases: 34
+    gate2_cases: 27
+    gate2_episodes: 8
+    thirteen_f_cases: 1
+    truth_process: 5
+    truth_action: 37
+    mechanizable_yes: 34
+    mechanizable_partial: 1
+    mechanizable_no: 7
+    reliability_primary: 2
+    reliability_near-primary: 32
+    reliability_secondary: 8
+  holdout:
+    cases: 26
+    episodes: 7
+    era_A_cases: 25
+    era_B_cases: 1
+    era_A_episodes: 6
+    era_B_episodes: 1
+    turning_points: 6
+    turning_with_regime_target: 6
+    gate1_cases: 6
+    gate1_episodes: 4
+    thesis_target_cases: 17
+    gate2_cases: 16
+    gate2_episodes: 6
+    thirteen_f_cases: 1
+    truth_process: 2
+    truth_action: 24
+    mechanizable_yes: 24
+    mechanizable_partial: 1
+    mechanizable_no: 1
+    reliability_primary: 1
+    reliability_near-primary: 13
+    reliability_secondary: 12
+reseal_reason: 'owner decision 2026-10-06: corpus expansion (12 cases, tools/build_cases_v2.py) before any engine
+  scoring; cases added to v1 holdout episodes; holdout never opened (cases/UNSEAL_LOG.txt absent)'
+unseal_log_absent_at_reseal: true
+previous:
+- version: 1
+  seed: 20261006
+  created_utc: '2026-10-06T19:59:33+00:00'
+  holdout_episodes:
+  - EP01-1981-BONDS
+  - EP09-2008-CRISIS
+  - EP13-2016-REGIME
+  - EP15-2019-TARIFF
+  - EP16-2020-COVID
+  - EP17-2021-MANIA
+  holdout_n_cases: 19
+  holdout_sha256: 867913efb0ba0fb67a59051b5563fc809adbdf2fc7f8fa72480b7c6eab061807
+  research_n_cases: 37
+  research_sha256: 907861d5fab5cf2b4e510c12713b100edd46abc72a2aa268a567b732ae517430
+  full_sha256: 8ff13ad73aceed22cfcb86180946c485d6c35547153966bd5f0b342eb3f87bae
+  holdout_yaml_sha256: 902bf4aae713d566d2b1a0f8cbdc46a40badbfe7a3078f2f57f0b3eb3f9a896a

@@ -1,0 +1,920 @@
+# Fat Pitch — parameter registry v1 (E1, 2026-10-06; numbers evidence pass 2026-10-06)
+# Keys: id, value, range, tag, citation, notes, tunable
+# Tags: stated (number given by the source) | interpreted (choice made here)
+#       | interpreted-from-article (Automated Alpha origin; default weight 0)
+# Cap (PLAN E.6): at most 8 entries with tunable: true, all tag interpreted.
+# Tunable set is chosen by leave-one-episode-out fidelity; ranges shown are the
+# search ranges; fidelity must be reported across each range (±20% minimum).
+# A range on a non-tunable entry is descriptive: a stated band, or a band across
+# which fidelity is reported without fitting.
+# Every interpreted entry carries "evidence: <grade>" in notes:
+#   direct (he gave the number or an explicit equivalent) | anchored (derived from
+#   numbers he cited about his own reasoning; arithmetic shown) | convention
+#   (standard practice; named) | none. No value was chosen by checking case outcomes.
+# Every number used in a spec\process.md formula is a registry id (no hard-coded constants).
+# Citations: library\<dir>\<file>. "DS" = discovered_sources, "RS" = reference_sources.
+# stated values are never tuned. Changing any entry changes the registry sha.
+
+
+# ---------------- Step 1: regime & policy ----------------
+- id: liq.growth_window_m
+  value: 12
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md"
+  notes: "Year-over-year growth for M2SL and INDPRO in R-02. Source gives no window. evidence: convention — year-over-year growth is the standard comparison for M2 and industrial production (removes seasonality; Friedman-Schwartz money-growth practice; SentimenTrader and Ned Davis M2-minus-IP measures are 12-month). Descriptive: 12m gives 15 three-state changes per decade vs 24 at 6m and 30 at 3m (spec\\research_D1_D3_D7.md). Owner decision 2026-10-06 (D1): stays 12."
+  tunable: false
+
+- id: liq.m2_ip.spread_pp
+  value: 3.5
+  range: [1.0, 7.0]
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md ('money supply growing a lot faster than industrial production')"
+  notes: "Threshold for 'a lot faster' in R-02 (M2 yoy minus IP yoy, percentage points). Tunable 1/8. evidence: convention/descriptive — 'a lot faster' is unquantified in Feig 2009 and no M2 or IP figures are cited with it (library and web search, spec\\research_D1_D3_D7.md). L2 drifts positive because nominal M2 is compared with real IP: real-time (ALFRED) median 3.37 pp, p25 0.35, p75 6.69 (1980-2026). 3.5 = smallest round value above the median gap ('faster than usual'); range [1, 7] = about p27-p77; real-time revision noise MAD 1.25 pp, so 1 pp grid. Owner decision 2026-10-06 (D1): 3.5 (was 2.0), tunable [1, 7] (was [0, 6])."
+  tunable: true
+
+- id: liq.confirm_periods
+  value: 2
+  range: [1, 3]
+  tag: interpreted
+  citation: "none (design choice)"
+  notes: "Consecutive observations (months for R-02; weeks for R-03/R-04) required before an impulse sign change is recorded as a transition. Range = fidelity reported across it, not fitted (numbers_review.md option D). evidence: none — minimal whipsaw filter; no source statement. Applies to every liquidity transition and therefore to T01/T02 timing. Owner decision 2026-10-06 (D8): A — 2, reported [1, 3]."
+  tunable: false
+
+- id: liq.netliq.window_w
+  value: 13
+  range: null
+  tag: interpreted
+  citation: "RS/2018-09-06_sokoloff-real-vision-interview.md (rate of change of balance sheets)"
+  notes: "Change window (weeks) for R-03 and R-04 impulse; 13w approximates the quarterly flow framing in ECNY 2020. evidence: convention — 13 weeks = one quarter, the standard horizon for balance-sheet flow comparisons and the horizon of the ECNY 2020 Mar-May framing. Not his number."
+  tunable: false
+
+- id: liq.qe_end_setback_m
+  value: 6
+  range: null
+  tag: interpreted
+  citation: "DS/2012-04-XX_grants-spring-conference-jim-grant.md (QE rallies came apart within about six months of ending); secondary notes"
+  notes: "Window after QE end in which R-14 expects equity setback. Secondary source; stated by him per attendee notes. evidence: direct — 'about six months' is his per an attendee write-up (reliability: secondary summary). Spec convention requires a primary or near-primary note for stated. Retagged stated -> interpreted; value unchanged."
+  tunable: false
+
+- id: policy.ff_change_window_m
+  value: 6
+  range: [3, 12]
+  tag: interpreted
+  citation: "DS/2014-07-16_delivering-alpha-kernen.md ('stay long until the Fed tightens'; no window)"
+  notes: "Used by R-14. Moved from a process.md formula constant (2026-10-06). evidence: none — policy_direction = sign of FF target change over this window. First hike flips the sign at once unless cuts occurred within the window. Range [3, 12] reported, not fitted."
+  tunable: false
+
+- id: policy.holdings_change_window_w
+  value: 13
+  range: null
+  tag: interpreted
+  citation: "RS/2018-09-06_sokoloff-real-vision-interview.md (rate of change of central-bank buying)"
+  notes: "Used by R-14. Moved from a process.md formula constant (2026-10-06). evidence: convention — 13 weeks = one quarter, same horizon as liq.netliq.window_w; taper read from the change in this window's change."
+  tunable: false
+
+- id: policy.tg_threshold_pp
+  value: 2.0
+  range: [1.0, 3.0]
+  tag: interpreted
+  citation: "RS/2015-01-18_lost-tree-club-speech.md (estimates 3-6% vs actual 1%)"
+  notes: "|FF - Taylor u-gap rate| beyond which policy-error sign is set (R-06). His cited gaps: 2003 >=2pp, 2016 ~2.5pp, 2017 ~3pp, 2018 ~2.5-3pp. Tunable 2/8. evidence: anchored — his cited Fed-vs-rule gaps: 2003 lowest staff guess 3% - FF 1% = 2.0pp; 2015 traditional rule 1.75% - 0 = 1.75pp and Fed-cited variant 3.5% - 0 = 3.5pp; 2016 ~3% - 0.5% = 2.5pp; 2017 ~4% - 1% = 3.0pp; 2018 4-5% - 1.75% = 2.25-3.25pp. Minimum cited gap = 1.75pp; value 2.0 sits at the 2003 anchor; range [1.0, 3.0] spans all cited gaps except the high variants."
+  tunable: true
+
+- id: policy.taylor_rstar_pct
+  value: 2.0
+  range: null
+  tag: interpreted
+  citation: "Taylor (1993) convention; not from source"
+  notes: "Neutral real rate in R-06. evidence: convention — Taylor (1993) r* = 2%. Shifts the rule rate one-for-one, so it moves the policy-error sign directly. Real-time r* estimates (Laubach-Williams) fell well below 2% after 2008; not used because he cites the traditional rule. Owner decision 2026-10-06 (D15): 2.0 fixed; fidelity also reported with real-time Laubach-Williams r* (policy.taylor_rstar_sensitivity)."
+  tunable: false
+
+- id: policy.taylor_rstar_sensitivity
+  value: "laubach_williams_realtime"
+  range: null
+  tag: interpreted
+  citation: "none (convention: Laubach-Williams 2003 natural-rate model, vintaged estimates)"
+  notes: "R-06 sensitivity variant: fidelity is also reported with real-time (vintaged) Laubach-Williams r* in place of policy.taylor_rstar_pct. Report only; never used for the primary score. Owner decision 2026-10-06 (D15). Not a number; excluded from numbers_review.md counts. evidence: convention."
+  tunable: false
+
+- id: policy.taylor_pi_target_pct
+  value: 2.0
+  range: null
+  tag: interpreted
+  citation: "Taylor (1993) convention"
+  notes: "Inflation target in R-06. He criticises the 2% target (CNBC 2017-12-12); used only as the Fed's own reaction-function benchmark. evidence: convention — Taylor (1993) and the FOMC's 2012 explicit 2% target."
+  tunable: false
+
+- id: policy.taylor_infl_coef
+  value: 0.5
+  range: null
+  tag: interpreted
+  citation: "Taylor (1993)"
+  notes: "Coefficient on (pi - pi*). evidence: convention — Taylor (1993) coefficient 0.5."
+  tunable: false
+
+- id: policy.taylor_ugap_coef
+  value: 1.0
+  range: null
+  tag: interpreted
+  citation: "Taylor (1993) 0.5 x output gap with Okun factor 2"
+  notes: "Coefficient on (NROU - UNRATE). Sensitivity run at 2.0 (Taylor 1999 variant), reported not tuned. evidence: convention — Taylor (1993) 0.5 on the output gap times Okun factor 2 = 1.0 on the unemployment gap; arithmetic: 0.5 x 2 = 1.0."
+  tunable: false
+
+- id: infl.soft_landing_pct
+  value: 4.5
+  range: null
+  tag: stated
+  citation: "RS/2022-06-10_sohn-2022-collison-conversation.md ('never had a soft landing after inflation has got above 4.5%')"
+  notes: "R-07. Measure: CPIAUCSL yoy (headline); source does not specify headline vs core."
+  tunable: false
+
+- id: infl.persist_pct
+  value: 5.0
+  range: null
+  tag: stated
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md ('Once inflation gets above 5%, it's never come down unless Fed funds have gotten above the CPI')"
+  notes: "R-08 and R-09 threshold."
+  tunable: false
+
+- id: infl.r08_expected_to_hold
+  value: false
+  range: null
+  tag: stated
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md; RS/2022-06-10_sohn-2022-collison-conversation.md ('this time that will probably be broken')"
+  notes: "He expected the FF>CPI regularity (R-08) could break in the 2022 cycle while R-09 (no taming without recession) would hold. R-08 is therefore a veto flag, not a forecast of required FF path."
+  tunable: false
+
+- id: infl.lookback_m
+  value: 24
+  range: [12, 36]
+  tag: interpreted
+  citation: "RS/2022-06-10_sohn-2022-collison-conversation.md (no window given)"
+  notes: "Used by R-07, R-09. Moved from a process.md formula constant (2026-10-06). evidence: none — trailing window in which CPI yoy above the stated 4.5%/5% thresholds keeps the no-soft-landing / recession prior active. Source gives no window. Range [12, 36] reported (fidelity shown across it, not fitted)."
+  tunable: false
+
+- id: xasset.window_m
+  value: 6
+  range: [3, 12]
+  tag: interpreted
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md; RS/2024-11-06_nbim-in-good-company-podcast.md ('three death knells'); DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md ('The four months off')"
+  notes: "Change window for DGS10, DCOILWTICO, USD index in R-10. Tunable 3/8. evidence: anchored/convention — no explicit window in Sohn 2022, NBIM 2024 or Real Vision 2018; the only dated account is 2000, moves seen on returning around Labor Day after 'four months off' (Feig 2009; NBIM 2024 'I come back'), about 4 months. Hyman's one-year horizon is the earnings forecast horizon, not the input window. Literature leans 12m (FCI impulse; Hamilton net oil price increase). Descriptive 1973-2026: all three up in 13-17% of months at any window; daily on/off changes per year 11.2 at 3m, 7.0 at 6m, 3.3 at 12m (spec\\research_D1_D3_D7.md). Fires T08 directly. Owner decision 2026-10-06 (D3): 6 (was 3), tunable [3, 12]."
+  tunable: true
+
+- id: xasset.min_move_sd
+  value: 0.25
+  range: [0.0, 0.5]
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md ('oil was screaming upward, interest rates were screaming upward'); RS/2018-09-06_sokoloff-real-vision-interview.md ('the dollar is going way up')"
+  notes: "R-10 reported variant only: each of the three moves over xasset.window_m must exceed this many standard deviations of its own window change (sd over the expanding as-of history). The main rule stays direction-only; fidelity is reported with and without the floor. Range [0, 0.5] reported, not fitted. evidence: none — his wording describes large moves but gives no magnitude; descriptive: a 0.25 sd floor halves the joint-rise frequency (about 15% to 8% of months, 1986-2026) at every window. Owner decision 2026-10-06 (D3)."
+  tunable: false
+
+- id: fci.loose_threshold
+  value: 0.0
+  range: null
+  tag: interpreted
+  citation: "DS/2024-10-16_bloomberg-tv-sonali-basak.md ('we don't see any restriction whatsoever')"
+  notes: "NFCI below this = loose (R-58). NFCI is zero-mean by construction. evidence: convention — NFCI is constructed with mean 0 = average conditions (Chicago Fed definition); negative = looser than average."
+  tunable: false
+
+- id: fci.change_window_w
+  value: 13
+  range: null
+  tag: interpreted
+  citation: "DS/2024-10-16_bloomberg-tv-sonali-basak.md"
+  notes: "Used by R-58. Moved from a process.md formula constant (2026-10-06). evidence: convention — quarterly change in NFCI; 13 weeks matches other weekly flow windows in this registry."
+  tunable: false
+
+- id: fragility.high_percentile
+  value: 80
+  range: [70, 90]
+  tag: interpreted
+  citation: "RS/2015-01-18_lost-tree-club-speech.md (alerts, not timing)"
+  notes: "Composite fragility percentile (expanding window, as-of) above which fragility_level = high (R-11). Tunable 4/8. evidence: convention — top-quintile cut, the usual cut in percentile sorts. No source level: Lost Tree compares single gauges with 1999, not a composite. Drives the long size multiplier, T20 and the R-61 block."
+  tunable: true
+
+- id: fragility.unprofitable_ipo_ref_pct
+  value: 80
+  range: null
+  tag: stated
+  citation: "RS/2015-01-18_lost-tree-club-speech.md ('80 percent of them are unprofitable... only other time... 1999')"
+  notes: "Reference level for display/attribution; DA 2014 gives 80% vs 83% in 1999."
+  tunable: false
+
+- id: fragility.b_rated_share_ref_pct
+  value: 71
+  range: null
+  tag: stated
+  citation: "RS/2015-01-18_lost-tree-club-speech.md (28% -> 71%)"
+  notes: "Reference; DA 2014 says 70% B-or-worse vs 31% in 1990s. No free series; SIFMA HY share as proxy (D-19)."
+  tunable: false
+
+- id: fragility.covlite_share_ref_pct
+  value: 60
+  range: null
+  tag: stated
+  citation: "RS/2015-01-18_lost-tree-club-speech.md (<20% -> >60%)"
+  notes: "Reference only; no free history (gap)."
+  tunable: false
+
+- id: fragility.min_components
+  value: 2
+  range: null
+  tag: interpreted
+  citation: "none (convention)"
+  notes: "Used by R-11. Moved from a process.md formula constant (2026-10-06). evidence: none — composite with fewer available components returns unknown. Data-availability guard; no source."
+  tunable: false
+
+- id: fragility.credit_gdp_change_q
+  value: 4
+  range: null
+  tag: interpreted
+  citation: "DS/2015-03-02_cnbc-closing-bell-kelly-evans.md (corporate debt $3.5T -> $7T; no window)"
+  notes: "Used by R-11. Moved from a process.md formula constant (2026-10-06). evidence: convention — quarters over which nonfinancial corporate debt/GDP change is measured (year-over-year, the standard credit-gap comparison); one of six fragility components."
+  tunable: false
+
+- id: rates.ngdp_anchor_gap_pp
+  value: 0.0
+  range: null
+  tag: interpreted
+  citation: "DS/2024-10-16_bloomberg-tv-sonali-basak.md ('the ten year's to trade around where nominal GDP is')"
+  notes: "R-56: DGS10 minus trailing NGDP yoy; below 0 = bonds rich (short-duration evidence). evidence: direct — 'the ten year's to trade around where nominal GDP is' -> anchor gap 0 is his; using 0 as a one-sided threshold (below = rich) rather than a band is a mapping. Retagged stated -> interpreted."
+  tunable: false
+
+- id: rates.ngdp_cheap_gap_pp
+  value: 2.0
+  range: null
+  tag: interpreted
+  citation: "DS/2024-10-16_bloomberg-tv-sonali-basak.md (anchor only; symmetry not stated)"
+  notes: "Used by R-56. Moved from a process.md formula constant (2026-10-06). evidence: none — DGS10 - NGDP yoy above this adds one evidence family to long duration. He states only the anchor and the rich side; the cheap-side band is chosen here."
+  tunable: false
+
+- id: fiscal.issuance_median_y
+  value: 5
+  range: null
+  tag: interpreted
+  citation: "DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md (no window)"
+  notes: "Used by R-63. Moved from a process.md formula constant (2026-10-06). evidence: none — as-of median of issuance/GDP over this many years is the baseline for 'heavy supply'."
+  tunable: false
+
+- id: fiscal.deficit_gdp_pct
+  value: 5.0
+  range: null
+  tag: interpreted
+  citation: "DS/2026-08-24_wsj-oped-let-the-bond-market-speak.md (deficit near 6% of GDP); DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md ($1T full-employment deficit)"
+  notes: "Used by R-63. Moved from a process.md formula constant (2026-10-06). evidence: anchored — deficits he cited as excessive at full employment: 2026 ~6% of GDP; 2019 $1T / ~$21.4T GDP = ~4.7%, at a time he says deficits did not drive his trading (rule dropped Oct 2023). 5% lies between ~4.7% and ~6%."
+  tunable: false
+
+- id: fiscal.active_from_year
+  value: 2023
+  range: null
+  tag: interpreted
+  citation: "DS/2023-10-24_robin-hood-paul-tudor-jones.md (threw out his rule against letting deficits drive trading)"
+  notes: "Used by R-63. Moved from a process.md formula constant (2026-10-06). evidence: direct — first year R-63 is active in fidelity scoring; year of his own stated rule change."
+  tunable: false
+
+
+# ---------------- Step 1b: internals ----------------
+- id: internals.rs_lookback_m
+  value: 6
+  range: [3, 12]
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (monthly charts predict 8-20 months)"
+  notes: "Relative-strength lookback for leading-industry turns (R-16). Tunable 5/8. evidence: convention — 6-month formation period is the standard relative-strength window (Jegadeesh-Titman 1993). Feig's 8-20 month monthly-chart horizon is a forecast horizon, not a look-back."
+  tunable: true
+
+- id: internals.turn_confirm_m
+  value: 2
+  range: null
+  tag: interpreted
+  citation: "none (convention)"
+  notes: "Used by R-15. Moved from a process.md formula constant (2026-10-06). evidence: none — months a sign change in leading-set RS must persist to count as a turn; mirrors liq.confirm_periods."
+  tunable: false
+
+- id: internals.lead_m
+  value: [6, 12]
+  range: null
+  tag: stated
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md ('Stocks tend to lead the fundamentals by somewhere between 6 and 12 months')"
+  notes: "R-15 lead window; used for premise age and scoring window diagnostics."
+  tunable: false
+
+- id: internals.momentum_bottom_lead_m
+  value: [12, 18]
+  range: null
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (momentum tools bottom 12-18 months before fundamentals)"
+  notes: "R-18. Conflicts with 6-12m (Sohn 2022); both retained, different object (momentum tools vs price level)."
+  tunable: false
+
+- id: internals.curve_credit_trend_m
+  value: 3
+  range: null
+  tag: interpreted
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md (no window)"
+  notes: "Used by R-17. Moved from a process.md formula constant (2026-10-06). evidence: none — direction window for curve and credit signals; same as xasset.window_m default."
+  tunable: false
+
+- id: internals.qe_signal_weight
+  value: 0.5
+  range: [0.0, 0.5]
+  tag: interpreted
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md (bond signal 'corrupted'/'destroyed' by QE); DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md ('over-rated')"
+  notes: "Used by R-17. Moved from a process.md formula constant (2026-10-06). evidence: none — weight on curve/credit evidence while QE is active ('halved'). His wording ('destroyed') points to a lower weight than 0.5; no magnitude given. Range [0, 0.5] reported, not fitted."
+  tunable: false
+
+- id: internals.leading_set
+  value: ["homebuilding", "trucking_transport", "retail", "banks", "small_caps", "metals", "semis"]
+  range: null
+  tag: stated
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md (homebuilders, trucking, retail); DS/2019-06-03_econclub-ny-bessent.md (retail, Russell 2000, metals); DS/2018-12-16_wsj-oped-warsh-fed-tightening-not-now.md (banks, housing, transports, industrials)"
+  notes: "Named industries; mapping to French 49-industry / sector ETF codes is interpreted (process.md R-16). semis added as interpreted (2024-26 AI leadership); flag separately."
+  tunable: false
+
+- id: internals.breadth_thrust
+  value: "Zweig: 10-day EMA of advances/(advances+declines) rises from <0.40 to >0.615 within 10 trading days (NYSE issues)"
+  range: null
+  tag: interpreted
+  citation: "DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md ('record volume and record breadth'); DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md ('breadth thrust')"
+  notes: "R-60. evidence: convention — classic Zweig breadth thrust (Martin Zweig, NYSE advancing/declining issues); his statement is 'record volume and record breadth' with no thresholds. Source segments: NYSE A/D (Unicorn archive) 1965-03-01..2020-02-10; S&P 500 member breadth (amber Alpaca x N-PORT) from 2021-09-22 with internals.breadth_thrust_spx_low/high; gap 2020-02-11..2021-09-21 uses internals.breadth_thrust_industry_fallback, flagged in output; forward NYSE A/D from a daily WSJ Markets Diary snapshot (personal research only; WSJ terms restrict automated use). On Unicorn data this definition finds 11 thrusts 1965-2020 (data-integrity check only). Owner decision 2026-10-06 (D7): Zweig on NYSE A/D (was industries above trend <20% -> >80% within 10 weeks). Sensitivities reported: up-volume confirmation; % of S&P 500 above 50dma from <20% to >80% within 50 days."
+  tunable: false
+
+- id: internals.breadth_thrust_spx_low
+  value: 0.40
+  range: null
+  tag: interpreted
+  citation: "DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md ('breadth thrust')"
+  notes: "R-60 on S&P 500 member breadth (2021-09-22 onward): lower Zweig threshold for the 10-day EMA of member advances/(advances+declines). Provisional. evidence: convention/descriptive — matched to the NYSE crossing frequency (EMA below 0.40 on 6.3% of NYSE days 1965-2020); the matched member value is 0.401 (2021-09..2026-10, 4 years of data; spec\\research_D1_D3_D7.md). Owner decision 2026-10-06 (D7)."
+  tunable: false
+
+- id: internals.breadth_thrust_spx_high
+  value: 0.646
+  range: null
+  tag: interpreted
+  citation: "DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md ('breadth thrust')"
+  notes: "R-60 on S&P 500 member breadth (2021-09-22 onward): upper Zweig threshold (replaces 0.615, which is NYSE-calibrated; member EMA is more dispersed, p99 0.658 vs 0.629 on NYSE). Provisional. evidence: convention/descriptive — matched to the NYSE crossing frequency (EMA above 0.615 on 2.1% of NYSE days 1965-2020) over 4 years of member data (spec\\research_D1_D3_D7.md). Owner decision 2026-10-06 (D7)."
+  tunable: false
+
+- id: internals.breadth_thrust_industry_fallback
+  value: "share of industries above trend rises from <20% to >80% within 10 weeks"
+  range: null
+  tag: interpreted
+  citation: "DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md ('record volume and record breadth')"
+  notes: "R-60 gap fill only, 2020-02-11..2021-09-21 (no free survivorship-free A/D or member breadth); output flagged breadth_source=industry_fallback. Previous primary definition (industry-level adaptation of Zweig, French-49 daily; above-trend uses internals.industry_trend_w). evidence: none — no source thresholds. Owner decision 2026-10-06 (D7)."
+  tunable: false
+
+- id: internals.breadth_sensitivity_pct50_thrust
+  value: "% of S&P 500 members above 50-day average rises from <20% to >80% within 50 trading days"
+  range: null
+  tag: interpreted
+  citation: "DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md ('breadth thrust')"
+  notes: "R-60 sensitivity variant, report only; never used for the primary score. Computable 2021-12 onward from amber Alpaca x N-PORT (1996 onward only with survivorship-biased Yahoo prices). evidence: none — practitioner variant; thresholds not his. Owner decision 2026-10-06 (D7). Not a number; excluded from numbers_review.md counts."
+  tunable: false
+
+- id: internals.breadth_sensitivity_upvolume
+  value: "thrust confirmed if at least one NYSE day with up-volume >= 90% of (up+down) volume occurs within the 10 trading days ending on the thrust day"
+  range: null
+  tag: interpreted
+  citation: "DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md ('record volume and record breadth')"
+  notes: "R-60 sensitivity variant (volume confirmation), report only; never used for the primary score. NYSE up/down volume: Unicorn 1965-03..2020-02; WSJ snapshot forward; not available on the S&P 500 member segment (unknown, not fail). evidence: convention — 90% up-volume day (Lowry Research / P. Desmond); his wording names volume but gives no threshold. Owner decision 2026-10-06 (D7). Not a number; excluded from numbers_review.md counts."
+  tunable: false
+
+- id: internals.industry_trend_w
+  value: 40
+  range: null
+  tag: interpreted
+  citation: "RS/2024-11-06_nbim-in-good-company-podcast.md (leadership narrowing)"
+  notes: "Used by R-59, R-60. Moved from a process.md formula constant (2026-10-06). evidence: convention — industry above/below trend = price vs 40-week moving average (Weinstein 1988); fixed, not tied to the tunable chart.trend_lookback_w."
+  tunable: false
+
+- id: internals.narrowing_window_m
+  value: 6
+  range: null
+  tag: interpreted
+  citation: "RS/2024-11-06_nbim-in-good-company-podcast.md"
+  notes: "Used by R-59. Moved from a process.md formula constant (2026-10-06). evidence: none — window over which internals.narrowing_drop_pts is measured."
+  tunable: false
+
+- id: internals.thrust_override_m
+  value: 6
+  range: null
+  tag: interpreted
+  citation: "DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md ('6 to 12 months down the road, you're out of recession')"
+  notes: "Used by R-60. Moved from a process.md formula constant (2026-10-06). evidence: anchored — months a breadth thrust overrides a negative liquidity impulse for equity direction; lower bound of his stated 6-12 month horizon."
+  tunable: false
+
+
+# ---------------- Step 2: theses ----------------
+- id: horizon.min_m
+  value: 18
+  range: null
+  tag: stated
+  citation: "RS/2015-01-18_lost-tree-club-speech.md ('18 months from now'); DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md (18 months to 3 years)"
+  notes: "R-20. Sohn 2022 gives 12-18m; NBIM 2023 'a year or two'."
+  tunable: false
+
+- id: horizon.max_m
+  value: 36
+  range: null
+  tag: stated
+  citation: "DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md"
+  notes: "R-20. NBIM 2024 adds 2-4 year trends."
+  tunable: false
+
+- id: horizon.trend_y
+  value: [2, 4]
+  range: null
+  tag: stated
+  citation: "RS/2024-11-06_nbim-in-good-company-podcast.md (looks for 2-4 year trends)"
+  notes: "Expected thesis life; premise review cadence."
+  tunable: false
+
+- id: fx.trend_persistence_y
+  value: 2
+  range: null
+  tag: stated
+  citation: "DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md ('never seen a major currency trend last less than two years'); DS/2023-04-24_nbim-annual-investment-conference.md (2-3 years)"
+  notes: "R-65 persistence prior for FX theses."
+  tunable: false
+
+- id: curve.cut_pricing_bp
+  value: 50
+  range: [25, 50]
+  tag: interpreted
+  citation: "DS/2023-04-24_nbim-annual-investment-conference.md (2y below 4% with FF 5.25%)"
+  notes: "|DGS2 - FF| beyond which the market is pricing cuts/hikes (R-23). Tunable 6/8. evidence: anchored — his statements about what the curve priced: NBIM 2023 2y below 4% vs FF 5.25% -> gap <= -125bp read as cuts priced; 2019-05 2y ~2.30% vs FF ~2.38% (effective) -> gap ~-8bp read as a one-way bet (cuts not priced); 2y ~1.85% -> gap ~-53bp read as 'asymmetry gone'. A threshold in (8, 53] bp separates his readings; value 50 lies inside; the upper part of the search range (53-100) contradicts the 2019 reading. Owner decision 2026-10-06 (D17): keep 50; tunable range narrowed from [25, 100] to [25, 50]."
+  tunable: true
+
+- id: bear.post_bubble_min_m
+  value: 6
+  range: null
+  tag: stated
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md ('Six months bear markets preceded by asset bubbles don't exist')"
+  notes: "R-61 minimum duration prior."
+  tunable: false
+
+- id: bear.decline_pct
+  value: 20
+  range: null
+  tag: interpreted
+  citation: "none (convention)"
+  notes: "Used by R-61. Moved from a process.md formula constant (2026-10-06). evidence: convention — index decline from the as-of running peak that marks a bear market; 20% is the standard market definition."
+  tunable: false
+
+- id: bear.fragility_lookback_m
+  value: 12
+  range: [6, 24]
+  tag: interpreted
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md (bubble-preceded bear markets; no window)"
+  notes: "Used by R-61. Moved from a process.md formula constant (2026-10-06). evidence: none — fragility_level must have been high within this many months before the decline began for the post-bubble block to apply. Owner decision 2026-10-06 (D4): range [6, 24] reported, not fitted."
+  tunable: false
+
+
+# ---------------- Step 3-4: expression & veto ----------------
+- id: chart.trend_lookback_w
+  value: 40
+  range: [20, 52]
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (daily/weekly/monthly second-derivative rate of change)"
+  notes: "Weekly trend lookback for chart-quality veto (R-29); monthly and daily windows scale from it (process.md R-29). Tunable 7/8. evidence: convention — 40-week moving average (~200 trading days) is the standard weekly trend line (Weinstein 1988 stage analysis). Feig's weekly charts 'predict 8-20 weeks' is a forecast horizon, not this look-back."
+  tunable: true
+
+- id: chart.monthly_roc_m
+  value: 12
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (monthly charts, second-derivative rate of change)"
+  notes: "Used by R-18, R-19, R-29. Moved from a process.md formula constant (2026-10-06). evidence: convention — 12-month rate of change is the standard monthly momentum measure (Moskowitz-Ooi-Pedersen 2012 time-series momentum); falls inside Feig's 8-20 month monthly-chart horizon."
+  tunable: false
+
+- id: chart.monthly_roc_change_m
+  value: 6
+  range: [3, 12]
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (second derivative; no window)"
+  notes: "Used by R-18, R-29. Moved from a process.md formula constant (2026-10-06). evidence: none — window for the change in 12-month ROC (second derivative). No source window. Owner decision 2026-10-06 (D5): 6 (was 3); range [3, 12] reported, not fitted. owner: report 12 and highlight 3 in sensitivity tables."
+  tunable: false
+
+- id: chart.daily_roc_d
+  value: 20
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (daily charts predict 8-20 days)"
+  notes: "Used by R-29. Moved from a process.md formula constant (2026-10-06). evidence: convention — 20 trading days = one month, the common short ROC window; inside Feig's 8-20 day daily-chart horizon."
+  tunable: false
+
+- id: chart.rs_bottom_quantile
+  value: 0.2
+  range: null
+  tag: interpreted
+  citation: "none (convention)"
+  notes: "Used by R-29. Moved from a process.md formula constant (2026-10-06). evidence: convention — relative strength vs class benchmark in the bottom quintile fails the chart; quintile sorts are standard in cross-sectional momentum."
+  tunable: false
+
+- id: chart.timing_weight
+  value: 0.2
+  range: null
+  tag: interpreted
+  citation: "DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md ('technical analysis is about 20% as effective today')"
+  notes: "R-32. Number stated; mapping to a weight on timing evidence is interpreted. Veto itself keeps full weight. evidence: anchored — the number (technicals '20% as effective') is his; using it as a weight is a mapping. Arithmetic: pre-algorithm weight 1.0 x 0.20 effectiveness = 0.2. Retagged stated -> interpreted."
+  tunable: false
+
+- id: chart.timing_cutover_year
+  value: 2010
+  range: [2005, 2015]
+  tag: interpreted
+  citation: "RS/2018-09-06_sokoloff-real-vision-interview.md (algos cancelled price-vs-news); DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md"
+  notes: "Used by R-32, R-51. Moved from a process.md formula constant (2026-10-06). evidence: convention — year from which timing evidence is weighted chart.timing_weight; algorithmic/high-frequency trading passed about half of US equity volume around 2008-2010 (SEC 2010 Concept Release on Equity Market Structure). Range [2005, 2015] reported, not fitted."
+  tunable: false
+
+- id: crowd.right_fraction
+  value: 0.8
+  range: null
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md ('the crowd makes money 80% of the time'); DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md"
+  notes: "R-31: no contrarian fade; informational."
+  tunable: false
+
+- id: crowd.max_entry_delay_bd
+  value: 5
+  range: null
+  tag: interpreted
+  citation: "DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md (crowding affects entry point only)"
+  notes: "Used by R-31. Moved from a process.md formula constant (2026-10-06). evidence: none — maximum business days crowding may delay a starter entry; crowding defined by crowd.cot_crowded_percentile."
+  tunable: false
+
+- id: crowd.cot_crowded_percentile
+  value: 90
+  range: [80, 95]
+  tag: interpreted
+  citation: "DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md (crowding affects entry timing)"
+  notes: "Used by R-31. Crowding threshold: COT net speculative position percentile at or above this value counts as crowded. Range [80, 95] reported, not fitted. evidence: none — owner decision 2026-10-06; basis = COT net speculative position percentile over trailing 3 years"
+  tunable: false
+
+- id: gate.forensics.weight
+  value: 0
+  range: null
+  tag: interpreted-from-article
+  citation: "RS/2026-03-24_automated-alpha-fat-pitch-filter.md"
+  notes: "R-34. Single-name equities only if ever enabled."
+  tunable: false
+
+- id: gate.roic.weight
+  value: 0
+  range: null
+  tag: interpreted-from-article
+  citation: "RS/2026-03-24_automated-alpha-fat-pitch-filter.md"
+  notes: "R-35."
+  tunable: false
+
+- id: gate.smart_money.weight
+  value: 0
+  range: null
+  tag: interpreted-from-article
+  citation: "RS/2026-03-24_automated-alpha-fat-pitch-filter.md"
+  notes: "R-36 (Form 4 / 13F)."
+  tunable: false
+
+- id: gate.cot_contrarian.weight
+  value: 0
+  range: null
+  tag: interpreted-from-article
+  citation: "RS/2026-03-24_automated-alpha-fat-pitch-filter.md"
+  notes: "R-37. Contradicts R-31; must stay 0 unless a primary citation appears."
+  tunable: false
+
+- id: liq.instrument_min_adv_usd
+  value: 50000000
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (size relative to market liquidity)"
+  notes: "R-33 floor; real cap is size.exit_cost_max_pct_nav. evidence: none — no source figure. Rarely binds for the index/futures/FX universe; binding cap is size.exit_cost_max_pct_nav."
+  tunable: false
+
+- id: liq.adv_window_d
+  value: 20
+  range: null
+  tag: interpreted
+  citation: "none (convention)"
+  notes: "Used by R-33. Moved from a process.md formula constant (2026-10-06). evidence: convention — 20-day average daily volume, the standard one-month ADV."
+  tunable: false
+
+- id: expr.beta_window_w
+  value: 156
+  range: null
+  tag: interpreted
+  citation: "RS/1992-XX-XX_new-market-wizards-chapter.md (factors correlated with price; no window)"
+  notes: "Used by R-25. Moved from a process.md formula constant (2026-10-06). evidence: convention — 3 years of weekly returns; 2-5 year estimation windows are standard for betas."
+  tunable: false
+
+- id: expr.second_order_min_abs_corr
+  value: 0.5
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (concentric circles)"
+  notes: "Used by R-27. Moved from a process.md formula constant (2026-10-06). evidence: convention — |r| >= 0.5 is the conventional 'large' correlation (Cohen 1988)."
+  tunable: false
+
+- id: expr.second_order_top_n
+  value: 3
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (gilts, MATIF, UK equities)"
+  notes: "Used by R-27. Moved from a process.md formula constant (2026-10-06). evidence: none — second-order expressions kept per first-order expression. Sterling had three named circles, but that is one episode's count, not a rule; matches the top-3 expression scoring window (PLAN E.4)."
+  tunable: false
+
+
+# ---------------- Step 5: tier & size ----------------
+- id: tier.min_independent_evidence
+  value: 3
+  range: [2, 4]
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (sterling escalation on catalyst)"
+  notes: "Independent evidence families (regime, internals, chart, catalyst, asymmetry) required for starter -> fat pitch (R-38). Tunable 8/8. evidence: none — sterling escalated on one catalyst plus an existing thesis and position; no count given. Number of families out of six set here."
+  tunable: true
+
+- id: tier.catalyst_window_bd
+  value: 20
+  range: [10, 40]
+  tag: interpreted
+  citation: "none"
+  notes: "Catalyst 'near' = scheduled event within 20 business days. Range = fidelity reported across it, not fitted (numbers_review.md option D). evidence: none — no source window. Nearby statement (Sohn 2022: 60-70% of a move happens within 2-3 weeks of an idea surfacing) concerns idea-to-move time, not catalyst proximity. Owner decision 2026-10-06 (D12): A — 20, reported [10, 40]."
+  tunable: false
+
+- id: pitch.per_year
+  value: [1, 2]
+  range: null
+  tag: stated
+  citation: "RS/2015-01-18_lost-tree-club-speech.md ('one or two times a year')"
+  notes: "R-39. Calibration target only; scored on held-out years only (PLAN E.4)."
+  tunable: false
+
+- id: size.starter_fraction
+  value: 0.33
+  range: [0.2, 0.33]
+  tag: stated
+  citation: "RS/2018-09-06_sokoloff-real-vision-interview.md ('a third of a position'); RS/2024-11-06_nbim-in-good-company-podcast.md ($1.5B ~20-25%)"
+  notes: "Fraction of class cap at starter tier. Range = spread across stated tellings, not a tuning range."
+  tunable: false
+
+- id: size.gross_max
+  value: 4.0
+  range: null
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (gross leverage rarely exceeded 4:1)"
+  notes: "R-41."
+  tunable: false
+
+- id: size.eq_net_long_max
+  value: 1.0
+  range: null
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md"
+  notes: "R-42 (fraction of NAV)."
+  tunable: false
+
+- id: size.eq_net_short_max
+  value: 0.5
+  range: null
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md"
+  notes: "R-42."
+  tunable: false
+
+- id: size.fx_max
+  value: 2.0
+  range: [1.5, 2.0]
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (150-200% of the fund in a currency)"
+  notes: "R-43 single-currency cap. Range is the stated band."
+  tunable: false
+
+- id: size.bond_10ye_max
+  value: 3.0
+  range: [3.0, 3.5]
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (300% in 10-year equivalents)"
+  notes: "R-44. Sohn 2022 and NBIM 2024 tell the 2000 trade as 350%; Feig says 300%. Engine uses 3.0."
+  tunable: false
+
+- id: size.exit_cost_max_pct_nav
+  value: [1.0, 2.0]
+  range: null
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (exit costs no more than 1-2% of the fund)"
+  notes: "R-45. Engine uses 1.0 at starter, 2.0 at fat pitch (interpreted split)."
+  tunable: false
+
+- id: size.adv_participation
+  value: 0.1
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (size relative to market liquidity)"
+  notes: "Used by R-33, R-45. Moved from a process.md formula constant (2026-10-06). evidence: convention — 10% of ADV per day is a common participation cap in execution and impact models."
+  tunable: false
+
+- id: size.hot_ytd_threshold
+  value: 0.2
+  range: [0.2, 0.3]
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md ('up 20 or 30%, you're playing the house money')"
+  notes: "R-46/R-47. Applied to the engine's paper scorecard, not a real fund. Range = stated band ('up 20 or 30%'); engine uses the lower end."
+  tunable: false
+
+- id: size.cold_multiplier
+  value: 0.33
+  range: null
+  tag: interpreted
+  citation: "RS/2018-09-06_sokoloff-real-vision-interview.md ('If I was down, I had not earned the right to play big')"
+  notes: "Size multiplier when scorecard YTD < 0. Magnitude not stated. evidence: none — 'had not earned the right to play big' gives direction only. 0.33 equals the stated starter fraction (1/3) by construction; that link is a design choice, not evidence."
+  tunable: false
+
+- id: size.hot_multiplier
+  value: 1.0
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md"
+  notes: "Fat-pitch tier reaches full class cap only when hot; neutral state uses 0.66 (interpreted). evidence: anchored — when up 20-30% 'that's when you try and get up 60% or 70%' -> hot = full stated class cap; multiplier 1.0 is the definitional maximum under the stated caps."
+  tunable: false
+
+- id: size.neutral_multiplier
+  value: 0.75
+  range: [0.5, 1.0]
+  tag: interpreted
+  citation: "RS/2018-09-06_sokoloff-real-vision-interview.md (hot/cold governs size)"
+  notes: "Used by R-46. Moved from a process.md formula constant (2026-10-06). evidence: none — size multiplier when scorecard YTD is between 0 and the hot threshold, i.e., most of the time. No source magnitude. Owner decision 2026-10-06 (D11): 0.75 (was 0.66, the cold/hot midpoint); range [0.5, 1.0] reported, not fitted."
+  tunable: false
+
+- id: size.risk_reset
+  value: "01-01"
+  range: null
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (January 1 resets the house money)"
+  notes: "R-47 scorecard reset date."
+  tunable: false
+
+- id: size.asymmetry_min_ratio
+  value: 5
+  range: null
+  tag: interpreted
+  citation: "DS/2022-09-28_delivering-alpha-kernen-transcript.md (40:1); DS/2019-06-07_cnbc-squawk-box-one-way-bet.md (~10bp vs 150-200bp)"
+  notes: "R-57: upside/downside ratio below which fat-pitch tier is not allowed. His cited cases 15:1 to 40:1; 5 is a conservative floor. evidence: anchored — his own ratios: sterling 2,000bp / 50bp = 40:1 (DA 2022); 2019 2y at 2.30%: 150-200bp up / ~10bp down = 15-20:1 (fat pitch); same trade at 1.85%: upside ~(1.85-0.30)=155bp vs downside back to FF ~(2.38-1.85)+0.10 = ~63bp -> ~2.5:1, which he called 'asymmetry gone'. A floor in (2.5, 15) separates his readings; 5 lies inside."
+  tunable: false
+
+- id: size.asymmetry_full_ratio
+  value: 10
+  range: null
+  tag: interpreted
+  citation: "DS/2022-09-28_delivering-alpha-kernen-transcript.md (40:1); DS/2019-06-07_cnbc-squawk-box-one-way-bet.md (15-20:1)"
+  notes: "Used by R-57. Moved from a process.md formula constant (2026-10-06). evidence: anchored — asymmetry at which the size scale reaches 1 (min(1, ratio/10)). His cited fat-pitch ratios are 15:1 to 40:1; 10 < 15 gives every cited fat pitch full scale."
+  tunable: false
+
+- id: fragility.size_multiplier_long
+  value: 0.66
+  range: null
+  tag: interpreted
+  citation: "DS/2014-07-16_delivering-alpha-kernen.md ('I can get out in a week')"
+  notes: "R-48: long size multiplier when fragility_level = high. Non-gating. evidence: none — 'I can get out in a week' (DA 2014) says he stayed long, not by how much he cut. Applies only when fragility_level = high."
+  tunable: false
+
+
+# ---------------- Step 6: monitoring ----------------
+- id: exit.premise_check_freq_bd
+  value: 1
+  range: null
+  tag: interpreted
+  citation: "DS/2016-11-10_cnbc-squawk-box-post-election-sold-gold.md (sold the night of the election)"
+  notes: "R-50: premises checked every business day; exit flag same day. evidence: direct — sold all gold the night of the 2016 election; 2019 went net flat after the tariff tweet and regretted spreading it over three days. Daily is the coarsest check consistent with both."
+  tunable: false
+
+- id: pit.election_result_time
+  value: "06:00 ET next day"
+  range: null
+  tag: interpreted
+  citation: "DS/2016-11-10_cnbc-squawk-box-post-election-sold-gold.md (sold the night of the election)"
+  notes: "Used by R-22. Moved from a process.md formula constant (2026-10-06). evidence: none — information timestamp assigned to election results. He acted overnight; the engine's next decision point after 06:00 is the same trading day, so the choice matters only for intraday replay."
+  tunable: false
+
+- id: exit.stop_loss
+  value: false
+  range: null
+  tag: stated
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md ('I have never used a stop loss in my career')"
+  notes: "R-49."
+  tunable: false
+
+- id: exit.review_window_w
+  value: [2, 3]
+  range: null
+  tag: stated
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md (analyst grinds for 2-3 weeks)"
+  notes: "R-38 invest-then-investigate review window; starter re-scored at end."
+  tunable: false
+
+- id: exit.price_vs_news_window_bd
+  value: 5
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md ('If all the news is great and the stock's not acting well, get out')"
+  notes: "R-30/R-51 reaction window after scheduled news. evidence: convention — short post-event windows of a few days are standard in event studies (MacKinlay 1997). Source gives no window."
+  tunable: false
+
+- id: exit.pvn_consecutive_releases
+  value: [1, 2]
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md; RS/2018-09-06_sokoloff-real-vision-interview.md (algos degraded the signal)"
+  notes: "Used by R-51. Moved from a process.md formula constant (2026-10-06). evidence: none — [before, from] chart.timing_cutover_year: consecutive price-vs-news contradictions while held that raise an exit flag."
+  tunable: false
+
+- id: exit.top_roc_flat_w
+  value: 4
+  range: null
+  tag: interpreted
+  citation: "RS/2024-11-06_nbim-in-good-company-podcast.md ('I'm a technician, so I usually wait for tops')"
+  notes: "R-52: weeks of flattening rate of change that define a technical top. evidence: none — 'I usually wait for tops' gives no duration."
+  tunable: false
+
+- id: exit.top_partial_fraction
+  value: 0.5
+  range: null
+  tag: interpreted
+  citation: "RS/2024-11-06_nbim-in-good-company-podcast.md ('I usually wait for tops'; no fraction)"
+  notes: "Used by R-52. Moved from a process.md formula constant (2026-10-06). evidence: none — fraction sold at a technical top; remainder exits on premise break only."
+  tunable: false
+
+- id: exit.top_high_window_w
+  value: 10
+  range: null
+  tag: interpreted
+  citation: "RS/2024-11-06_nbim-in-good-company-podcast.md"
+  notes: "Used by R-52. Moved from a process.md formula constant (2026-10-06). evidence: none — look-back for the recent high in the top test."
+  tunable: false
+
+- id: exit.top_atr_mult
+  value: 1.0
+  range: null
+  tag: interpreted
+  citation: "RS/2024-11-06_nbim-in-good-company-podcast.md"
+  notes: "Used by R-52. Moved from a process.md formula constant (2026-10-06). evidence: none — distance below the recent high, in ATRs, required for a top."
+  tunable: false
+
+- id: exit.atr_window_d
+  value: 14
+  range: null
+  tag: interpreted
+  citation: "none (convention)"
+  notes: "Used by R-52. Moved from a process.md formula constant (2026-10-06). evidence: convention — ATR period; implicit in the formula before this pass. Wilder (1978) default 14 days."
+  tunable: false
+
+- id: score.deviation_sigma
+  value: 2.0
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md (watches whether daily P&L behaves as expected)"
+  notes: "Used by R-53. Moved from a process.md formula constant (2026-10-06). evidence: convention — 2-sigma control limit (Shewhart-style); flag only, no automatic exit."
+  tunable: false
+
+- id: score.deviation_window_d
+  value: 10
+  range: null
+  tag: interpreted
+  citation: "DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md"
+  notes: "Used by R-53. Moved from a process.md formula constant (2026-10-06). evidence: none — business days over which P&L-vs-expected deviation is measured."
+  tunable: false
+
+
+# ---------------- Step 7 ----------------
+- id: cash.default
+  value: true
+  range: null
+  tag: stated
+  citation: "DS/2023-04-24_nbim-annual-investment-conference.md ('not to play when you don't see a fat pitch')"
+  notes: "R-54."
+  tunable: false
+
+
+# ---------------- Added after process.md drafting (fixed constants) ----------------
+- id: xregion.window_w
+  value: 26
+  range: null
+  tag: interpreted
+  citation: "DS/2015-03-02_cnbc-closing-bell-kelly-evans.md (long where QE is starting)"
+  notes: "R-12 balance-sheet impulse window (weeks), assets/GDP change per region. evidence: none — half-year balance-sheet change chosen here; no source window."
+  tunable: false
+
+- id: internals.narrowing_drop_pts
+  value: 20
+  range: null
+  tag: interpreted
+  citation: "RS/2024-11-06_nbim-in-good-company-podcast.md (leadership narrowing)"
+  notes: "R-59: fall (percentage points over 6 months) in share of industries above trend while index above trend. evidence: none — 'leadership narrowing' has no magnitude in NBIM 2024."
+  tunable: false
+
+- id: short.rally_min_pct
+  value: 15
+  range: [15, 20]
+  tag: stated
+  citation: "DS/2022-06-XX_sohn-2022-john-collison.md (would re-short after a 15-20% rally)"
+  notes: "R-62: equity short starter only after rally of at least this size from trailing low within bear regime. Range = stated band (15-20% rally); engine uses the lower end."
+  tunable: false
