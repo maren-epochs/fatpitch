@@ -1,0 +1,32 @@
+id: 1981-06-30_half-cash-19pct-rates-1981
+asof: '1981-06-30T16:00:00-04:00'
+era: B
+episode_id: EP01-1981-BONDS
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: true
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: equity
+    direction: short
+    region: US
+  expression:
+  - equity_us
+  action: reduce
+window:
+  unit: business_days
+  n: 20
+citation: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md
+date_basis: 'conservative: NMW (interview Dec 1991) gives ''By mid-1981'' for the move to 50% cash and ''unbelievably
+  bearish in June 1981'', with the losses following in Q3 1981; the move is therefore no later than June; asof =
+  last NYSE trading day of June 1981'
+seed_id: X-17
+notes: '''By mid-1981, stocks were up to the top of their valuation range, while at the same time, interest rates
+  had soared to 19 percent. It was one of the more obvious sell situations in the history of the market. We went
+  into a 50 percent cash position.'' Regime label tightening is implied by his 19% rate read; he names no Fed action
+  for mid-1981 (the Q4 1981 ''the Fed was extremely tight'' read belongs to C01). Thesis short = his stated bear
+  view (''never felt more strongly about anything than the bear side of this market''); the action is the cut to
+  50% cash, the other 50% stayed long, so no size band. Distinct from C01 (1981-12-31: dumped the remaining stocks,
+  50% long bonds).'

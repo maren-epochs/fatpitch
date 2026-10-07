@@ -1,0 +1,24 @@
+id: 2014-07-16_still-dancing-2014
+asof: '2014-07-16T16:00:00-04:00'
+era: A
+episode_id: EP12-2014-15-DIVERGE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - equity_us
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2014-07-16_delivering-alpha-kernen.md
+date_basis: 'pinned: Delivering Alpha 2014 interview date (note date)'
+seed_id: C25
+notes: Long equities with fragility alert; liquid book ('I can get out in a week').

@@ -1,0 +1,29 @@
+id: 1989-12-29_nikkei-short-boj-1989
+asof: '1989-12-29T16:00:00-05:00'
+era: B
+episode_id: EP23-1989-NIKKEI
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: equity
+    direction: short
+    region: JP
+  expression:
+  - equity_jp
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md
+date_basis: 'conservative: NMW (interview Dec 1991) gives ''In late 1989'' for the bearish turn and the short; asof
+  = last NYSE trading day of Q4 1989'
+seed_id: X-19
+notes: 'Short the Japanese stock market (Nikkei): ''just about the best risk/reward trade I had ever seen''. Reasons:
+  multiyear overextension, a speculative blow-off, and ''most important—three times as important as everything I
+  just said—the Bank of Japan had started to dramatically tighten monetary policy'' (JGBs falling while the Nikkei
+  made highs). The BoJ read is tightening; it is recorded here and not as regime_direction, which is a read of US
+  policy, and the source states no US read for late 1989. Thesis-only case.'

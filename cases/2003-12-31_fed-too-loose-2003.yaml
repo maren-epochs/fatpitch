@@ -1,0 +1,20 @@
+id: 2003-12-31_fed-too-loose-2003
+asof: '2003-12-31T16:00:00-05:00'
+era: A
+episode_id: EP08-2003-06-LOOSE
+truth_type: process
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: easing
+  theses: []
+  expression: []
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: RS/2015-01-18_lost-tree-club-speech.md
+date_basis: 'conservative: Lost Tree gives Q4 2003 for the fed-funds exercise; last trading day of 2003'
+seed_id: C13
+notes: 'Process target: policy direction easing (FF 1%); policy-error sign too_loose (R-06) is not a scored component.'

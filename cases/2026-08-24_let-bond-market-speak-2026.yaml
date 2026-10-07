@@ -1,0 +1,26 @@
+id: 2026-08-24_let-bond-market-speak-2026
+asof: '2026-08-24T16:00:00-04:00'
+era: A
+episode_id: EP21-2025-26-ROTATE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: rates
+    direction: short
+    region: US
+  expression:
+  - rates_us
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/2026-08-24_wsj-oped-let-the-bond-market-speak.md
+date_basis: 'pinned: WSJ op-ed publication date (note date)'
+seed_id: X-12
+notes: Treasury's expanded long-dated buybacks judged yield suppression ('Treasury-run QE'); inflation above target
+  at full employment, 10y at or below nominal GDP; long yields should be allowed to rise. Position not stated. Regime
+  label easing (policy judged too loose), not tightening as in the HOLDOUT.md v1 candidate row.

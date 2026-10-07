@@ -1,0 +1,28 @@
+id: 2023-06-07_more-shoes-ai-long-bloomberg-2023
+asof: '2023-06-07T16:00:00-04:00'
+era: A
+episode_id: EP19-2023-RATES
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - equity_us
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2023-06-07_bloomberg-invest-sonali-basak.md
+date_basis: 'pinned: Bloomberg Invest on-stage interview with Sonali Basak, 2023-06-07 (Fortune report same day)'
+seed_id: X-24
+notes: '''The biggest broadest asset bubble ever, and then you jack interest rates up 500 basis points in a year...
+  Silicon Valley Bank, Bed Bath & Beyond, they''re probably the tip of the iceberg''; ''Our central case is there''s
+  more shoes to drop''. Regime label tightening. Long AI as stated: Bloomberg clip title ''Druckenmiller on How
+  AI is Dominating His Long Portfolio''; ''A.I. is real and it could be as transformative as the internet''. Coded
+  equity/long/US as in X-09 (single names not coded). The hard-landing view states no short.'

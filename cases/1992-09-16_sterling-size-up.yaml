@@ -1,0 +1,29 @@
+id: 1992-09-16_sterling-size-up
+asof: '1992-09-16T16:00:00-04:00'
+era: B
+episode_id: EP04-1992-ERM
+truth_type: action
+mechanizable: 'no'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: fx
+    direction: short
+    region: GBP
+  expression:
+  - fx_gbp
+  action: size_up
+  size_band:
+    low: 70
+    high: 100
+    unit: pct_nav
+window:
+  unit: business_days
+  n: 20
+citation: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md; RS/2015-01-18_lost-tree-club-speech.md; RS/2024-11-06_nbim-in-good-company-podcast.md
+date_basis: 'conservative: escalation followed Schlesinger''s comments and preceded sterling''s ERM exit (all tellings);
+  no day given; the latest defensible day is the ERM exit, 1992-09-16 (CardPlayer gives Sept. 15; later date used)'
+seed_id: C06
+notes: Size-up on the Bundesbank catalyst; band spans tellings ($5B of $7B to $7.5B of $7.5B).

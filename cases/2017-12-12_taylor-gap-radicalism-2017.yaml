@@ -1,0 +1,26 @@
+id: 2017-12-12_taylor-gap-radicalism-2017
+asof: '2017-12-12T16:00:00-05:00'
+era: A
+episode_id: EP14-2018-QT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - equity_us
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2017-12-12_cnbc-closing-bell-kelly-evans.md
+date_basis: 'pinned: CNBC Closing Bell interview date (note date)'
+seed_id: X-03
+notes: Taylor-rule rates far above actual policy rates in the US and Europe ('monetary radicalism'); the stock market
+  'a function of central bank policy'; long US equities (prefers AMZN, FB, GOOGL); no crypto. Episode EP14 taken
+  back to Dec 2017 (Fed balance-sheet runoff began Oct 2017).

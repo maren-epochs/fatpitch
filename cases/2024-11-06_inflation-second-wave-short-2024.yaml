@@ -1,0 +1,30 @@
+id: 2024-11-06_inflation-second-wave-short-2024
+asof: '2024-11-06T16:00:00-05:00'
+era: A
+episode_id: EP20-2024-CUT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: rates
+    direction: short
+    region: US
+  expression:
+  - rates_us
+  action: hold
+  size_band:
+    low: 25
+    high: 25
+    unit: pct_nav_10y_eq
+window:
+  unit: business_days
+  n: 20
+citation: RS/2024-11-06_nbim-in-good-company-podcast.md
+date_basis: 'pinned: In Good Company episode recorded 2024-11-05 (US election day) and published 2024-11-06; publication
+  date used'
+seed_id: X-11
+notes: More worried about inflation than about the economy; the 50bp cut judged a premature declaration of victory;
+  ~25% NAV 10y-equivalent Treasury short held; neither long nor short AI.

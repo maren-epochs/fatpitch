@@ -1,0 +1,25 @@
+id: 1988-12-30_dem-short-size-up
+asof: '1988-12-30T16:00:00-05:00'
+era: B
+episode_id: EP03-1988-89-DEM
+truth_type: action
+mechanizable: 'no'
+source_reliability: secondary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: fx
+    direction: short
+    region: DEM
+  expression:
+  - fx_dem
+  action: size_up
+window:
+  unit: business_days
+  n: 20
+citation: RS/1992-XX-XX_new-market-wizards-chapter.md
+date_basis: 'conservative: CardPlayer account (via NMW note) dates the deutsche-mark short only to 1988; last trading
+  day of 1988'
+seed_id: C03
+notes: $1B short DM position doubled after Soros's challenge.

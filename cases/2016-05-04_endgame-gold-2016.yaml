@@ -1,0 +1,29 @@
+id: 2016-05-04_endgame-gold-2016
+asof: '2016-05-04T16:00:00-04:00'
+era: A
+episode_id: EP13-2016-REGIME
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: commodity
+    direction: long
+    region: GOLD
+  - asset_class: equity
+    direction: short
+    region: US
+  expression:
+  - commodity_gold
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2016-05-04_sohn-the-endgame-archived-transcript.md; DS/2016-05-04_sohn-the-endgame.md
+date_basis: 'pinned: Sohn 2016 talk date (note date)'
+seed_id: C29
+notes: 'Policy too loose (''the biggest and longest dovish deviation from historical norms I have seen in my career'');
+  gold ''remains our largest currency allocation''; equities: ''the bull market is exhausting itself'', risk/reward
+  ''negative without substantially lower prices''. Source: full prepared text (archived Sohn PDF).'

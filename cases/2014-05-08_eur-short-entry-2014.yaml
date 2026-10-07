@@ -1,0 +1,25 @@
+id: 2014-05-08_eur-short-entry-2014
+asof: '2014-05-08T16:00:00-04:00'
+era: A
+episode_id: EP12-2014-15-DIVERGE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: fx
+    direction: short
+    region: EUR
+  expression:
+  - fx_eur
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: RS/2018-09-06_sokoloff-real-vision-interview.md; DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md
+date_basis: 'conservative: Sokoloff notes give ''did a lot at 139'' in 2014 without a day; latest 2014 date with
+  EURUSD (FRED DEXUSEU) in 1.385-1.395 is 2014-05-08'
+seed_id: C24
+notes: Short EUR on ECB easing vs Fed taper (policy divergence).

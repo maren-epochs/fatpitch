@@ -1,0 +1,22 @@
+id: 2023-12-28_two-year-exit-2023
+asof: '2023-12-28T16:00:00-05:00'
+era: A
+episode_id: EP19-2023-RATES
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: easing
+  theses: []
+  expression:
+  - rates_us
+  action: exit
+window:
+  unit: business_days
+  n: 20
+citation: DS/2024-05-07_cnbc-squawk-box-forward-guidance-ai-argentina.md
+date_basis: 'conservative: exit after the Dec 2023 pivot (FOMC 2023-12-13) at ~4.30% (CNBC 2024-05-07); latest Dec
+  2023 date with DGS2 in 4.25-4.35 is 2023-12-28'
+seed_id: C50
+notes: 'Exit: the tight-financial-conditions premise broke after the pivot (R-58).'

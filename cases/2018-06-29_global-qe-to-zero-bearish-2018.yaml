@@ -1,0 +1,26 @@
+id: 2018-06-29_global-qe-to-zero-bearish-2018
+asof: '2018-06-29T16:00:00-04:00'
+era: A
+episode_id: EP14-2018-QT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: equity
+    direction: short
+    region: US
+  expression:
+  - equity_us
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: RS/2018-09-06_sokoloff-real-vision-interview.md
+date_basis: 'conservative: Real Vision interview (filmed 2018-09-06) says he expected global central-bank buying
+  falling from ~$1T/yr to zero to hit equities from mid-year; no day given; asof = last trading day of Jun 2018'
+seed_id: X-04
+notes: Bearish US equities on the rate of change of global QE (Fed runoff plus ECB purchases going to zero within
+  12 months). Retrospective account; action and size not stated.

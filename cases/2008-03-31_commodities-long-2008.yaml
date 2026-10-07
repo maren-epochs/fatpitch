@@ -1,0 +1,23 @@
+id: 2008-03-31_commodities-long-2008
+asof: '2008-03-31T16:00:00-04:00'
+era: A
+episode_id: EP09-2008-CRISIS
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: commodity
+    direction: long
+  expression:
+  - commodity_global
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md
+date_basis: 'conservative: Feig gives ''In March 2008 ... after Bear Stearns''; last trading day of Mar 2008'
+seed_id: C16
+notes: 'Long commodities: charts agreed with expected global liquidity, despite a bearish economic view.'

@@ -1,0 +1,32 @@
+id: 2023-04-24_no-fat-pitch-2023
+asof: '2023-04-24T16:00:00-04:00'
+era: A
+episode_id: EP19-2023-RATES
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: fx
+    direction: short
+    region: USD
+  - asset_class: commodity
+    direction: long
+    region: GOLD
+  - asset_class: rates
+    direction: short
+    region: JP
+  expression:
+  - fx_usd
+  - commodity_gold
+  - rates_jp
+  action: flat
+window:
+  unit: business_days
+  n: 20
+citation: DS/2023-04-24_nbim-annual-investment-conference.md
+date_basis: 'pinned: NBIM 2023 conference date (note date)'
+seed_id: C47
+notes: No fat pitch; net equity about -3%; small relative positions.

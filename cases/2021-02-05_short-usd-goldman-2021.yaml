@@ -1,0 +1,37 @@
+id: 2021-02-05_short-usd-goldman-2021
+asof: '2021-02-05T16:00:00-05:00'
+era: A
+episode_id: EP17-2021-MANIA
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: fx
+    direction: short
+    region: USD
+  - asset_class: rates
+    direction: short
+    region: US
+  - asset_class: commodity
+    direction: long
+  expression:
+  - fx_usd
+  - rates_us
+  - commodity_global
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2021-01-XX_talks-at-gs-great-investors-pasquariello.md; DS/2021-02-XX_goldman-sachs-interview.md
+date_basis: 'conservative: Talks at GS interview ''recorded in late January 2021'' (TIE adaptation), day unknown;
+  first dated publication of its content is 2021-02-06 (Saturday, Off Piste notes); asof = last NYSE trading day
+  before that publication, the latest date certainly on or after the recording'
+seed_id: X-08
+notes: 'Positions stated as held: ''a very, very short dollar position''; ''a short Treasury position, primarily
+  at the long end''; ''a large position in commodities''. Regime label easing: ''The longer the Fed tries to keep
+  rates suppressed...''; ''if the Fed continues to push the envelope in terms of friendliness''. Constructive on
+  stock names in Taiwan, Korea and China (single names; not coded). Source is TIE''s edited first-person adaptation.
+  USD leg conflicts with the long-USD leg of C43.'

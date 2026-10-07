@@ -1,0 +1,23 @@
+id: 2018-12-17_pause-oped-2018
+asof: '2018-12-17T16:00:00-05:00'
+era: A
+episode_id: EP14-2018-QT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses: []
+  expression: []
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/2018-12-16_wsj-oped-warsh-fed-tightening-not-now.md
+date_basis: 'pinned: WSJ op-ed online Sunday 2018-12-16 afternoon; next trading day close'
+seed_id: C33
+notes: Fed should 'cease--for now--its double-barreled blitz of higher interest rates and tighter liquidity' (regime
+  read tightening). The op-ed states no position; no source dated on or before the asof states one, so no thesis
+  or expression (regime-only case). His Treasury long is first stated in the Bloomberg TV interview of 2018-12-18,
+  after the asof.

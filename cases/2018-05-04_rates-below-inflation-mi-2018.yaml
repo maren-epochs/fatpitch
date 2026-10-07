@@ -1,0 +1,25 @@
+id: 2018-05-04_rates-below-inflation-mi-2018
+asof: '2018-05-04T16:00:00-04:00'
+era: A
+episode_id: EP14-2018-QT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses: []
+  expression: []
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/2018-05-03_manhattan-institute-hamilton-award-speech.md
+date_basis: 'conservative: Manhattan Institute Alexander Hamilton Award dinner, 2018-05-03; time of the remarks
+  not stated and a dinner may fall after the close; asof = next NYSE close'
+seed_id: X-21
+notes: '''Years after the Great Recession ended the Fed has not only kept interest rates below inflation but have
+  accumulated an unprecedented $4.5 trillion on their balance sheet by doing QE.'' / ''an unprecedented, ultra-monetary,
+  radical monetary expansion''; deficits larger because policy has not ''been normalized''. Regime label easing:
+  his read of the stance in May 2018, although the Fed was hiking and runoff had begun. No position stated (regime-only
+  case).'

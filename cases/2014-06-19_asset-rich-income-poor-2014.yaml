@@ -1,0 +1,22 @@
+id: 2014-06-19_asset-rich-income-poor-2014
+asof: '2014-06-19T16:00:00-04:00'
+era: A
+episode_id: EP12-2014-15-DIVERGE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses: []
+  expression: []
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/2014-06-19_wsj-oped-warsh-asset-rich-income-poor.md
+date_basis: 'pinned: WSJ op-ed with Kevin Warsh dated 2014-06-19 (refers to the FOMC meeting ''earlier this week'',
+  2014-06-17/18); Hoover repost 2014-06-20'
+seed_id: X-13
+notes: '''Extraordinarily loose monetary policy will continue in force''; the Fed should exit ''its extraordinary
+  monetary accommodation'' sooner and more predictably. Buybacks over capex. No position stated (regime-only case).'

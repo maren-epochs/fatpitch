@@ -1,0 +1,19 @@
+UNICORN NYSE: 13867 days 1965-03-01..2020-02-10; years with <245 days: {1968: 226}
+  calendar gaps >5 days: 1 e.g. [(datetime.date(2001, 9, 10), datetime.date(2001, 9, 17))]
+  adv+dec median by decade: {1960: 1233, 1970: 1416, 1980: 1549, 1990: 2216, 2000: 3107, 2010: 3033, 2020: 2926}
+  Zweig thrusts (EMA10 <0.40 -> >0.615 within 10d): 11: ['1971-12-03', '1974-10-10', '1975-01-03', '1982-08-20', '1984-08-03', '2004-05-25', '2009-03-18', '2011-10-14', '2013-10-18', '2015-10-08', '2019-01-07']
+  EMA10 share of days <0.40: 6.3%  >0.615: 2.11%
+
+S&P 500 via N-PORT SPX (21 quarter-end snapshots 2021-06-30..2026-06-30) x Alpaca bars
+  2021-06-30: holdings=505 symbols=495 with Alpaca bars=488
+  2022-06-30: holdings=505 symbols=498 with Alpaca bars=493
+  2023-06-30: holdings=503 symbols=497 with Alpaca bars=493
+  2024-06-30: holdings=503 symbols=497 with Alpaca bars=494
+  2025-06-30: holdings=504 symbols=501 with Alpaca bars=499
+  2026-06-30: holdings=503 symbols=503 with Alpaca bars=502
+  daily breadth rows 1264 2021-09-22..2026-10-05 median members priced=493 -> C:\Users\<user>\Documents\druckenmiller\tools\research\sample_data\sp500_breadth_alpaca.csv
+  Zweig on S&P 500 members: 3 ['2022-09-12', '2022-10-25', '2023-11-03']; EMA<0.40 6.2% >0.615 6.6%
+  %>50dma thrust <20% -> >80% within 50d: 3 ['2022-08-10', '2022-11-10', '2023-12-01']
+  %>50dma thrust <25% -> >75% within 30d: 4 ['2022-07-29', '2022-11-10', '2023-11-24', '2025-05-16']
+  %>50dma thrust <15% -> >90% within 50d: 3 ['2022-08-12', '2022-11-30', '2023-12-26']
+  %>200dma available from 2022-07-07; median 0.57, p10 0.36, p90 0.72

@@ -1,0 +1,35 @@
+id: 2024-10-02_grants-gold-argentina-japan-2024
+asof: '2024-10-02T16:00:00-04:00'
+era: A
+episode_id: EP20-2024-CUT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: commodity
+    direction: long
+    region: GOLD
+  - asset_class: equity
+    direction: long
+    region: AR
+  - asset_class: equity
+    direction: long
+    region: JP
+  expression:
+  - commodity_gold
+  - equity_ar
+  - equity_jp
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2024-10-01_grants-fall-conference-2024.md
+date_basis: 'conservative: Grant''s Fall 2024 conference, 2024-10-01 per HedgeFundAlpha, 2024-10-02 per Hedgeweek;
+  later date used'
+seed_id: X-15
+notes: Fed paraphrased as taking 'a reckless monetary gamble with overtly reflationary policies' (HFA, not verbatim).
+  Owns gold, not miners; attention on Argentina and Japan; no China without a leadership change; likes COHR (single
+  name; not coded).

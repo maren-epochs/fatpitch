@@ -1,0 +1,22 @@
+id: 2008-12-31_brazil-rates-process
+asof: '2008-12-31T16:00:00-05:00'
+era: A
+episode_id: EP09-2008-CRISIS
+truth_type: process
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses: []
+  expression:
+  - rates_br
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md
+date_basis: 'conservative: Feig dates the Brazil add only to 2008; last trading day of 2008'
+seed_id: C18
+notes: 'Process target: chart veto (R-29) blocks adding; existing position held. His action was an add against the
+  chart.'

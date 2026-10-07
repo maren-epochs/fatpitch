@@ -1,0 +1,29 @@
+id: 1987-06-30_net-short-fed-tightening-1987
+asof: '1987-06-30T16:00:00-04:00'
+era: B
+episode_id: EP22-1987-CRASH
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: true
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: equity
+    direction: short
+    region: US
+  expression:
+  - equity_us
+  action: reverse
+window:
+  unit: business_days
+  n: 20
+citation: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md
+date_basis: 'conservative: NMW (interview Dec 1991) gives only ''In June I changed my stripes and actually went
+  net short'' (no day); asof = last NYSE trading day of June 1987'
+seed_id: X-18
+notes: 'Switched from long to net short US equities in June 1987: ''The Fed had been tightening since January 1987,
+  and the dollar was tanking, which suggested that the Fed was going to tighten some more.'' Valuation (2.6% dividend
+  yield, record price/book) set the magnitude; liquidity and narrow breadth set the timing (''I never use valuation
+  to time the market''). Action reverse: ''before you switched from long to short''. The 1987-10-16 switch to 130%
+  long is a later technical trade and not coded.'

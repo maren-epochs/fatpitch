@@ -1,0 +1,32 @@
+id: 2020-11-09_rotation-bitcoin-2020
+asof: '2020-11-09T16:00:00-05:00'
+era: A
+episode_id: EP16-2020-COVID
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  - asset_class: commodity
+    direction: long
+    region: GOLD
+  - asset_class: crypto
+    direction: long
+    region: BTC
+  expression:
+  - equity_us
+  - commodity_gold
+  - crypto_btc
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: RS/2020-11-09_cnbc-the-exchange-rotation.md
+date_basis: 'pinned: CNBC interview date (note date)'
+seed_id: C41
+notes: Long value (not net short), gold and miners, bitcoin.

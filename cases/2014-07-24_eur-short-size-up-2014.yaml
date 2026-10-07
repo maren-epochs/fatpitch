@@ -1,0 +1,25 @@
+id: 2014-07-24_eur-short-size-up-2014
+asof: '2014-07-24T16:00:00-04:00'
+era: A
+episode_id: EP12-2014-15-DIVERGE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: fx
+    direction: short
+    region: EUR
+  expression:
+  - fx_eur
+  action: size_up
+window:
+  unit: business_days
+  n: 20
+citation: RS/2018-09-06_sokoloff-real-vision-interview.md
+date_basis: 'conservative: Sokoloff notes give ''got a lot more brave at 135'' in 2014; latest 2014 date with EURUSD
+  (FRED DEXUSEU) in 1.345-1.355 is 2014-07-24'
+seed_id: C24b
+notes: Size-up of the EUR short (split from seed C24).

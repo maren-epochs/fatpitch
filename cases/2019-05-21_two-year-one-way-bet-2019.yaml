@@ -1,0 +1,25 @@
+id: 2019-05-21_two-year-one-way-bet-2019
+asof: '2019-05-21T16:00:00-04:00'
+era: A
+episode_id: EP15-2019-TARIFF
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: rates
+    direction: long
+    region: US
+  expression:
+  - rates_us
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: DS/2019-06-07_cnbc-squawk-box-one-way-bet.md
+date_basis: 'conservative: entry after the tariff tweet with 2y at ~2.30% (note); latest May 2019 date with DGS2
+  in 2.25-2.35 is 2019-05-21'
+seed_id: C36
+notes: 'One-way bet: cuts not priced vs FF.'

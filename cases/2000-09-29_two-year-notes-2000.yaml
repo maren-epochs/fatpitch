@@ -1,0 +1,29 @@
+id: 2000-09-29_two-year-notes-2000
+asof: '2000-09-29T16:00:00-04:00'
+era: B
+episode_id: EP07-2000-RATES
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: rates
+    direction: long
+    region: US
+  expression:
+  - rates_us
+  action: enter
+  size_band:
+    low: 300
+    high: 350
+    unit: pct_nav_10y_eq
+window:
+  unit: business_days
+  n: 20
+citation: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md; DS/2022-06-XX_sohn-2022-john-collison.md; RS/2024-11-06_nbim-in-good-company-podcast.md
+date_basis: 'conservative: ''after returning from sabbatical around Labor Day'' (Feig) / ''Sept 2000'' (NBIM 2024);
+  last trading day of Sep 2000'
+seed_id: C12
+notes: Rates, oil and USD rising together (R-10); FF 6.5%; band spans 300% (Feig) to 350% (Sohn 2022, NBIM 2024).

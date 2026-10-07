@@ -1,0 +1,23 @@
+id: 2023-05-01_fiscal-horror-show-2023
+asof: '2023-05-01T16:00:00-04:00'
+era: A
+episode_id: EP19-2023-RATES
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses: []
+  expression: []
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/2023-05-01_tie-spring-2023-coming-fiscal-horror-show.md; DS/2023-05-01_usc-marshall-keynote.md
+date_basis: 'pinned: USC Marshall keynote 2023-05-01 (TIE Spring 2023 states the article is based on it); the printed
+  text cites the June 2023 CBO outlook in a figure, so only the policy read, which matches the speech window (500bp
+  of hikes also cited at NBIM 2023-04-24), is coded'
+seed_id: X-14
+notes: '''In an attempt to correct the biggest mistake in Fed history, the Fed in the last year has raised rates
+  500 basis points. Better late than never.'' Fiscal-gap argument; no position stated (regime-only case).'

@@ -1,0 +1,31 @@
+id: 2026-09-10_ai-trim-fx-short-2026
+asof: '2026-09-10T16:00:00-04:00'
+era: A
+episode_id: EP21-2025-26-ROTATE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: fx
+    direction: short
+    region: EUR
+  - asset_class: fx
+    direction: short
+    region: GBP
+  expression:
+  - equity_us
+  - fx_eur
+  - fx_gbp
+  action: reduce
+window:
+  unit: business_days
+  n: 20
+citation: DS/2026-09-10_piper-sandler-closed-door-event.md
+date_basis: 'pinned: Piper Sandler event date (note date)'
+seed_id: C56
+notes: 'Reduce AI holdings to ~20% of the level six months earlier; short EUR and GBP at smaller size. Regime label
+  easing: US rates ''at best too low'', cuts ''no longer necessary'' (FT report via aggregators). The only policy
+  read stated is the Fed''s; none for the ECB or BoE (FX theses), so the US read is used, as in X-10.'

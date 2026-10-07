@@ -1,0 +1,29 @@
+id: 2024-05-07_japan-copper-long-2024
+asof: '2024-05-07T16:00:00-04:00'
+era: A
+episode_id: EP20-2024-CUT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: JP
+  - asset_class: commodity
+    direction: long
+    region: COPPER
+  expression:
+  - equity_jp
+  - commodity_copper
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2024-05-07_cnbc-squawk-box-forward-guidance-ai-argentina.md
+date_basis: 'pinned: CNBC Squawk Box interview date (note date)'
+seed_id: X-10
+notes: Dec 2023 pivot judged to have loosened financial conditions ('set financial conditions on fire'); long Japan
+  (governance reform, reflation) and copper (12-year greenfield lead time; EV, grid, data-center demand); no China.

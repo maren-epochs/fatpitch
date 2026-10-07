@@ -1,0 +1,25 @@
+id: 2015-01-20_lost-tree-eur-short-2015
+asof: '2015-01-20T16:00:00-05:00'
+era: A
+episode_id: EP12-2014-15-DIVERGE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: fx
+    direction: short
+    region: EUR
+  expression:
+  - fx_eur
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: RS/2015-01-18_lost-tree-club-speech.md
+date_basis: 'pinned: Lost Tree speech 2015-01-18 (Sunday); next trading day close (2015-01-19 market holiday)'
+seed_id: C26
+notes: 'Not net short equities (alerts, not timing); EUR short held. Regime label easing: ECB ''going to print money''
+  (thesis region EUR); US zero rates judged too loose. Relative-policy case.'

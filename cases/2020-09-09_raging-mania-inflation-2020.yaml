@@ -1,0 +1,21 @@
+id: 2020-09-09_raging-mania-inflation-2020
+asof: '2020-09-09T16:00:00-04:00'
+era: A
+episode_id: EP16-2020-COVID
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses: []
+  expression: []
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/2020-09-09_cnbc-squawk-box-absolute-raging-mania.md
+date_basis: 'pinned: CNBC Squawk Box interview date (note date)'
+seed_id: X-06
+notes: Fed and Treasury 'merging'; 'absolute raging mania'; first inflation worry in a long while; no view on the
+  near term, next 3-5 years challenging. No position stated (regime-only case).

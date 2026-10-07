@@ -1,0 +1,30 @@
+id: 1981-12-31_long-bonds-volcker
+asof: '1981-12-31T16:00:00-05:00'
+era: B
+episode_id: EP01-1981-BONDS
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: rates
+    direction: long
+    region: US
+  expression:
+  - rates_us
+  action: enter
+  size_band:
+    low: 50
+    high: 50
+    unit: pct_nav
+window:
+  unit: business_days
+  n: 20
+citation: RS/2015-01-18_lost-tree-club-speech.md
+date_basis: 'conservative: Lost Tree gives the trade only as early Duquesne, Volcker era (short rates 18%, 30y at
+  14%); year 1981 per seed; asof = last trading day of 1981'
+seed_id: C01
+notes: Volcker's tightening (short rates 18%) read as credible ('there is no way this man was going to let inflation
+  go'); 50% of capital in 30-year Treasuries.

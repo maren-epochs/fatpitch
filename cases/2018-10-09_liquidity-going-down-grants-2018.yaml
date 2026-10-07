@@ -1,0 +1,23 @@
+id: 2018-10-09_liquidity-going-down-grants-2018
+asof: '2018-10-09T16:00:00-04:00'
+era: A
+episode_id: EP14-2018-QT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses: []
+  expression: []
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/2018-10-09_grants-fall-conference-jim-grant.md
+date_basis: 'pinned: Grant''s Fall 2018 conference conversation with James Grant, 2018-10-09 (note date)'
+seed_id: X-22
+notes: '''It''s all about liquidity, and liquidity is going down'' and ''The bombs are going to go off and things
+  will be getting ugly'' (HedgeFundAlpha headlines; notes not verbatim): hikes plus QT plus the end of foreign QE
+  read as tightening. A notes snippet ''We are going to higher interest rates'' is not verbatim and states no position,
+  so no thesis is coded. No position stated (regime-only case).'

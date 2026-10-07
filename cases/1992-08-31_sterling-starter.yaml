@@ -1,0 +1,29 @@
+id: 1992-08-31_sterling-starter
+asof: '1992-08-31T16:00:00-04:00'
+era: B
+episode_id: EP04-1992-ERM
+truth_type: action
+mechanizable: 'no'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: fx
+    direction: short
+    region: GBP
+  expression:
+  - fx_gbp
+  action: enter
+  size_band:
+    low: 20
+    high: 25
+    unit: pct_nav
+window:
+  unit: business_days
+  n: 20
+citation: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md; RS/2015-01-18_lost-tree-club-speech.md; RS/2024-11-06_nbim-in-good-company-podcast.md
+date_basis: 'conservative: Lost Tree gives ''Sterling, Aug 1992'' for the initial $1.5B short; last trading day
+  of Aug 1992'
+seed_id: C05
+notes: Starter short GBP (ERM peg premise); invest-then-investigate.

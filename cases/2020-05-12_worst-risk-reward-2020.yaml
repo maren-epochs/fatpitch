@@ -1,0 +1,21 @@
+id: 2020-05-12_worst-risk-reward-2020
+asof: '2020-05-12T16:00:00-04:00'
+era: A
+episode_id: EP16-2020-COVID
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: null
+  theses: []
+  expression:
+  - equity_us
+  action: reduce
+window:
+  unit: business_days
+  n: 20
+citation: RS/2020-05-12_economic-club-of-new-york.md; DS/2020-05-12_econclub-ny-webcast.md
+date_basis: 'pinned: Economic Club of New York webcast date (note date)'
+seed_id: C38
+notes: Equity risk/reward the worst of his career; liquidity read turning negative.

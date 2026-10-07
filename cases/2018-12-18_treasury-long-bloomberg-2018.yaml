@@ -1,0 +1,36 @@
+id: 2018-12-18_treasury-long-bloomberg-2018
+asof: '2018-12-18T16:00:00-05:00'
+era: A
+episode_id: EP14-2018-QT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: rates
+    direction: long
+    region: US
+  expression:
+  - rates_us
+  - equity_us_financials
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2018-12-18_bloomberg-tv-erik-schatzker.md
+date_basis: 'pinned: Bloomberg News article on the Bloomberg TV interview with Erik Schatzker published 2018-12-18
+  04:00 ET (09:00 UTC, page metadata), before the open; the full interview aired on Bloomberg TV the same day (air
+  time unverified). The positions were public before the 2018-12-18 close, so asof = that close whatever the broadcast
+  time'
+seed_id: X-16
+notes: 'Says he owns two-, five- and 10-year Treasuries; if the Fed tightens too much and must reverse, ''it''s
+  not inconceivable to me at all that the 2-years are back to 50 to 60 basis points in a couple of years''. Says
+  he has been short ''all the financials'', including banks, for the same rate reasons: coded as the expression
+  equity_us_financials only, since the thesis vocabulary has no sector region and an equity/short/US thesis would
+  misstate it (he says he avoids shorting the market: ''you get squeezed out of shorts''). Regime read tightening:
+  he urged the Fed to hold off the 2018-12-19 hike (same read as C33) and wants ''this bubble to unwind slowly''.
+  Action hold: he states ownership; the article''s ''has been buying'' is the reporter''s summary with no entry
+  date. Long cloud names (MSFT, CRM, NOW, WDAY) are single names, not coded. Indicators ''not red yet, but... definitely
+  amber''.'

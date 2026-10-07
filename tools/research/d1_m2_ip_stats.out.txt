@@ -1,0 +1,96 @@
+
+== REVISED L2, window=12m: n=800 mean=4.42 sd=6.12
+pctiles 5/10/25/50/75/90/95: -3.31 -1.96 0.89 3.37 6.84 11.86 15.19
+  >0pp: share= 80.1%  spells= 16  median_len=33.5m  mean_len=40.1m  max_len=90
+  >1pp: share= 74.0%  spells= 28  median_len=11.5m  mean_len=21.1m  max_len=83
+  >2pp: share= 65.6%  spells= 36  median_len= 3.0m  mean_len=14.6m  max_len=79
+  >3pp: share= 54.6%  spells= 32  median_len=11.0m  mean_len=13.7m  max_len=40
+  >4pp: share= 43.8%  spells= 32  median_len= 8.5m  mean_len=10.9m  max_len=32
+  >5pp: share= 35.1%  spells= 23  median_len= 8.0m  mean_len=12.2m  max_len=27
+  >6pp: share= 29.5%  spells= 24  median_len= 6.5m  mean_len= 9.8m  max_len=24
+  >7pp: share= 23.8%  spells= 22  median_len= 6.0m  mean_len= 8.6m  max_len=22
+  <0pp: share= 19.9% spells=16 median_len=5.5m
+  autocorr lag1/3/6/12: 0.96 0.83 0.62 0.16
+  3-state flips per decade at thr 2pp: 15.0; thr 0 (sign only): 4.6
+
+== REVISED L2 12m, excluding 2020-03..2021-12 (COVID/M2 break): n=778 mean=3.98 sd=5.23
+pctiles 5/10/25/50/75/90/95: -3.38 -2.01 0.80 3.31 6.55 10.67 13.90
+  >0pp: share= 79.7%  spells= 15  median_len=35.0m  mean_len=41.3m  max_len=90
+  >1pp: share= 73.4%  spells= 27  median_len=11.0m  mean_len=21.1m  max_len=83
+  >2pp: share= 64.9%  spells= 35  median_len= 3.0m  mean_len=14.4m  max_len=79
+  >3pp: share= 53.6%  spells= 31  median_len=10.0m  mean_len=13.5m  max_len=40
+  >4pp: share= 42.5%  spells= 31  median_len= 8.0m  mean_len=10.7m  max_len=32
+  >5pp: share= 33.7%  spells= 22  median_len= 7.5m  mean_len=11.9m  max_len=27
+  >6pp: share= 27.9%  spells= 23  median_len= 6.0m  mean_len= 9.4m  max_len=24
+  >7pp: share= 22.0%  spells= 21  median_len= 6.0m  mean_len= 8.1m  max_len=22
+  <0pp: share= 20.3% spells=15 median_len=8.0m
+  autocorr lag1/3/6/12: 0.97 0.86 0.63 0.15
+  era 1960-1979: median=2.81 p25=0.93 p75=5.86 p90=11.19 share>2=61% share>5=29% share<0=18%
+  era 1980-1999: median=2.53 p25=-1.46 p75=6.84 p90=11.44 share>2=55% share>5=34% share<0=36%
+  era 2000-2019: median=4.21 p25=2.41 p75=7.21 p90=10.92 share>2=80% share>5=44% share<0=6%
+  era 2022-2026: median=2.50 p25=-0.33 p75=3.74 p90=4.40 share>2=61% share>5=5% share<0=27%
+  component medians: M2 yoy 6.58 IP yoy 2.63 sd M2 3.79 sd IP 4.73
+  share of L2 variance from IP: 0.60; from M2: 0.38; corr(m2,ip)=-0.02
+  2020-2021 path:
+[[18262.0, 6.7, -2.3, 9.0], [18293.0, 6.8, -1.4, 8.2], [18322.0, 10.1, -5.3, 15.4], [18353.0, 16.9, -17.3, 34.2], [18383.0, 22.0, -16.0, 38.0], [18414.0, 22.8, -10.6, 33.4], [18444.0, 23.2, -6.8, 30.0], [18475.0, 23.0, -6.5, 29.5], [18506.0, 23.6, -6.2, 29.8], [18536.0, 23.5, -4.6, 28.2], [18567.0, 24.2, -4.8, 29.0], [18597.0, 24.5, -3.3, 27.8], [18628.0, 25.6, -2.1, 27.7], [18659.0, 26.8, -5.7, 32.5], [18687.0, 23.9, 1.0, 22.9], [18718.0, 18.2, 16.6, 1.7], [18748.0, 14.1, 15.7, -1.6], [18779.0, 12.6, 9.0, 3.7], [18809.0, 12.5, 5.5, 7.0], [18840.0, 13.2, 4.3, 8.9], [18871.0, 12.8, 3.0, 9.8], [18901.0, 12.8, 3.6, 9.3], [18932.0, 12.3, 3.9, 8.4], [18962.0, 12.5, 2.2, 10.2]]
+
+== REVISED L2, window=6m annualized: n=800 mean=4.35 sd=7.83
+pctiles 5/10/25/50/75/90/95: -5.32 -3.42 -0.14 3.28 7.41 12.24 15.98
+  >0pp: share= 74.5%  spells= 37  median_len=11.0m  mean_len=16.1m  max_len=88
+  >1pp: share= 68.4%  spells= 42  median_len=10.0m  mean_len=13.0m  max_len=42
+  >2pp: share= 60.9%  spells= 53  median_len= 7.0m  mean_len= 9.2m  max_len=32
+  >3pp: share= 52.0%  spells= 50  median_len= 5.0m  mean_len= 8.3m  max_len=29
+  >4pp: share= 44.0%  spells= 43  median_len= 5.0m  mean_len= 8.2m  max_len=27
+  >5pp: share= 37.4%  spells= 41  median_len= 6.0m  mean_len= 7.3m  max_len=27
+  >6pp: share= 32.5%  spells= 38  median_len= 6.0m  mean_len= 6.8m  max_len=27
+  >7pp: share= 26.9%  spells= 36  median_len= 4.0m  mean_len= 6.0m  max_len=21
+  <0pp: share= 25.5% spells=37 median_len=3.0m
+  autocorr lag1/3/6/12: 0.91 0.62 0.21 0.07
+  3-state flips per decade at thr 2pp: 24.3; thr 0 (sign only): 10.9
+
+== REVISED L2, window=3m annualized: n=800 mean=4.27 sd=10.14
+pctiles 5/10/25/50/75/90/95: -6.72 -4.15 -0.60 3.34 7.85 12.98 16.78
+  >0pp: share= 70.4%  spells= 65  median_len= 5.0m  mean_len= 8.7m  max_len=35
+  >1pp: share= 65.2%  spells= 67  median_len= 5.0m  mean_len= 7.8m  max_len=34
+  >2pp: share= 59.4%  spells= 71  median_len= 4.0m  mean_len= 6.7m  max_len=34
+  >3pp: share= 53.1%  spells= 70  median_len= 4.5m  mean_len= 6.1m  max_len=28
+  >4pp: share= 46.4%  spells= 73  median_len= 3.0m  mean_len= 5.1m  max_len=20
+  >5pp: share= 38.5%  spells= 64  median_len= 3.0m  mean_len= 4.8m  max_len=20
+  >6pp: share= 33.2%  spells= 62  median_len= 3.0m  mean_len= 4.3m  max_len=20
+  >7pp: share= 28.5%  spells= 58  median_len= 3.0m  mean_len= 3.9m  max_len=17
+  <0pp: share= 29.6% spells=65 median_len=2.0m
+  autocorr lag1/3/6/12: 0.78 0.16 0.11 0.02
+  3-state flips per decade at thr 2pp: 30.3; thr 0 (sign only): 19.3
+
+== REVISED L2, window=24m annualized: n=788 mean=4.48 sd=4.71
+pctiles 5/10/25/50/75/90/95: -1.79 -1.05 1.59 3.55 6.68 10.61 13.56
+  >0pp: share= 84.8%  spells= 10  median_len=23.5m  mean_len=66.8m  max_len=257
+  >1pp: share= 79.3%  spells= 12  median_len=33.5m  mean_len=52.1m  max_len=174
+  >2pp: share= 70.9%  spells= 21  median_len=17.0m  mean_len=26.6m  max_len=82
+  >3pp: share= 59.4%  spells= 21  median_len= 8.0m  mean_len=22.3m  max_len=75
+  >4pp: share= 45.1%  spells= 20  median_len= 9.0m  mean_len=17.8m  max_len=53
+  >5pp: share= 35.3%  spells= 18  median_len= 9.5m  mean_len=15.4m  max_len=49
+  >6pp: share= 28.3%  spells= 13  median_len=23.0m  mean_len=17.2m  max_len=45
+  >7pp: share= 23.9%  spells= 10  median_len=21.5m  mean_len=18.8m  max_len=44
+  <0pp: share= 15.2% spells=9 median_len=8.0m
+  autocorr lag1/3/6/12: 0.98 0.92 0.81 0.55
+  3-state flips per decade at thr 2pp: 8.8; thr 0 (sign only): 2.7
+
+== REAL-TIME L2 12m (vintage in force at each month-end), 1980-2026: n=559 mean=4.35 sd=6.68
+pctiles 5/10/25/50/75/90/95: -3.58 -2.48 0.35 3.37 6.69 12.31 17.64
+  >0pp: share= 76.7%  spells= 22  median_len=15.5m  mean_len=19.5m  max_len=81
+  >1pp: share= 67.3%  spells= 20  median_len=19.5m  mean_len=18.8m  max_len=42
+  >2pp: share= 58.3%  spells= 18  median_len=18.5m  mean_len=18.1m  max_len=37
+  >3pp: share= 52.8%  spells= 19  median_len=13.0m  mean_len=15.5m  max_len=36
+  >4pp: share= 44.0%  spells= 21  median_len= 8.0m  mean_len=11.7m  max_len=34
+  >5pp: share= 35.1%  spells= 22  median_len= 7.5m  mean_len= 8.9m  max_len=23
+  >6pp: share= 29.0%  spells= 17  median_len= 8.0m  mean_len= 9.5m  max_len=21
+  >7pp: share= 22.7%  spells= 12  median_len= 9.5m  mean_len=10.6m  max_len=20
+  <0pp: share= 23.3% spells=21 median_len=3.0m
+  autocorr lag1/3/6/12: 0.96 0.82 0.60 0.11
+
+real-time minus revised (approx aligned): mean=-0.27 MAD=1.25 p90|d|=2.89
+
+== M2 yoy minus nominal GDP yoy (Marshallian-k growth), quarterly 1960-2026: n=266
+pctiles 5/10/25/50/75/90/95: -5.17 -3.95 -2.21 0.05 2.27 4.53 5.76
+share >0/2/5: 50% 29% 8%

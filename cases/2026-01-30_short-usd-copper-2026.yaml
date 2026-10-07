@@ -1,0 +1,38 @@
+id: 2026-01-30_short-usd-copper-2026
+asof: '2026-01-30T16:00:00-05:00'
+era: A
+episode_id: EP21-2025-26-ROTATE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: fx
+    direction: short
+    region: USD
+  - asset_class: commodity
+    direction: long
+    region: COPPER
+  - asset_class: rates
+    direction: short
+    region: US
+  - asset_class: equity
+    direction: long
+    region: JP
+  - asset_class: equity
+    direction: long
+    region: KR
+  expression:
+  - fx_usd
+  - commodity_copper
+  - equity_jp
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md
+date_basis: 'pinned: Morgan Stanley interview recorded 2026-01-30 (note; released 2026-02-27)'
+seed_id: C54
+notes: Short USD, long copper, UST short as hedge, long Japan/Korea.

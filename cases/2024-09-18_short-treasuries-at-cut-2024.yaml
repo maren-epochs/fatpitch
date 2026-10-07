@@ -1,0 +1,28 @@
+id: 2024-09-18_short-treasuries-at-cut-2024
+asof: '2024-09-18T16:00:00-04:00'
+era: A
+episode_id: EP20-2024-CUT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: rates
+    direction: short
+    region: US
+  expression:
+  - rates_us
+  action: enter
+  size_band:
+    low: 25
+    high: 25
+    unit: pct_nav_10y_eq
+window:
+  unit: business_days
+  n: 20
+citation: DS/2024-10-16_bloomberg-tv-sonali-basak.md; RS/2024-11-06_nbim-in-good-company-podcast.md
+date_basis: 'pinned: ''We shorted bonds the day the Fed cut fifty'' (Bloomberg 2024-10-16); FOMC 2024-09-18'
+seed_id: C53
+notes: Easing into loose financial conditions; 10y below nominal GDP (R-56).

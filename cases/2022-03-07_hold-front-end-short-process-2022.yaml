@@ -1,0 +1,27 @@
+id: 2022-03-07_hold-front-end-short-process-2022
+asof: '2022-03-07T16:00:00-05:00'
+era: A
+episode_id: EP17-2021-MANIA
+truth_type: process
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: rates
+    direction: short
+    region: US
+  expression:
+  - rates_us
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: RS/2024-11-06_nbim-in-good-company-podcast.md; DS/2022-06-XX_sohn-2022-john-collison.md
+date_basis: 'conservative: NBIM 2024 says most of the 2y short was taken off at ~150 bp, no date; latest Q1 2022
+  date with DGS2 in 1.40-1.60 is 2022-03-07'
+seed_id: C44
+notes: 'Process target: premise (policy too loose, inflation) intact, so the short is held (R-49). His action took
+  most off. Regime label easing: his read of policy in March 2022 was still loose (''they were still buying bonds
+  in March of 22'', Sohn 2022, retrospective); no contemporaneous statement.'

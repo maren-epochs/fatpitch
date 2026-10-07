@@ -1,0 +1,29 @@
+id: 2022-06-10_waiting-for-fat-pitch-2022
+asof: '2022-06-10T16:00:00-04:00'
+era: A
+episode_id: EP18-2022-INFL
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: commodity
+    direction: long
+    region: OIL
+  - asset_class: commodity
+    direction: long
+    region: COPPER
+  expression:
+  - commodity_oil
+  - commodity_copper
+  action: flat
+window:
+  unit: business_days
+  n: 20
+citation: DS/2022-06-XX_sohn-2022-john-collison.md; RS/2022-06-10_sohn-2022-collison-conversation.md
+date_basis: 'pinned: Sohn 2022 release date 2022-06-10 (RS note); recording date unknown, release date is the latest
+  defensible'
+seed_id: C45
+notes: Low conviction; equities flat-to-short; waiting for a fat pitch.

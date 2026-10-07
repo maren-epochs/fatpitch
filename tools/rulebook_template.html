@@ -1,0 +1,758 @@
+<title>Fat Pitch Rulebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: desk playbook — sticky section rail on wide screens, one reading column, dense reference tables. */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #eceef2;
+  --fg: #16202e;
+  --muted: #5a6577;
+  --line: #cfd5de;
+  --accent: #1f4fa3;
+  --accent-soft: #e3eaf7;
+  --stated: #1d6b45;
+  --stated-bg: #e1f1e8;
+  --interp: #8a5a00;
+  --interp-bg: #fbefd6;
+  --article: #9b2f2f;
+  --article-bg: #f7e1e1;
+  --pass: #1d6b45;
+  --fail: #9b2f2f;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151d; --surface: #171e29; --surface-2: #1f2836; --fg: #e3e8ef; --muted: #98a3b4; --line: #2f3a4b;
+    --accent: #7ea6ec; --accent-soft: #1c2a44;
+    --stated: #6fcf9b; --stated-bg: #15301f; --interp: #e6b450; --interp-bg: #33270e; --article: #ef8b8b; --article-bg: #3a1a1a;
+    --pass: #6fcf9b; --fail: #ef8b8b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151d; --surface: #171e29; --surface-2: #1f2836; --fg: #e3e8ef; --muted: #98a3b4; --line: #2f3a4b;
+  --accent: #7ea6ec; --accent-soft: #1c2a44;
+  --stated: #6fcf9b; --stated-bg: #15301f; --interp: #e6b450; --interp-bg: #33270e; --article: #ef8b8b; --article-bg: #3a1a1a;
+  --pass: #6fcf9b; --fail: #ef8b8b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--font-body); }
+.wrap { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 40px; max-width: 1240px; margin: 0 auto; padding-inline: 24px; padding-block: 28px 80px; }
+nav.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; }
+nav.rail .brand { font: 700 15px/1.2 var(--font-display); letter-spacing: .02em; margin-bottom: 14px; }
+nav.rail a { color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 5px; border-left: 2px solid transparent; }
+nav.rail a:hover, nav.rail a:focus-visible { color: var(--fg); background: var(--surface-2); outline: none; }
+main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h1 { font-size: 34px; line-height: 1.1; font-weight: 700; }
+h2 { font-size: 24px; font-weight: 700; padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+h3 { font-size: 17px; font-weight: 600; }
+p { margin: 0; max-width: 72ch; }
+.eyebrow { font: 500 11.5px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--muted); font-size: 16px; margin-top: 10px; }
+code, .mono { font-family: var(--font-mono); font-size: .88em; }
+code { background: var(--surface-2); padding: 1px 4px; border-radius: 3px; }
+a { color: var(--accent); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+
+/* stat strip */
+.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 18px; font-variant-numeric: tabular-nums; }
+.stat b { font: 600 22px/1 var(--font-display); display: block; }
+.stat span { font-size: 12.5px; color: var(--muted); }
+
+/* tags */
+.tag { display: inline-block; font: 500 11px/1 var(--font-mono); padding: 4px 7px 3px; border-radius: 3px; white-space: nowrap; letter-spacing: .02em; }
+.tag.stated { color: var(--stated); background: var(--stated-bg); }
+.tag.interpreted { color: var(--interp); background: var(--interp-bg); }
+.tag.interpreted-from-article { color: var(--article); background: var(--article-bg); }
+.tag.tunable { color: var(--accent); background: var(--accent-soft); }
+
+/* pipeline */
+.pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; counter-reset: none; }
+.pstep { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pstep .k { font: 500 11px/1 var(--font-mono); color: var(--muted); }
+.pstep .n { font: 600 15px/1.2 var(--font-display); }
+.pstep .d { font-size: 12.5px; color: var(--muted); }
+.pstep .bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; background: var(--surface-2); margin-top: 4px; }
+.pstep .bar i { display: block; height: 100%; }
+
+/* method grid */
+.method { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.mcard { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.mcard p { font-size: 13.5px; }
+
+/* decision trees */
+.trees { display: flex; flex-direction: column; gap: 22px; }
+.treebox { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; min-width: 0; overflow-x: auto; }
+.treebox h3 { margin-bottom: 4px; }
+.treebox > p { font-size: 13.5px; color: var(--muted); margin-bottom: 10px; }
+ul.tree, ul.tree ul { list-style: none; margin: 0; padding-left: 18px; }
+ul.tree { padding-left: 0; }
+ul.tree li { position: relative; padding: 5px 0 5px 18px; }
+ul.tree ul li::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; border-left: 1px solid var(--line); }
+ul.tree ul li:last-child::before { bottom: auto; height: 19px; }
+ul.tree ul li::after { content: ""; position: absolute; left: 0; top: 19px; width: 12px; border-top: 1px solid var(--line); }
+.node { display: inline-block; padding: 5px 9px; border-radius: 5px; border: 1px solid var(--line); background: var(--surface-2); font-size: 13.5px; max-width: 64ch; }
+.node.q { background: var(--surface); border-color: var(--accent); }
+.node.pass { border-color: var(--pass); color: var(--pass); background: transparent; font-weight: 500; }
+.node.fail { border-color: var(--fail); color: var(--fail); background: transparent; font-weight: 500; }
+.node.info { border-style: dashed; background: transparent; color: var(--muted); }
+.br { font: 500 10.5px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 6px; }
+.rref { font-family: var(--font-mono); font-size: 11.5px; color: var(--accent); background: var(--accent-soft); border: 0; border-radius: 3px; padding: 2px 5px; margin-left: 4px; cursor: pointer; }
+.rref:hover, .rref:focus-visible { outline: 1px solid var(--accent); }
+
+/* rule explorer */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; }
+.filters label { font-size: 12px; color: var(--muted); }
+.chip { font: 500 12px/1 var(--font-body); padding: 6px 9px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.chip:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+input[type="search"], select { font: 13px var(--font-body); padding: 6px 9px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--fg); min-width: 0; }
+input[type="search"] { flex: 1 1 180px; }
+.count { font: 12px var(--font-mono); color: var(--muted); margin-left: auto; }
+.rules { display: flex; flex-direction: column; gap: 10px; }
+.rule { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; min-width: 0; scroll-margin-top: 80px; }
+.rule.flash { outline: 2px solid var(--accent); }
+.rule header { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: baseline; }
+.rule .rid { font: 600 13px/1 var(--font-mono); color: var(--muted); }
+.rule .rt { font: 600 16px/1.3 var(--font-display); flex: 1 1 260px; min-width: 0; }
+.rule .tagnote { font-size: 12px; color: var(--muted); }
+.rule dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 6px 14px; margin: 12px 0 0; font-size: 13.5px; }
+.rule dt { color: var(--muted); font-size: 12px; padding-top: 2px; }
+.rule dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.rule .srcs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.srcchip { font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 3px 7px; color: var(--fg); background: var(--surface-2); text-decoration: none; }
+.srcchip .rel { font: 500 10.5px var(--font-mono); color: var(--muted); margin-left: 5px; }
+.params-inline { display: flex; flex-wrap: wrap; gap: 6px; }
+.pinl { font: 12px var(--font-mono); background: var(--surface-2); border-radius: 3px; padding: 2px 6px; border-left: 3px solid var(--line); }
+.pinl.his { border-left-color: var(--stated); }
+.pinl.ours { border-left-color: var(--interp); }
+.review-intro { display: flex; flex-wrap: wrap; gap: 10px 28px; font-variant-numeric: tabular-nums; }
+
+/* tables */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font: 600 12px var(--font-display); letter-spacing: .03em; color: var(--muted); background: var(--surface-2); position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; font-family: var(--font-mono); font-size: 12px; }
+td, td .mono { overflow-wrap: anywhere; }
+td .tag { white-space: normal; }
+#paramTable, #tTable, #reviewTable { table-layout: fixed; }
+#reviewTable th:nth-child(1) { width: 24%; }
+#reviewTable th:nth-child(2) { width: 11%; }
+#reviewTable th:nth-child(3) { width: 11%; }
+#reviewTable th:nth-child(4) { width: 14%; }
+#reviewTable th:nth-child(5) { width: 40%; }
+#paramTable th:nth-child(1) { width: 24%; }
+#paramTable th:nth-child(2) { width: 12%; }
+#paramTable th:nth-child(3) { width: 11%; }
+#paramTable th:nth-child(4) { width: 13%; }
+#paramTable th:nth-child(5) { width: 40%; }
+#paramTable td:first-child .mono { font-size: 12px; }
+#paramTable td:first-child .tag { margin-top: 4px; }
+#tTable th:nth-child(1) { width: 7%; }
+#tTable th:nth-child(2) { width: 25%; }
+#tTable th:nth-child(3) { width: 18%; }
+#tTable th:nth-child(4) { width: 17%; }
+#tTable th:nth-child(5) { width: 19%; }
+#tTable th:nth-child(6) { width: 14%; }
+@media (max-width: 760px) {
+  #paramTable thead { display: none; }
+  #paramTable, #paramTable tbody, #paramTable tr, #paramTable td { display: block; width: 100%; }
+  #paramTable tr { border-bottom: 1px solid var(--line); padding: 8px 0; }
+  #paramTable td { border: 0; padding: 3px 12px; }
+  #paramTable td:nth-child(2)::before { content: "Value "; color: var(--muted); font-family: var(--font-body); }
+  #paramTable td:nth-child(3)::before { content: "Range "; color: var(--muted); font-family: var(--font-body); }
+}
+
+/* sources */
+.src { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 14px; }
+.src .sd { font: 500 12.5px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.src .st { font-weight: 600; }
+.src .sm { font-size: 12.5px; color: var(--muted); grid-column: 2; }
+.src .sr { grid-column: 2; display: flex; flex-wrap: wrap; gap: 4px; }
+.rel-badge { font: 500 10.5px var(--font-mono); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--line); }
+
+/* decisions */
+.dflow { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: dstep; }
+.dflow li { counter-increment: dstep; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; font-size: 12.5px; color: var(--muted); }
+.dflow li b { font: 600 14.5px/1.25 var(--font-display); color: var(--fg); }
+.dflow li b::before { content: counter(dstep) "  "; font: 500 11px var(--font-mono); color: var(--accent); }
+.decisions { display: flex; flex-direction: column; gap: 12px; }
+.dec { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; scroll-margin-top: 80px; }
+.dec.old { opacity: .78; }
+.dec .dh { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12px; color: var(--muted); }
+.dec .dh .dd { font: 500 12.5px var(--font-mono); font-variant-numeric: tabular-nums; color: var(--fg); }
+.dec .dh .did { font: 500 12px var(--font-mono); }
+.dec .dq { font: 600 16.5px/1.3 var(--font-display); }
+.pill { font: 500 11px/1 var(--font-mono); padding: 4px 7px 3px; border-radius: 10px; border: 1px solid var(--line); white-space: nowrap; }
+.pill.live { color: var(--pass); border-color: var(--pass); }
+.pill.gone { color: var(--muted); }
+.pill.who { color: var(--accent); border-color: var(--accent); }
+.opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; }
+.opts li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 6px 9px; border-radius: 5px; background: var(--surface-2); border: 1px solid transparent; }
+.opts li .ol { font: 600 12px var(--font-mono); color: var(--muted); }
+.opts li.pick { background: var(--accent-soft); border-color: var(--accent); }
+.opts li.pick .ol, .opts li .ch { color: var(--accent); }
+.opts li .ch { font: 500 10.5px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; }
+.dec .why { font-size: 13.5px; max-width: none; }
+.dec .lbl { font: 500 10.5px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); display: block; margin-bottom: 5px; }
+.er { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.er > div { border: 1px solid var(--line); border-radius: 5px; padding: 9px 11px; font-size: 13px; min-width: 0; }
+.er .pending { border-style: dashed; color: var(--muted); }
+.er .measured { border-color: var(--accent); }
+.ev { display: flex; flex-wrap: wrap; gap: 5px; }
+.ev code { font-size: 11.5px; }
+@media (max-width: 640px) { .er { grid-template-columns: minmax(0, 1fr); } .opts li { grid-template-columns: 26px minmax(0, 1fr); } .opts li .ch { grid-column: 2; } }
+
+.note { font-size: 13px; color: var(--muted); }
+.disclaimer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-inline: 16px; }
+  nav.rail { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  nav.rail .brand { width: 100%; margin-bottom: 4px; }
+  nav.rail a { border: 1px solid var(--line); padding: 4px 8px; }
+  .rule dl { grid-template-columns: minmax(0, 1fr); }
+  .rule dt { padding-top: 6px; }
+  .src { grid-template-columns: minmax(0, 1fr); }
+  .src .sm, .src .sr { grid-column: 1; }
+  h1 { font-size: 27px; }
+}
+@media (prefers-reduced-motion: no-preference) { .rule.flash { transition: outline-color .6s; } }
+</style>
+
+<div class="wrap">
+  <nav class="rail" aria-label="Sections">
+    <div class="brand">Fat Pitch Rulebook</div>
+    <a href="#overview">Overview</a>
+    <a href="#decisions">Decisions</a>
+    <a href="#method">How criteria are set</a>
+    <a href="#review">Review: our numbers</a>
+    <a href="#trees">Decision trees</a>
+    <a href="#rules">Rules</a>
+    <a href="#sources">Where he said it</a>
+    <a href="#params">Parameters</a>
+    <a href="#theses">Thesis table</a>
+    <a href="#conflicts">Conflicts</a>
+    <a href="#gaps">Gaps</a>
+  </nav>
+
+  <main>
+    <section id="overview" class="stack">
+      <div class="eyebrow">Process model · spec v0.3 + staged changes · __BUILT__ · research mode, not pre-registered</div>
+      <h1>Fat Pitch Rulebook</h1>
+      <p class="lede">Every rule the engine uses to reproduce Druckenmiller's public investment process, where in his interviews and speeches each rule comes from, and how each threshold was chosen. Thesis first: liquidity and policy set the regime, the chart can veto, size follows conviction, and the default is cash.</p>
+      <div class="stats" id="stats"></div>
+      <div class="pipeline" id="pipeline" aria-label="Seven-step process"></div>
+      <p class="note">Bar colour inside each step shows the mix of rule tags: green = stated by him, amber = interpreted, red = from the Automated Alpha article (weight 0).</p>
+    </section>
+
+    <section id="decisions" class="stack">
+      <h2>Decisions and what they were expected to do</h2>
+      <p>Every change to a rule, threshold or test is a recorded decision. Each record keeps the question in plain words, the options that were on the table, the evidence that settled it, and a prediction of its effect written <strong>before</strong> any result was seen. The measured result is added afterwards, next to the prediction, so a wrong expectation stays visible.</p>
+      <ol class="dflow" aria-label="How a decision is made">
+        <li><b>Problem found</b>A rule misreads history, a test cannot be passed, or the owner asks for something new.</li>
+        <li><b>Evidence gathered blind</b>Research reads the source library and public records without seeing case answers or scores.</li>
+        <li><b>Options, one recommended</b>Two to four choices in plain words; the recommendation states its reason and what it rejects.</li>
+        <li><b>Owner decides; prediction written</b>The choice and its expected effect are committed before any run that could inform it.</li>
+        <li><b>Measured one change at a time</b>Each change is its own commit and run, so its effect is the difference from the step before.</li>
+      </ol>
+      <div class="filters" role="group" aria-label="Filter decisions">
+        <span id="areaChips"></span>
+        <input type="search" id="dq" placeholder="question, rule, file…" aria-label="Search decisions">
+        <button class="chip" id="showOld" aria-pressed="false">Include superseded</button>
+        <span class="count" id="decCount"></span>
+      </div>
+      <div class="decisions" id="decList"></div>
+    </section>
+
+    <section id="method" class="stack">
+      <h2>How criteria are set</h2>
+      <div class="method">
+        <div class="mcard"><span class="tag stated">stated</span><h3>He said it</h3><p>The principle appears in a primary or near-primary transcript in his own words. This tag is about the principle only. When he gave a number (4.5% inflation, gross leverage 4:1, 1–2 pitches a year), it is used as-is and never tuned. Most stated rules still contain numbers we chose; each rule card shows "numbers: his / ours", and the review list collects them.</p></div>
+        <div class="mcard"><span class="tag interpreted">interpreted</span><h3>Built from what he said</h3><p>The principle is his but the formula, window or threshold is not (for example, "money growing a lot faster than industrial production" needs a number for "a lot"). Each choice is written down with its reasoning and the source it rests on.</p></div>
+        <div class="mcard"><span class="tag interpreted-from-article">interpreted-from-article</span><h3>Not his</h3><p>Gates that come only from the Automated Alpha article (accounting forensics, ROIC, 13F/Form 4 "smart money", contrarian COT). They are computed and logged at weight 0 and turn on only if a primary citation is found.</p></div>
+        <div class="mcard"><span class="tag tunable">tunable · max 8</span><h3>Fit to his decisions, not to returns</h3><p>Only 8 interpreted parameters may move. Each is chosen by leave-one-episode-out fidelity: how often the engine reaches the decision he actually made, using only data published at the time. To pass, the engine's regime odds must beat climatology, a 12-month trend and an always-easing forecaster on probability skill, call tightening better than always-easing, and track the Fed's own rate cycles; results are shown across each parameter's range.</p></div>
+      </div>
+      <div class="treebox">
+        <h3>Deciding a criterion</h3>
+        <p>Applied to every candidate rule before it enters the spec.</p>
+        <ul class="tree">
+          <li><span class="node q">Does a primary or near-primary transcript show him stating the principle?</span>
+            <ul>
+              <li><span class="br">Yes</span><span class="node q">Did he give a number?</span>
+                <ul>
+                  <li><span class="br">Yes</span><span class="node pass">stated, fixed at his number</span></li>
+                  <li><span class="br">No</span><span class="node info">stated principle, interpreted formula: threshold set by reasoning and recorded</span></li>
+                </ul>
+              </li>
+              <li><span class="br">Only secondary</span><span class="node info">interpreted until a transcript confirms it</span></li>
+              <li><span class="br">Only the article</span><span class="node fail">interpreted-from-article, weight 0</span></li>
+            </ul>
+          </li>
+          <li><span class="node q">Do sources disagree?</span>
+            <ul>
+              <li><span class="br">Same object</span><span class="node info">primary beats secondary; otherwise widen to the stated range (horizon 18–36 months)</span></li>
+              <li><span class="br">Different objects</span><span class="node info">keep both (internals lead 6–12 months; momentum bottoms 12–18 months)</span></li>
+            </ul>
+          </li>
+          <li><span class="node q">Is the interpreted threshold among the 8 tunable?</span>
+            <ul>
+              <li><span class="br">Yes</span><span class="node info">search range fixed in advance → leave-one-episode-out fidelity → held-out score run once, pre-registered</span></li>
+              <li><span class="br">No</span><span class="node info">fixed design choice, documented; sensitivity reported, never fitted</span></li>
+            </ul>
+          </li>
+          <li><span class="node q">Was the rule written after looking at how cases turned out?</span>
+            <ul><li><span class="br">Guard</span><span class="node info">thesis table authored before reading case outcomes; spec, table and case list hashed and registered before any scoring</span></li></ul>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="review" class="stack">
+      <h2>Review: numbers we chose</h2>
+      <p>Most rules carry his principle, but he rarely gave numbers. Every threshold and window below was chosen during spec writing, not taken from a source. These are the values to check before the rules are locked in. Tunable ones will be fitted to his decisions within the range shown; the rest stay fixed at the value shown.</p>
+      <div class="review-intro" id="reviewStats"></div>
+      <div class="tablewrap"><table id="reviewTable"><thead><tr><th>Parameter</th><th>Our value</th><th>Range</th><th>Used by</th><th>Reasoning and source it rests on</th></tr></thead><tbody></tbody></table></div>
+      <h3>Constants written into formulas</h3>
+      <p>Formula constants are now registry parameters (fixed, graded for evidence in each entry's notes and ranked for review in <code>spec\numbers_review.md</code>), so the table above lists every number chosen.</p>
+      <p class="note">Numbers he gave himself: 4.5% and 5% inflation, gross leverage 4:1, equity net +100% / −50%, FX 150–200%, bonds 300%, exit cost 1–2%, up 20% = hot, 1–2 pitches a year, 6–12 and 12–18 month leads, 18–36 month horizon, 2-year currency trends, 15% rally before shorting, technicals ~20% as effective, starter ≈ one third.</p>
+    </section>
+
+    <section id="trees" class="stack">
+      <h2>Decision trees</h2>
+      <p class="note">Nightly, for each as-of date, using only data published by then. Missing data returns <em>unknown</em>, which never counts as pass or fail. Numbers are current registry values; tunable ones are marked.</p>
+      <div class="trees">
+
+        <div class="treebox">
+          <h3>Step 1 · Regime and policy</h3>
+          <p>Liquidity and the Fed set the backdrop, per region (US, euro area, Japan, UK).</p>
+          <ul class="tree">
+            <li><span class="node q">Which data era is the as-of date in?</span>
+              <ul>
+                <li><span class="br">2002 →</span><span class="node info">All three liquidity measures reported: M2 vs IP, Fed assets − TGA − RRP, Fed purchases − net Treasury issuance</span><button class="rref" data-r="R-02">R-02</button><button class="rref" data-r="R-03">R-03</button><button class="rref" data-r="R-04">R-04</button></li>
+                <li><span class="br">Pre-2002</span><span class="node info">M2 growth − industrial-production growth (his stated rule, 1959 →)</span><button class="rref" data-r="R-02">R-02</button></li>
+              </ul>
+            </li>
+            <li><span class="node q">M2 yoy − IP yoy above 2.0 pp <span class="tag tunable">tunable</span>?</span>
+              <ul>
+                <li><span class="br">Yes</span><span class="node pass">Liquidity impulse positive</span></li>
+                <li><span class="br">Below 0</span><span class="node fail">Liquidity impulse negative</span></li>
+                <li><span class="br">Between</span><span class="node info">Neutral. A sign change counts only after 2 consecutive readings</span></li>
+              </ul>
+            </li>
+            <li><span class="node q">Policy direction: which way was the Fed's last rate move? (fed funds target from 1982, discount rate 1948–1982)</span><button class="rref" data-r="R-14">R-14</button>
+              <ul>
+                <li><span class="br">Up / down</span><span class="node info">tightening / easing, held until the first move the other way ("stay long until the Fed tightens")</span></li>
+                <li><span class="br">No move on record</span><span class="node q">Which Fed balance-sheet programme is in force (announced releases since 2008)?</span>
+                  <ul>
+                    <li><span class="br">Buying</span><span class="node pass">easing, taper phases included</span></li>
+                    <li><span class="br">Runoff</span><span class="node fail">tightening (QT)</span></li>
+                    <li><span class="br">None</span><span class="node info">neutral; a programme ended within 6 months raises the QE-end setback flag</span></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><span class="node info">Odds of easing / on hold / tightening: votes from R-14 and the liquidity family, each outcome starting at 0.1</span><button class="rref" data-r="R-66">R-66</button></li>
+            <li><span class="node info">Hybrid track only, warning flag: anticipated Fed turn from the bill market (6-month vs 3-month bills) checked by inflation momentum</span><button class="rref" data-r="R-67">R-67</button></li>
+            <li><span class="node q">Fed funds − Taylor rate (unemployment-gap version) beyond ±2.0 pp <span class="tag tunable">tunable</span>?</span><button class="rref" data-r="R-06">R-06</button>
+              <ul>
+                <li><span class="br">Below −2</span><span class="node fail">Policy too loose: policy-error opportunity</span><button class="rref" data-r="R-05">R-05</button></li>
+                <li><span class="br">Above +2</span><span class="node fail">Policy too tight: policy-error opportunity</span></li>
+              </ul>
+            </li>
+            <li><span class="node q">Inflation checks</span>
+              <ul>
+                <li><span class="br">CPI &gt; 4.5% and tightening</span><span class="node fail">No-soft-landing flag: recession prior</span><button class="rref" data-r="R-07">R-07</button></li>
+                <li><span class="br">CPI &gt; 5% and FF &lt; CPI</span><span class="node fail">Inflation veto flag: long duration and long equity lose one evidence family</span><button class="rref" data-r="R-08">R-08</button><button class="rref" data-r="R-09">R-09</button></li>
+              </ul>
+            </li>
+            <li><span class="node q">10-year yield, WTI and the dollar all up over 3 months <span class="tag tunable">tunable</span>?</span><button class="rref" data-r="R-10">R-10</button>
+              <ul><li><span class="br">Yes</span><span class="node fail">Cross-asset warning ("three death knells")</span></li></ul>
+            </li>
+            <li><span class="node q">Fragility composite above 80th percentile <span class="tag tunable">tunable</span>? (unprofitable IPOs, HY issuance share, corporate debt growth, buybacks, tight HY spreads, margin debt)</span><button class="rref" data-r="R-11">R-11</button>
+              <ul><li><span class="br">Yes</span><span class="node info">Fragility high: shrinks long size, adds evidence to shorts. Never sets direction</span><button class="rref" data-r="R-48">R-48</button></li></ul>
+            </li>
+            <li><span class="node info">Also: 10-year vs nominal GDP growth, financial conditions (NFCI), fiscal supply, cross-region balance sheets</span><button class="rref" data-r="R-56">R-56</button><button class="rref" data-r="R-58">R-58</button><button class="rref" data-r="R-63">R-63</button><button class="rref" data-r="R-12">R-12</button></li>
+          </ul>
+        </div>
+
+        <div class="treebox">
+          <h3>Step 1b · Market internals</h3>
+          <p>Stocks lead the economy; read as evidence feeding the thesis, not as confirmation after it.</p>
+          <ul class="tree">
+            <li><span class="node q">Leading industries (homebuilders, transports, retail, banks, small caps, metals, semis): has their 6-month relative strength <span class="tag tunable">tunable</span> turned, confirmed 2 months?</span><button class="rref" data-r="R-15">R-15</button><button class="rref" data-r="R-16">R-16</button>
+              <ul>
+                <li><span class="br">Turned up</span><span class="node pass">Internals up (6–12 months ahead of the economy)</span></li>
+                <li><span class="br">Turned down</span><span class="node fail">Internals down</span></li>
+              </ul>
+            </li>
+            <li><span class="node q">Share of industries above trend fell ≥ 20 pts in 6 months while the index rose?</span><button class="rref" data-r="R-59">R-59</button>
+              <ul><li><span class="br">Yes</span><span class="node fail">Leadership narrowing: yellow light, required before any bear market</span></li></ul>
+            </li>
+            <li><span class="node q">Industries above trend jump from &lt; 20% to &gt; 80% within 10 weeks?</span><button class="rref" data-r="R-60">R-60</button>
+              <ul><li><span class="br">Yes</span><span class="node pass">Breadth thrust: overrides a negative liquidity read for 6 months (the June 2020 lesson)</span></li></ul>
+            </li>
+            <li><span class="node info">Curve and credit trends (weight halved while QE distorts bonds); momentum bottoms 12–18 months before fundamentals; cross-asset trend vector</span><button class="rref" data-r="R-17">R-17</button><button class="rref" data-r="R-18">R-18</button><button class="rref" data-r="R-19">R-19</button></li>
+          </ul>
+        </div>
+
+        <div class="treebox">
+          <h3>Step 2 · Thesis</h3>
+          <p>Change, not level. 25 transition rows map a regime or internals change to a thesis with premises.</p>
+          <ul class="tree">
+            <li><span class="node q">Did any regime or internals state change at the as-of date?</span><button class="rref" data-r="R-21">R-21</button>
+              <ul>
+                <li><span class="br">No</span><span class="node info">Hold existing theses whose premises still hold; no new thesis (T24)</span></li>
+                <li><span class="br">Yes</span><span class="node q">Match transition table rows (see Thesis table)</span>
+                  <ul>
+                    <li><span class="br">Match</span><span class="node pass">Thesis: class, direction, region, premises, invalidation events, 18–36 month horizon</span><button class="rref" data-r="R-20">R-20</button><button class="rref" data-r="R-22">R-22</button></li>
+                    <li><span class="br">Conflicting</span><span class="node fail">Long and short on the same class and region → cash (T25)</span></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><span class="node info">Forward policy view from the Treasury curve: 2-year − fed funds beyond ±50 bp <span class="tag tunable">tunable</span> = cuts or hikes priced (replayable back to 1976)</span><button class="rref" data-r="R-23">R-23</button></li>
+            <li><span class="node info">Post-bubble bear markets last &gt; 6 months; currency trends last ≥ 2 years</span><button class="rref" data-r="R-61">R-61</button><button class="rref" data-r="R-65">R-65</button></li>
+          </ul>
+        </div>
+
+        <div class="treebox">
+          <h3>Step 3 · Expression</h3>
+          <p>Pick what best expresses the thesis across the whole menu.</p>
+          <ul class="tree">
+            <li><span class="node q">Rank instruments by 3-year weekly beta to the thesis driver</span><button class="rref" data-r="R-25">R-25</button>
+              <ul>
+                <li><span class="br">Then</span><span class="node q">Add second-order expressions in other classes (|corr| ≥ 0.5): the sterling → gilts → UK stocks pattern</span><button class="rref" data-r="R-27">R-27</button>
+                  <ul>
+                    <li><span class="br">Then</span><span class="node q">Rank by payoff asymmetry: upside to target ÷ downside to premise break</span><button class="rref" data-r="R-28">R-28</button>
+                      <ul><li><span class="br">Out</span><span class="node pass">Top 3 expressions, long and short; ties go to the more liquid class (rates/FX first)</span><button class="rref" data-r="R-26">R-26</button></li></ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div class="treebox">
+          <h3>Step 4 · Veto</h3>
+          <p>"If I really like a fundamental thesis and the chart stinks, I won't do it."</p>
+          <ul class="tree">
+            <li><span class="node q">Chart quality: do daily, weekly (40-week <span class="tag tunable">tunable</span>) and monthly trend mostly agree with the thesis, and relative strength is not bottom-quintile?</span><button class="rref" data-r="R-29">R-29</button>
+              <ul>
+                <li><span class="br">No</span><span class="node fail">Veto</span></li>
+                <li><span class="br">Yes</span><span class="node q">Price vs news: after a thesis-relevant release, did price move against the news?</span><button class="rref" data-r="R-30">R-30</button>
+                  <ul>
+                    <li><span class="br">Yes</span><span class="node fail">Veto (timing weight 0.2: technicals ~20% as effective today)</span><button class="rref" data-r="R-32">R-32</button></li>
+                    <li><span class="br">No</span><span class="node q">Liquid enough? ADV ≥ $50M and exit cost ≤ 1% of NAV at starter size</span><button class="rref" data-r="R-33">R-33</button>
+                      <ul>
+                        <li><span class="br">No</span><span class="node fail">Veto</span></li>
+                        <li><span class="br">Yes</span><span class="node q">Equity short?</span>
+                          <ul>
+                            <li><span class="br">Yes</span><span class="node q">Rallied ≥ 15% from the low?</span><button class="rref" data-r="R-62">R-62</button>
+                              <ul>
+                                <li><span class="br">No</span><span class="node info">Reduce or go flat instead ("just sidestep it")</span></li>
+                                <li><span class="br">Yes</span><span class="node pass">Admit as starter</span></li>
+                              </ul>
+                            </li>
+                            <li><span class="br">No</span><span class="node pass">Admit as starter</span></li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><span class="node info">Crowded positioning never vetoes; at most delays entry 5 days ("the crowd makes money 80% of the time")</span><button class="rref" data-r="R-31">R-31</button></li>
+            <li><span class="node info">Article gates computed at weight 0: forensics, ROIC, smart money, contrarian COT</span><button class="rref" data-r="R-34">R-34</button><button class="rref" data-r="R-35">R-35</button><button class="rref" data-r="R-36">R-36</button><button class="rref" data-r="R-37">R-37</button></li>
+          </ul>
+        </div>
+
+        <div class="treebox">
+          <h3>Step 5 · Tier and size</h3>
+          <p>Invest, then investigate: a starter goes on first, and size follows the evidence.</p>
+          <ul class="tree">
+            <li><span class="node q">How many independent evidence families agree? (liquidity regime, policy error, internals, chart after entry, catalyst within 20 business days, asymmetry)</span><button class="rref" data-r="R-38">R-38</button>
+              <ul>
+                <li><span class="br">≥ 3 <span class="tag tunable">tunable</span> and asymmetry ≥ 5:1</span><span class="node pass">Fat pitch: full size (target 1–2 a year)</span><button class="rref" data-r="R-39">R-39</button><button class="rref" data-r="R-57">R-57</button></li>
+                <li><span class="br">Fewer</span><span class="node info">Starter: one third of the class cap. Failed evidence lowers tier, never removes</span></li>
+              </ul>
+            </li>
+            <li><span class="node q">Size band = tier × class cap × liquidity cap × hot/cold × fragility × asymmetry</span><button class="rref" data-r="R-40">R-40</button>
+              <ul>
+                <li><span class="br">Class caps</span><span class="node info">Equity net +100% / −50% · single currency 150–200% · bonds 300% in 10-year equivalents</span><button class="rref" data-r="R-42">R-42</button><button class="rref" data-r="R-43">R-43</button><button class="rref" data-r="R-44">R-44</button></li>
+                <li><span class="br">Liquidity</span><span class="node info">Exit cost ≤ 1–2% of the fund</span><button class="rref" data-r="R-45">R-45</button></li>
+                <li><span class="br">Hot / cold</span><span class="node info">Up ≥ 20% YTD → full; down → one third; never bet big to get even; resets 1 January</span><button class="rref" data-r="R-46">R-46</button><button class="rref" data-r="R-47">R-47</button></li>
+                <li><span class="br">Portfolio</span><span class="node info">Gross leverage ≤ 4:1, scaled pro rata</span><button class="rref" data-r="R-41">R-41</button></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div class="treebox">
+          <h3>Step 6 · Monitoring and exit</h3>
+          <p>No stop-losses. Exit when the reason changes, the same day.</p>
+          <ul class="tree">
+            <li><span class="node q">Every business day: is any recorded premise now false?</span><button class="rref" data-r="R-50">R-50</button>
+              <ul><li><span class="br">Yes</span><span class="node fail">Exit, naming the broken premise; if the break triggers another row, the new thesis starts the same day (gold sold on election night 2016)</span></li></ul>
+            </li>
+            <li><span class="node q">Price moved against the news on two consecutive thesis releases?</span><button class="rref" data-r="R-51">R-51</button>
+              <ul><li><span class="br">Yes</span><span class="node fail">Exit</span></li></ul>
+            </li>
+            <li><span class="node q">Winner whose weekly rate of change has been flat 4 weeks and price is &gt; 1 ATR below its 10-week high?</span><button class="rref" data-r="R-52">R-52</button>
+              <ul><li><span class="br">Yes</span><span class="node info">Exit half ("I'm a technician, I usually wait for tops"); never exit on valuation alone</span></li></ul>
+            </li>
+            <li><span class="node q">After the 2–3 week investigation window, is evidence still at starter level?</span><button class="rref" data-r="R-38">R-38</button>
+              <ul><li><span class="br">No</span><span class="node fail">Drop</span></li></ul>
+            </li>
+            <li><span class="node info">Price-based stop-loss: never</span><button class="rref" data-r="R-49">R-49</button></li>
+          </ul>
+        </div>
+
+        <div class="treebox">
+          <h3>Step 7 · Cash default</h3>
+          <p>"Not to play when you don't see a fat pitch."</p>
+          <ul class="tree">
+            <li><span class="node q">Did any thesis survive the veto without conflict?</span><button class="rref" data-r="R-54">R-54</button>
+              <ul>
+                <li><span class="br">No</span><span class="node info">"No pitch": show nearest misses and the vetoes that blocked them</span></li>
+                <li><span class="br">Yes</span><span class="node pass">Pitches by tier; everything else stays in cash. No baseline equity allocation</span><button class="rref" data-r="R-55">R-55</button></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="rules" class="stack">
+      <h2>Rules</h2>
+      <p class="note">Each rule shows the citation (library note, reliability, short quote), the operational formula, parameters with current values, and conflicts between sources. Reliability: NP = near-primary transcript, P = primary, S = secondary summary.</p>
+      <div class="filters" role="group" aria-label="Filter rules">
+        <label for="q">Search</label>
+        <input type="search" id="q" placeholder="rule, source, series id…">
+        <select id="stepSel" aria-label="Step"></select>
+        <span id="tagChips"></span>
+        <span class="count" id="ruleCount"></span>
+      </div>
+      <div class="rules" id="ruleList"></div>
+    </section>
+
+    <section id="sources" class="stack">
+      <h2>Where he said it</h2>
+      <p class="note">Every library note cited by at least one rule, oldest first, with the rules it supports. Links go to the public recording or transcript where one exists.</p>
+      <div class="stack" id="srcList"></div>
+    </section>
+
+    <section id="params" class="stack">
+      <h2>Parameters</h2>
+      <div class="filters" role="group" aria-label="Filter parameters">
+        <button class="chip" id="tunOnly" aria-pressed="false">Tunable only</button>
+        <span class="count" id="paramCount"></span>
+      </div>
+      <div class="tablewrap"><table id="paramTable"><thead><tr><th>Parameter</th><th>Value</th><th>Search range</th><th>Tag</th><th>Basis</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section id="theses" class="stack">
+      <h2>Thesis table</h2>
+      <p class="note">Written before any case outcome was read. A thesis fires only when its trigger newly becomes true.</p>
+      <div class="tablewrap"><table id="tTable"><thead><tr><th>Row</th><th>Trigger</th><th>Thesis</th><th>Premises</th><th>Invalidated by</th><th>Rules</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section id="conflicts" class="stack">
+      <h2>Conflicts between sources</h2>
+      <div class="tablewrap"><table id="cTable"></table></div>
+    </section>
+
+    <section id="gaps" class="stack">
+      <h2>Gaps</h2>
+      <div class="stack" id="gapList"></div>
+      <p class="disclaimer">A process model built from public interviews and speeches. Not affiliated with or endorsed by Stanley Druckenmiller or Duquesne. Rule text paraphrases; quotes are short excerpts from the cited sources.</p>
+    </section>
+  </main>
+</div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const TAGS = ["stated", "interpreted", "interpreted-from-article"];
+  const TAGCOL = { "stated": "var(--stated)", "interpreted": "var(--interp)", "interpreted-from-article": "var(--article)" };
+  const STEPDESC = {
+    "1": "Liquidity, policy error, inflation, warnings", "1b": "Leading industries, breadth, curve",
+    "2": "Transition → thesis with premises", "3": "Best instrument across the menu",
+    "4": "Chart, price vs news, liquidity", "5": "Starter → fat pitch, size band",
+    "6": "Premise check, exits, no stops", "7": "No pitch, no play"
+  };
+  const reg = {}; D.registry.forEach(p => { reg[p.id] = p; });
+
+  // decisions
+  const DEC = (D.decisions || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const AREAS = [...new Set(DEC.map(d => d.area))].sort();
+  const areaOn = new Set();
+  const areaChips = document.getElementById("areaChips");
+  areaChips.innerHTML = AREAS.map(a => `<button class="chip" data-area="${esc(a)}" aria-pressed="false">${esc(a)}</button>`).join(" ");
+  const isOld = d => /^(superseded|retired)/i.test(String(d.status || ""));
+  const WHO = { "owner": "owner", "owner-on-recommendation": "owner, on recommendation", "derived": "derived from a rule" };
+  function renderDecisions() {
+    const q = document.getElementById("dq").value.trim().toLowerCase();
+    const old = document.getElementById("showOld").getAttribute("aria-pressed") === "true";
+    const rows = DEC.filter(d => (old || !isOld(d)) && (!areaOn.size || areaOn.has(d.area))
+      && (!q || JSON.stringify(d).toLowerCase().includes(q)));
+    document.getElementById("decCount").textContent = `${rows.length} of ${DEC.length}`;
+    document.getElementById("decList").innerHTML = rows.map(d => {
+      const opts = (d.options || []).map(o => {
+        const pick = String(o.label) === String(d.chosen);
+        return `<li class="${pick ? "pick" : ""}"><span class="ol">${esc(o.label)}</span><span>${esc(o.summary)}</span>${pick ? '<span class="ch">chosen</span>' : ""}</li>`;
+      }).join("");
+      const meas = d.measured_result
+        ? `<div class="measured"><span class="lbl">Measured</span>${esc(d.measured_result)}</div>`
+        : `<div class="pending"><span class="lbl">Measured</span>No result recorded yet.</div>`;
+      const ev = (d.evidence || []).map(e => `<code>${esc(e)}</code>`).join("");
+      return `<article class="dec${isOld(d) ? " old" : ""}" id="dec-${esc(d.id)}">
+        <div class="dh"><span class="dd">${esc(d.date)}</span><span class="did">${esc(d.id)}</span><span class="tag tunable">${esc(d.area)}</span>
+          <span class="pill ${isOld(d) ? "gone" : "live"}">${esc(d.status)}</span><span class="pill who">${esc(WHO[d.decided_by] || d.decided_by || "")}</span></div>
+        <div class="dq">${esc(d.question)}</div>
+        ${opts ? `<ul class="opts">${opts}</ul>` : ""}
+        <p class="why"><span class="lbl">How it was decided</span>${esc(d.how_decided)}</p>
+        <div class="er"><div><span class="lbl">Expected, written before results</span>${esc(d.expected_result || "not stated at the time")}</div>${meas}</div>
+        ${ev ? `<div class="ev">${ev}</div>` : ""}
+      </article>`;
+    }).join("") || `<p class="note">No decisions match.</p>`;
+  }
+  areaChips.addEventListener("click", e => {
+    const b = e.target.closest("button[data-area]"); if (!b) return;
+    const a = b.dataset.area; areaOn.has(a) ? areaOn.delete(a) : areaOn.add(a);
+    b.setAttribute("aria-pressed", areaOn.has(a)); renderDecisions();
+  });
+  document.getElementById("dq").addEventListener("input", renderDecisions);
+  document.getElementById("showOld").addEventListener("click", e => {
+    const b = e.currentTarget; b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); renderDecisions();
+  });
+  renderDecisions();
+
+  // stats
+  const n = t => D.rules.filter(r => r.tag === t).length;
+  const tunable = D.registry.filter(p => p.tunable).length;
+  document.getElementById("stats").innerHTML = [
+    [D.rules.length, "rules"], [n("stated"), "stated by him"], [n("interpreted"), "interpreted"],
+    [n("interpreted-from-article"), "article-only, weight 0"], [D.registry.length, "parameters"],
+    [tunable, "tunable"], [D.transitions.length, "thesis rows"], [Object.keys(D.sources).length, "sources cited"], [(D.decisions || []).length, "recorded decisions"]
+  ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+
+  // pipeline
+  document.getElementById("pipeline").innerHTML = D.steps.map(s => {
+    const rs = D.rules.filter(r => r.step === s.code);
+    const bar = TAGS.map(t => { const c = rs.filter(r => r.tag === t).length; return c ? `<i style="width:${c / rs.length * 100}%;background:${TAGCOL[t]}"></i>` : ""; }).join("");
+    return `<div class="pstep"><span class="k">STEP ${esc(s.code)} · ${rs.length} rules</span><span class="n">${esc(s.name)}</span><span class="d">${esc(STEPDESC[s.code] || "")}</span><span class="bar">${bar}</span></div>`;
+  }).join("");
+
+  // rule explorer
+  const stepSel = document.getElementById("stepSel");
+  stepSel.innerHTML = `<option value="">All steps</option>` + D.steps.map(s => `<option value="${esc(s.code)}">Step ${esc(s.code)} · ${esc(s.name)}</option>`).join("");
+  const tagChips = document.getElementById("tagChips");
+  const activeTags = new Set();
+  tagChips.innerHTML = TAGS.map(t => `<button class="chip" data-tag="${t}" aria-pressed="false">${t}</button>`).join(" ");
+  tagChips.addEventListener("click", e => {
+    const b = e.target.closest("button[data-tag]"); if (!b) return;
+    const t = b.dataset.tag; activeTags.has(t) ? activeTags.delete(t) : activeTags.add(t);
+    b.setAttribute("aria-pressed", activeTags.has(t)); renderRules();
+  });
+  const q = document.getElementById("q");
+  q.addEventListener("input", renderRules); stepSel.addEventListener("change", renderRules);
+
+  const paramIds = html => {
+    const ids = new Set(); const re = /<code>([a-z_]+\.[a-z0-9_.]+)<\/code>/g; let m;
+    while ((m = re.exec(html))) if (reg[m[1]]) ids.add(m[1]);
+    return [...ids];
+  };
+  const fmtVal = v => Array.isArray(v) ? v.join("–") : (v === true ? "true" : v === false ? "false" : v);
+
+  function numberSource(r) {
+    const pids = paramIds(r.fields.map(f => f.html).join(" "));
+    if (!pids.length) return null;
+    const ours = pids.filter(id => reg[id].tag !== "stated").length;
+    if (!ours) return { cls: "stated", label: "numbers: his" };
+    if (ours === pids.length) return { cls: "interpreted", label: "numbers: ours" };
+    return { cls: "interpreted", label: `numbers: ${pids.length - ours} his, ${ours} ours` };
+  }
+  function ruleCard(r) {
+    const fields = r.fields.map(f => `<dt>${f.label || ""}</dt><dd>${f.html}</dd>`).join("");
+    const pids = paramIds(r.fields.map(f => f.html).join(" "));
+    const params = pids.length ? `<dt>Numbers</dt><dd><div class="params-inline">${pids.map(id => `<span class="pinl ${reg[id].tag === "stated" ? "his" : "ours"}" title="${reg[id].tag === "stated" ? "Number stated by him" : "Number chosen by us"}">${esc(id)} = ${esc(fmtVal(reg[id].value))}${reg[id].tunable ? " · tunable" : ""}</span>`).join("")}</div></dd>` : "";
+    const ns = numberSource(r);
+    const srcs = r.sources.map(s => { const m = D.sources[s.key]; if (!m) return ""; const label = `${m.date} · ${esc(m.title).slice(0, 60)}`;
+      return m.url ? `<a class="srcchip" href="${esc(m.url)}" target="_blank" rel="noopener">${label}<span class="rel">${esc(s.rel || "")}</span></a>` : `<span class="srcchip">${label}<span class="rel">${esc(s.rel || "")}</span></span>`; }).join("");
+    return `<article class="rule" id="${r.id}"><header><span class="rid">${r.id}</span><span class="rt">${r.title}</span><span class="tag ${r.tag}" title="Where the principle comes from">principle: ${r.tag}</span>${ns ? `<span class="tag ${ns.cls}" title="Where the thresholds come from">${ns.label}</span>` : ""}${r.tagNote ? `<span class="tagnote">${r.tagNote}</span>` : ""}</header><dl>${fields}${params}</dl>${srcs ? `<div class="srcs">${srcs}</div>` : ""}</article>`;
+  }
+  function renderRules() {
+    const term = q.value.trim().toLowerCase(); const st = stepSel.value;
+    const list = D.rules.filter(r => (!st || r.step === st) && (!activeTags.size || activeTags.has(r.tag)) &&
+      (!term || (r.id + " " + r.title + " " + r.fields.map(f => f.html).join(" ") + " " + r.sources.map(s => s.key).join(" ")).toLowerCase().includes(term)));
+    document.getElementById("ruleList").innerHTML = list.map(ruleCard).join("") || `<p class="note">No rules match these filters.</p>`;
+    document.getElementById("ruleCount").textContent = `${list.length} of ${D.rules.length}`;
+  }
+  renderRules();
+
+  function goRule(id) {
+    q.value = ""; stepSel.value = ""; activeTags.clear();
+    tagChips.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", "false"));
+    renderRules();
+    const el = document.getElementById(id); if (!el) return;
+    el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1600);
+  }
+  document.addEventListener("click", e => { const b = e.target.closest(".rref"); if (b) { e.preventDefault(); goRule(b.dataset.r); } });
+
+  // sources
+  const byKey = {}; D.rules.forEach(r => r.sources.forEach(s => { (byKey[s.key] ||= []).push(r.id); }));
+  const relOrder = k => Object.values(byKey[k] || []).length;
+  document.getElementById("srcList").innerHTML = Object.values(D.sources).sort((a, b) => a.date.localeCompare(b.date)).map(m => {
+    const ids = [...new Set(byKey[m.key] || [])];
+    const title = m.url ? `<a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.title)}</a>` : esc(m.title);
+    const meta = [m.type, m.venue, m.access].filter(Boolean).map(esc).join(" · ");
+    return `<div class="src"><span class="sd">${esc(m.date)}</span><span class="st">${title} <span class="rel-badge">${esc(m.reliability || "n/a")}</span></span><span class="sm">${meta}</span><span class="sr">${ids.map(i => `<button class="rref" data-r="${i}">${i}</button>`).join("")}</span></div>`;
+  }).join("");
+
+  // params
+  const tunBtn = document.getElementById("tunOnly");
+  function renderParams() {
+    const only = tunBtn.getAttribute("aria-pressed") === "true";
+    const rows = D.registry.filter(p => !only || p.tunable);
+    document.querySelector("#paramTable tbody").innerHTML = rows.map(p => `<tr><td><span class="mono">${esc(p.id)}</span>${p.tunable ? `<br><span class="tag tunable">tunable</span>` : ""}</td><td class="num">${esc(fmtVal(p.value))}</td><td class="num">${p.range ? esc(fmtVal(p.range)) : "—"}</td><td><span class="tag ${esc(p.tag)}">${esc(p.tag)}</span></td><td>${p.notes || ""}<div class="note">${p.citation || ""}</div></td></tr>`).join("");
+    document.getElementById("paramCount").textContent = `${rows.length} of ${D.registry.length}`;
+  }
+  tunBtn.addEventListener("click", () => { tunBtn.setAttribute("aria-pressed", tunBtn.getAttribute("aria-pressed") !== "true"); renderParams(); });
+  renderParams();
+
+  // review: interpreted numbers
+  const usedBy = id => D.rules.filter(r => paramIds(r.fields.map(f => f.html).join(" ")).includes(id)).map(r => r.id);
+  const ours = D.registry.filter(p => p.tag === "interpreted").sort((a, b) => (b.tunable ? 1 : 0) - (a.tunable ? 1 : 0));
+  const his = D.registry.filter(p => p.tag === "stated").length;
+  document.getElementById("reviewStats").innerHTML = [
+    [his, "numbers stated by him"], [ours.length, "numbers chosen by us"], [ours.filter(p => p.tunable).length, "of ours tunable"],
+    [D.registry.filter(p => p.tag === "interpreted-from-article").length, "article weights (0)"]
+  ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+  document.querySelector("#reviewTable tbody").innerHTML = ours.map(p => `<tr><td><span class="mono">${esc(p.id)}</span>${p.tunable ? `<br><span class="tag tunable">tunable</span>` : ""}</td><td class="num">${esc(fmtVal(p.value))}</td><td class="num">${p.range ? esc(fmtVal(p.range)) : "fixed"}</td><td>${usedBy(p.id).map(i => `<button class="rref" data-r="${i}">${i}</button>`).join("") || "—"}</td><td>${p.notes || ""}<div class="note">${p.citation || ""}</div></td></tr>`).join("");
+
+  // transitions
+  document.querySelector("#tTable tbody").innerHTML = D.transitions.map(t => `<tr><td class="num">${esc(t.id)}${t.mech !== "yes" ? `<div class="note">${esc(t.mech)}</div>` : ""}</td><td>${esc(t.trigger)}</td><td><strong>${esc(t.direction)}</strong> ${esc(t.class)} · ${esc(t.region)}${t.notes ? `<div class="note">${esc(t.notes)}</div>` : ""}</td><td>${(t.premises || []).map(esc).join("<br>") || "—"}</td><td>${(t.invalidation || []).map(esc).join("<br>") || "—"}</td><td>${(t.rules || []).map(r => `<button class="rref" data-r="${esc(r)}">${esc(r)}</button>`).join("")}</td></tr>`).join("");
+
+  // conflicts and gaps
+  const tableHTML = rows => rows.length ? `<thead><tr>${rows[0].map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>` : "";
+  document.getElementById("cTable").innerHTML = tableHTML(D.conflicts);
+  document.getElementById("gapList").innerHTML = D.gaps.map(g => `<h3>${g.title}</h3><div class="tablewrap"><table>${tableHTML(g.rows)}</table></div>`).join("");
+
+  // deep link to a rule
+  if (/^#R-\d+$/.test(location.hash)) goRule(location.hash.slice(1));
+})();
+</script>

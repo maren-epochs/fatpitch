@@ -1,0 +1,24 @@
+id: 2015-11-04_sidelines-2015
+asof: '2015-11-04T16:00:00-05:00'
+era: A
+episode_id: EP12-2014-15-DIVERGE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: fx
+    direction: short
+    region: EUR
+  expression:
+  - fx_eur
+  action: flat
+window:
+  unit: business_days
+  n: 20
+citation: DS/2015-11-04_nyt-dealbook-conference-sorkin.md
+date_basis: 'pinned: DealBook conference date (note date)'
+seed_id: C28
+notes: Equities flat ('sidelines') with a bearish skew; EUR short.

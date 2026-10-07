@@ -1,0 +1,25 @@
+id: 1988-03-28_still-bearish-barrons-1988
+asof: '1988-03-28T16:00:00-05:00'
+era: B
+episode_id: EP02-1988-BEAR
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: equity
+    direction: short
+    region: US
+  expression:
+  - equity_us
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/1988-03-28_barrons-still-bearish.md; RS/1988-03-28_barrons-still-bearish-interview.md
+date_basis: 'pinned: Barron''s issue date 1988-03-28 (Monday); interview published that day'
+seed_id: X-01
+notes: Still bearish on US equities five months after the 1987 crash; expected a further correction; buyout (LBO)
+  excess cited. Teaser-level source; action and size not stated.

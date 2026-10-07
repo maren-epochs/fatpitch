@@ -1,0 +1,26 @@
+id: 2023-11-01_debt-supply-short-2023
+asof: '2023-11-01T16:00:00-04:00'
+era: A
+episode_id: EP19-2023-RATES
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: rates
+    direction: short
+    region: US
+  expression:
+  - rates_us
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md
+date_basis: 'pinned: CNBC interview date (note date)'
+seed_id: C49
+notes: 'Short long-end Treasuries on debt supply (R-63): ''I made a lot of money this year betting on bonds going
+  down because of the debt''. Whether the short was still held on 2023-11-01 is not stated (the host describes a
+  curve trade; C48 records a long 2-year a week earlier).'

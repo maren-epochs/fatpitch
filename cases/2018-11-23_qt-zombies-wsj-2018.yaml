@@ -1,0 +1,26 @@
+id: 2018-11-23_qt-zombies-wsj-2018
+asof: '2018-11-23T16:00:00-05:00'
+era: A
+episode_id: EP14-2018-QT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses: []
+  expression: []
+  action: null
+window:
+  unit: business_days
+  n: 20
+citation: DS/2018-11-21_wsj-interview-risky-to-be-tightening.md
+date_basis: 'conservative: WSJ interview relayed by ForexLive at 2018-11-22 04:12 GMT (2018-11-21 23:12 ET), so
+  the WSJ text was public by then but probably after the 11-21 close; 2018-11-22 was a NYSE holiday (Thanksgiving);
+  asof = 2018-11-23, the first close at which the content is certainly public (a 13:00 early close; asof kept at
+  the corpus 16:00 ET convention)'
+seed_id: X-23
+notes: '''As quantitative easing turns to quantitative tightening, all these zombies are going to be exposed'';
+  ''risky to be tightening now'' (ForexLive headline paraphrase); defensives over cyclicals since May mean ''a very,
+  very late cycle''. Regime label tightening (QE turning to QT plus hikes). The call for the Fed to wait is a prescription
+  and is not coded. WSJ original not read. No position stated (regime-only case).'

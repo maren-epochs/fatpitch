@@ -1,0 +1,30 @@
+id: 2015-03-02_long-japan-europe-2015
+asof: '2015-03-02T16:00:00-05:00'
+era: A
+episode_id: EP12-2014-15-DIVERGE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: JP
+  - asset_class: equity
+    direction: long
+    region: EA
+  expression:
+  - equity_jp
+  - equity_ea
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2015-03-02_cnbc-closing-bell-kelly-evans.md
+date_basis: 'pinned: CNBC Closing Bell interview date (note date)'
+seed_id: C27
+notes: Most net long outside the US, where QE is starting (FX-hedged). Regime label easing refers to BoJ/ECB ('very,
+  very expansive... they're doing QE'), the thesis region; US read was 'most aggressive monetary policy since 1913'
+  with tightening anticipated, not yet begun. Relative-policy (divergence) rationale.

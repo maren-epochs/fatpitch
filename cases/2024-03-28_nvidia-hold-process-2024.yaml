@@ -1,0 +1,26 @@
+id: 2024-03-28_nvidia-hold-process-2024
+asof: '2024-03-28T16:00:00-04:00'
+era: A
+episode_id: EP20-2024-CUT
+truth_type: process
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - equity_us
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2024-05-07_cnbc-squawk-box-forward-guidance-ai-argentina.md; DS/2024-10-16_bloomberg-tv-sonali-basak.md;
+  DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md
+date_basis: 'conservative: CNBC 2024-05-07 note dates the Nvidia cut to late March 2024; last trading day of Mar
+  2024'
+seed_id: C52
+notes: 'Process target: no exit on valuation while premises intact (R-49/R-52). His action sold.'

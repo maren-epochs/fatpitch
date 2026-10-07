@@ -1,0 +1,26 @@
+id: 1991-12-31_fed-panic-bond-exit-1991
+asof: '1991-12-31T16:00:00-05:00'
+era: B
+episode_id: EP24-1991-EASE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses: []
+  expression:
+  - rates_us
+  action: exit
+window:
+  unit: business_days
+  n: 20
+citation: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md
+date_basis: 'conservative: NMW interview dated by Schwager ''[at the time of this interview, December 1991]'' (no
+  day); the long-bond exit is given as ''late 1991''; asof = last NYSE trading day of December 1991'
+seed_id: X-20
+notes: 'Contemporaneous read: ''now with the economy in decline, the deficit ballooning, and the administration
+  and the Fed in a state of panic, the public should be wary about the risk in holding long-term bonds''; money-market
+  rates ''only 4.5 percent''. Long bonds: ''I was long until late 1991.'' Regime label easing (Fed in panic, low
+  short rates). The bond warning is advice to the public, not a stated short, so no thesis is coded; the action
+  is the exit of the long-bond position. Debt-liquidation view of the economy.'

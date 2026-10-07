@@ -1,0 +1,21 @@
+id: 2022-09-28_sidestep-2022
+asof: '2022-09-28T16:00:00-04:00'
+era: A
+episode_id: EP18-2022-INFL
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses: []
+  expression:
+  - equity_us
+  action: flat
+window:
+  unit: business_days
+  n: 20
+citation: DS/2022-09-28_delivering-alpha-kernen-transcript.md
+date_basis: 'pinned: Delivering Alpha 2022 interview date (note date)'
+seed_id: C46
+notes: Do not short, sidestep.

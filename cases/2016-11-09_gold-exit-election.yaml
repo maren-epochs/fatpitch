@@ -1,0 +1,21 @@
+id: 2016-11-09_gold-exit-election
+asof: '2016-11-09T16:00:00-05:00'
+era: A
+episode_id: EP13-2016-REGIME
+truth_type: action
+mechanizable: 'no'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: null
+  theses: []
+  expression:
+  - commodity_gold
+  action: exit
+window:
+  unit: business_days
+  n: 20
+citation: DS/2016-11-10_cnbc-squawk-box-post-election-sold-gold.md
+date_basis: 'pinned: gold sold on election night 2016-11-08 after the close; first close after the sale is 2016-11-09'
+seed_id: C30
+notes: Premise break on the election result (political catalyst).

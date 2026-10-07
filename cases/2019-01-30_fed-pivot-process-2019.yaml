@@ -1,0 +1,24 @@
+id: 2019-01-30_fed-pivot-process-2019
+asof: '2019-01-30T16:00:00-05:00'
+era: A
+episode_id: EP15-2019-TARIFF
+truth_type: process
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: true
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - equity_us
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: DS/2019-12-18_bloomberg-schatzker-couldnt-have-been-more-wrong.md
+date_basis: 'pinned: FOMC pivot date named in the seed (Fed pause); statement source is retrospective (Dec 2019)'
+seed_id: C34
+notes: 'Process target: T01 (policy easing) implies long equities. His positioning was timid.'

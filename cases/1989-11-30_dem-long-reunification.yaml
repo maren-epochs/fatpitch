@@ -1,0 +1,25 @@
+id: 1989-11-30_dem-long-reunification
+asof: '1989-11-30T16:00:00-05:00'
+era: B
+episode_id: EP03-1988-89-DEM
+truth_type: action
+mechanizable: 'no'
+source_reliability: primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: fx
+    direction: long
+    region: DEM
+  expression:
+  - fx_dem
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: DS/1992-XX-XX_new-market-wizards-schwager-chapter.md
+date_basis: 'conservative: NMW note gives ''after the Berlin Wall fell'' (1989-11-09) without a trade day; last
+  trading day of Nov 1989'
+seed_id: C04
+notes: Long deutsche mark on reunification's monetary implications. Wording of the chapter unverified.

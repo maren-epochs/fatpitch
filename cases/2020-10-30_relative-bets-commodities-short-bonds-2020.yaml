@@ -1,0 +1,30 @@
+id: 2020-10-30_relative-bets-commodities-short-bonds-2020
+asof: '2020-10-30T16:00:00-04:00'
+era: A
+episode_id: EP16-2020-COVID
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: true
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: commodity
+    direction: long
+  - asset_class: rates
+    direction: short
+    region: US
+  expression:
+  - commodity_global
+  - rates_us
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: DS/2021-05-11_cnbc-squawk-box-raging-mania-dollar.md; DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md
+date_basis: 'conservative: CNBC 2021-05-11 says relative bets were shifted into commodities, rates (short bonds)
+  and the dollar from August to October 2020; asof = last trading day of Oct 2020'
+seed_id: X-07
+notes: 'Emergency settings judged no longer warranted (economy booming by Oct 2020, per the 2023 account); relative
+  bets moved into commodities and short bonds. Dollar leg omitted: direction ambiguous across sources (C43 codes
+  long USD; a Feb 2021 secondary report says short USD).'

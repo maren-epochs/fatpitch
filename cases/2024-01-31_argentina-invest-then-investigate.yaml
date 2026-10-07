@@ -1,0 +1,24 @@
+id: 2024-01-31_argentina-invest-then-investigate
+asof: '2024-01-31T16:00:00-05:00'
+era: A
+episode_id: EP20-2024-CUT
+truth_type: action
+mechanizable: 'no'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: equity
+    direction: long
+    region: AR
+  expression:
+  - equity_ar
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: DS/2024-05-07_cnbc-squawk-box-forward-guidance-ai-argentina.md
+date_basis: 'conservative: entry after Milei''s Davos speech (Jan 2024), no day; last trading day of Jan 2024'
+seed_id: C51
+notes: Five most liquid Argentine ADRs on a political catalyst.

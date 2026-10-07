@@ -1,0 +1,29 @@
+id: 2023-05-09_ai-long-hard-landing-sohn-2023
+asof: '2023-05-09T16:00:00-04:00'
+era: A
+episode_id: EP19-2023-RATES
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  - asset_class: commodity
+    direction: long
+    region: GOLD
+  expression:
+  - equity_us
+  - commodity_gold
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2023-05-09_sohn-2023-kiril-sokoloff.md; DS/2023-06-07_bloomberg-invest-sonali-basak.md
+date_basis: 'pinned: Sohn 2023 conversation date (note date)'
+seed_id: X-09
+notes: Hard-landing view after a broad asset bubble and 500bp of hikes; long AI via NVDA and MSFT, long gold and
+  silver; copper and housing named as recovery ideas.

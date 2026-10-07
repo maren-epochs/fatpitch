@@ -1,0 +1,25 @@
+id: 2021-06-15_short-front-end-2021
+asof: '2021-06-15T16:00:00-04:00'
+era: A
+episode_id: EP17-2021-MANIA
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: rates
+    direction: short
+    region: US
+  expression:
+  - rates_us
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: RS/2024-11-06_nbim-in-good-company-podcast.md
+date_basis: 'conservative: NBIM 2024 gives ''spring 2021'' with 2y at 15 bp; latest date to 2021-06-18 (end of spring)
+  with DGS2 in 0.13-0.17 is 2021-06-15'
+seed_id: C42
+notes: 'Policy too loose with inflation rising: short 2-year notes.'

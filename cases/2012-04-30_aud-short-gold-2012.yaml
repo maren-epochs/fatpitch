@@ -1,0 +1,32 @@
+id: 2012-04-30_aud-short-gold-2012
+asof: '2012-04-30T16:00:00-04:00'
+era: A
+episode_id: EP11-2012-13-QE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: fx
+    direction: short
+    region: AUD
+  - asset_class: fx
+    direction: long
+    region: USD
+  - asset_class: commodity
+    direction: long
+    region: GOLD
+  expression:
+  - fx_aud
+  - fx_usd
+  - commodity_gold
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2012-04-XX_grants-spring-conference-jim-grant.md
+date_basis: 'conservative: Grant''s Spring Conference note dated 2012-04-XX; last trading day of Apr 2012'
+seed_id: C20
+notes: Short AUD, long USD, gold via options (attendee notes).

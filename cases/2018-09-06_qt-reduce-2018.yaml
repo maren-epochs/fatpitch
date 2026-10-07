@@ -1,0 +1,21 @@
+id: 2018-09-06_qt-reduce-2018
+asof: '2018-09-06T16:00:00-04:00'
+era: A
+episode_id: EP14-2018-QT
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: tightening
+  theses: []
+  expression:
+  - equity_us
+  action: reduce
+window:
+  unit: business_days
+  n: 20
+citation: RS/2018-09-06_sokoloff-real-vision-interview.md; DS/2018-10-09_grants-fall-conference-jim-grant.md
+date_basis: 'pinned: Real Vision interview date per RS note'
+seed_id: C32
+notes: 'QT plus hikes while global QE goes to zero: reduce equities.'

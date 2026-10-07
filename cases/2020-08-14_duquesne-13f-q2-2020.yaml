@@ -1,0 +1,112 @@
+id: 2020-08-14_duquesne-13f-q2-2020
+asof: '2020-08-14T16:00:00-04:00'
+era: A
+episode_id: EP16-2020-COVID
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: false
+targets:
+  regime_direction: null
+  theses: []
+  expression:
+  - equity_us_financials
+  - equity_us_health
+  action: null
+  tilt:
+    equity_us_communication: -1
+    equity_us_consumer_disc: -1
+    equity_us_financials: 1
+    equity_us_health: 1
+    equity_us_tech: -1
+window:
+  unit: quarters
+  n: 1
+citation: 'SEC EDGAR 13F-HR, Duquesne Family Office LLC (CIK 1536411): 0001536411-20-000004 (period 2020-03-31,
+  filed 2020-05-15) and 0001536411-20-000006 (period 2020-06-30, filed 2020-08-14); https://www.sec.gov/Archives/edgar/data/1536411/000153641120000006/
+  ; seed C40: RS/2020-08-18_gurufocus-q2-2020-13f.md'
+date_basis: 'pinned: EDGAR filingDate 2020-08-14 of the later 13F-HR (PLAN E.3: `filed` is the information date)'
+seed_id: C40
+derivation:
+  method: 'tools/build_13f_cases.py: long-equity weights, QoQ delta (pp), top 10 issuers by |delta|, summed by family;
+    positive families are targets'
+  top_movers:
+  - cusip: 64110L106
+    issuer: NETFLIX INC | COM
+    w_prev_pct: 12.92
+    w_pct: 4.32
+    delta_pp: -8.6
+    family: equity_us_communication
+  - cusip: '023135106'
+    issuer: AMAZON COM INC | COM
+    w_prev_pct: 14.32
+    w_pct: 7.21
+    delta_pp: -7.11
+    family: equity_us_consumer_disc
+  - cusip: 30303M102
+    issuer: FACEBOOK INC | CL A
+    w_prev_pct: 8.43
+    w_pct: 1.62
+    delta_pp: -6.82
+    family: equity_us_communication
+  - cusip: '872590104'
+    issuer: T-MOBILE US INC | COM
+    w_prev_pct: 0.0
+    w_pct: 5.02
+    delta_pp: 5.02
+    family: equity_us_communication
+  - cusip: 98138H101
+    issuer: WORKDAY INC | CL A
+    w_prev_pct: 8.73
+    w_pct: 4.0
+    delta_pp: -4.73
+    family: equity_us_tech
+  - cusip: 46625H100
+    issuer: JPMORGAN CHASE & CO | COM
+    w_prev_pct: 0.0
+    w_pct: 4.65
+    delta_pp: 4.65
+    family: equity_us_financials
+  - cusip: '594918104'
+    issuer: MICROSOFT CORP | COM
+    w_prev_pct: 7.08
+    w_pct: 11.23
+    delta_pp: 4.15
+    family: equity_us_tech
+  - cusip: 78464A870
+    issuer: SPDR SER TR | S&P BIOTECH
+    w_prev_pct: 0.0
+    w_pct: 3.76
+    delta_pp: 3.76
+    family: equity_us_health
+  - cusip: 00507V109
+    issuer: ACTIVISION BLIZZARD INC | COM
+    w_prev_pct: 3.77
+    w_pct: 0.49
+    delta_pp: -3.28
+    family: equity_us_communication
+  - cusip: 02079K305
+    issuer: ALPHABET INC | CAP STK CL A
+    w_prev_pct: 6.6
+    w_pct: 3.76
+    delta_pp: -2.84
+    family: equity_us_communication
+  family_delta_pp:
+    equity_us_communication: -16.52
+    equity_us_consumer_disc: -7.11
+    equity_us_financials: 4.65
+    equity_us_health: 3.76
+    equity_us_tech: -0.58
+  prior_filing: 0001536411-20-000002 (period 2019-12-31, filed 2020-02-14)
+  prior_family_delta_pp:
+    equity_us_communication: 14.66
+    equity_us_consumer_disc: 13.06
+    equity_us_financials: -5.51
+    equity_us_health: 0.0
+    equity_us_tech: 0.31
+  prior_tilt:
+    equity_us_communication: 1
+    equity_us_consumer_disc: 1
+    equity_us_financials: -1
+    equity_us_health: 0
+    equity_us_tech: 1

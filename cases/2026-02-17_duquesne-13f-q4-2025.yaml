@@ -1,0 +1,121 @@
+id: 2026-02-17_duquesne-13f-q4-2025
+asof: '2026-02-17T16:00:00-05:00'
+era: A
+episode_id: EP21-2025-26-ROTATE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: primary
+retrospective: false
+targets:
+  regime_direction: null
+  theses: []
+  expression:
+  - equity_us_financials
+  - equity_us
+  - equity_us_tech
+  action: null
+  tilt:
+    equity_br: 1
+    equity_us: 1
+    equity_us_communication: 1
+    equity_us_financials: 1
+    equity_us_health: -1
+    equity_us_materials: 1
+    equity_us_tech: 1
+window:
+  unit: quarters
+  n: 1
+citation: 'SEC EDGAR 13F-HR, Duquesne Family Office LLC (CIK 1536411): 0001536411-25-000017 (period 2025-09-30,
+  filed 2025-11-14) and 0001536411-26-000002 (period 2025-12-31, filed 2026-02-17); https://www.sec.gov/Archives/edgar/data/1536411/000153641126000002/
+  ; seed C55: RS/2026-02-26_bilanz-q4-2025-rotation.md'
+date_basis: 'pinned: EDGAR filingDate 2026-02-17 of the later 13F-HR (PLAN E.3: `filed` is the information date)'
+seed_id: C55
+derivation:
+  method: 'tools/build_13f_cases.py: long-equity weights, QoQ delta (pp), top 10 issuers by |delta|, summed by family;
+    positive families are targets'
+  top_movers:
+  - cusip: 81369Y605
+    issuer: SELECT SECTOR SPDR TR | STATE STREET FIN
+    w_prev_pct: 0.0
+    w_pct: 7.13
+    delta_pp: 7.13
+    family: equity_us_financials
+  - cusip: 46137V357
+    issuer: INVESCO EXCHANGE TRADED FD T | S&P500 EQL WGT
+    w_prev_pct: 0.0
+    w_pct: 5.33
+    delta_pp: 5.33
+    family: equity_us
+  - cusip: '881624209'
+    issuer: TEVA PHARMACEUTICAL INDS LTD | SPONSORED ADS
+    w_prev_pct: 8.53
+    w_pct: 4.34
+    delta_pp: -4.18
+    family: equity_us_health
+  - cusip: '457669307'
+    issuer: INSMED INC | COM PAR $.01
+    w_prev_pct: 8.88
+    w_pct: 6.11
+    delta_pp: -2.77
+    family: equity_us_health
+  - cusip: '925050106'
+    issuer: VERONA PHARMA PLC | SPONSORED ADS
+    w_prev_pct: 2.72
+    w_pct: 0.0
+    delta_pp: -2.72
+    family: equity_us_health
+  - cusip: '464286400'
+    issuer: ISHARES INC | MSCI BRAZIL ETF
+    w_prev_pct: 0.0
+    w_pct: 2.67
+    delta_pp: 2.67
+    family: equity_br
+  - cusip: 02079K305
+    issuer: ALPHABET INC | CAP STK CL A
+    w_prev_pct: 0.63
+    w_pct: 2.86
+    delta_pp: 2.22
+    family: equity_us_communication
+  - cusip: 013872106
+    issuer: ALCOA CORP | COM
+    w_prev_pct: 0.0
+    w_pct: 1.73
+    delta_pp: 1.73
+    family: equity_us_materials
+  - cusip: 29362U104
+    issuer: ENTEGRIS INC | COM
+    w_prev_pct: 0.0
+    w_pct: 1.69
+    delta_pp: 1.69
+    family: equity_us_tech
+  - cusip: '518415104'
+    issuer: LATTICE SEMICONDUCTOR CORP | COM
+    w_prev_pct: 0.0
+    w_pct: 1.61
+    delta_pp: 1.61
+    family: equity_us_tech
+  family_delta_pp:
+    equity_br: 2.67
+    equity_us: 5.33
+    equity_us_communication: 2.22
+    equity_us_financials: 7.13
+    equity_us_health: -9.67
+    equity_us_materials: 1.73
+    equity_us_tech: 3.3
+  prior_filing: 0001536411-25-000011 (period 2025-06-30, filed 2025-08-15)
+  prior_family_delta_pp:
+    equity_br: -0.54
+    equity_us: 0.0
+    equity_us_communication: 0.63
+    equity_us_financials: -1.32
+    equity_us_health: 5.07
+    equity_us_materials: 0.0
+    equity_us_tech: -3.39
+  prior_tilt:
+    equity_br: -1
+    equity_us: 0
+    equity_us_communication: 1
+    equity_us_financials: -1
+    equity_us_health: 1
+    equity_us_materials: 0
+    equity_us_tech: -1

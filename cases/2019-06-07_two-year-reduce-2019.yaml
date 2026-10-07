@@ -1,0 +1,21 @@
+id: 2019-06-07_two-year-reduce-2019
+asof: '2019-06-07T16:00:00-04:00'
+era: A
+episode_id: EP15-2019-TARIFF
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses: []
+  expression:
+  - rates_us
+  action: reduce
+window:
+  unit: business_days
+  n: 20
+citation: DS/2019-06-07_cnbc-squawk-box-one-way-bet.md
+date_basis: 'pinned: CNBC interview date (note date)'
+seed_id: C37b
+notes: 'Reduce the 2y long: asymmetry gone at 1.85% (split from seed C37).'

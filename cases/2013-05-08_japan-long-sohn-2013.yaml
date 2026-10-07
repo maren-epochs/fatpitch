@@ -1,0 +1,24 @@
+id: 2013-05-08_japan-long-sohn-2013
+asof: '2013-05-08T16:00:00-04:00'
+era: A
+episode_id: EP11-2012-13-QE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: JP
+  expression:
+  - equity_jp
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2013-05-08_sohn-commodities-conundrum.md
+date_basis: 'pinned: Sohn 2013 talk date (note date)'
+seed_id: C21
+notes: Long Japan (real estate, banks) as BoJ QE starts.

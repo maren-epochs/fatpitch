@@ -1,0 +1,39 @@
+id: 2015-04-16_just-like-2004-ruhle-2015
+asof: '2015-04-16T16:00:00-04:00'
+era: A
+episode_id: EP12-2014-15-DIVERGE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: fx
+    direction: short
+    region: EUR
+  - asset_class: equity
+    direction: long
+    region: JP
+  - asset_class: equity
+    direction: long
+    region: EA
+  - asset_class: commodity
+    direction: long
+    region: OIL
+  expression:
+  - fx_eur
+  - equity_jp
+  - equity_ea
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md
+date_basis: 'conservative: air date uncertain (Bloomberg clips dated 2015-04-15; transcripts published 2015-04-16
+  by HedgeFundAlpha and GuruFocus); the later date is the first close at which the content is certainly public'
+seed_id: X-02
+notes: Big bets short EUR on US/Europe policy divergence ('we were tapering... They were going to start QE. They
+  had gone to a negative deposit rate') and long Japan/Europe equities; constructive on oil vs the forward curve.
+  Regime label easing refers to the thesis region (ECB QE / negative rates); US read also easing (zero rates 'unnecessary',
+  'rhymes with 2004'). Relative-policy case.

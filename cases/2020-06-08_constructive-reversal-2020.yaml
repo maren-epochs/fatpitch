@@ -1,0 +1,24 @@
+id: 2020-06-08_constructive-reversal-2020
+asof: '2020-06-08T16:00:00-04:00'
+era: A
+episode_id: EP16-2020-COVID
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - equity_us
+  action: reverse
+window:
+  unit: business_days
+  n: 20
+citation: DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md
+date_basis: 'pinned: CNBC interview date (note date)'
+seed_id: C39
+notes: Reversal to constructive (Fed support, breadth thrust).

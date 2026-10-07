@@ -1,0 +1,31 @@
+id: 2021-05-11_raging-mania-reduce-2021
+asof: '2021-05-11T16:00:00-04:00'
+era: A
+episode_id: EP17-2021-MANIA
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: rates
+    direction: short
+    region: US
+  - asset_class: commodity
+    direction: long
+  - asset_class: fx
+    direction: long
+    region: USD
+  expression:
+  - equity_us
+  action: reduce
+window:
+  unit: business_days
+  n: 20
+citation: DS/2021-05-11_cnbc-squawk-box-raging-mania-dollar.md; DS/2021-05-11_hustle-mfm-trung-phan.md
+date_basis: 'pinned: CNBC interview date (note date)'
+seed_id: C43
+notes: Equity exposure far below four or five months earlier; relative bets 'into commodities, into interest rates,
+  into the dollar'. Leg directions are inferred from 'our other asset categories... would be the cause of this stock
+  market bubble popping' (commodities, rates and dollar up); USD direction not stated outright.

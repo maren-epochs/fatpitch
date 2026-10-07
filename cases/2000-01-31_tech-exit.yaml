@@ -1,0 +1,21 @@
+id: 2000-01-31_tech-exit
+asof: '2000-01-31T16:00:00-05:00'
+era: B
+episode_id: EP06-1999-2000-TECH
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses: []
+  expression:
+  - equity_us
+  action: exit
+window:
+  unit: business_days
+  n: 20
+citation: RS/2015-01-18_lost-tree-club-speech.md
+date_basis: 'conservative: Lost Tree/NBIM 2024 give ''Jan 2000'' for selling all tech; last trading day of Jan 2000'
+seed_id: C10
+notes: Sold ~$6B of tech equities.

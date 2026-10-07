@@ -1,0 +1,24 @@
+id: 2013-09-19_no-taper-risk-long-2013
+asof: '2013-09-19T16:00:00-04:00'
+era: A
+episode_id: EP11-2012-13-QE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: secondary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - equity_us
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2013-09-19_cnbc-squawk-box-fed-wealth-transfer.md
+date_basis: 'pinned: CNBC interview date (note date)'
+seed_id: C23
+notes: Risk assets held under continued QE (implied).

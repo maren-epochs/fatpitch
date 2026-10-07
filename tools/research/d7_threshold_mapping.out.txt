@@ -1,0 +1,5 @@
+NYSE EMA10 pctiles 1/5/50/95/99: [0.337 0.391 0.512 0.594 0.629]
+NYSE 2000-2020 EMA10 pctiles 1/5/50/95/99: [0.355 0.41  0.523 0.601 0.631]  share<0.40 4.0% >0.615 2.65%
+S&P500-members EMA10 pctiles 1/5/50/95/99: [0.335 0.389 0.517 0.621 0.658]
+frequency-matched S&P thresholds (same exceedance as NYSE 1965-2020): lo=0.401 hi=0.646
+Zweig on S&P members with matched thresholds: ['2022-10-25']

@@ -1,0 +1,24 @@
+id: 2006-12-29_left-the-party-2006
+asof: '2006-12-29T16:00:00-05:00'
+era: A
+episode_id: EP08-2003-06-LOOSE
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses: []
+  expression:
+  - equity_us
+  action: exit
+window:
+  unit: business_days
+  n: 20
+citation: DS/2014-07-16_delivering-alpha-kernen.md; RS/2015-01-18_lost-tree-club-speech.md
+date_basis: 'conservative: DA 2014 gives only ''left the party in 2006''; last trading day of 2006'
+seed_id: C15
+notes: 'Left the party in 2006 (''I made a lot of money in ''05 because I wanted to ride the overly aggressive policy.
+  ''06 I stunk. I had made some money but I left the party.''). No source states his read of 2006 policy (Lost Tree:
+  returns ''weren''t very good in ''06 because I was a little early''), so no regime target; the dance-until-they-raise-rates
+  line in DA 2014 is the host''s framing of 2014, not a 2006 read.'

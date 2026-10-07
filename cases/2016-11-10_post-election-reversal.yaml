@@ -1,0 +1,34 @@
+id: 2016-11-10_post-election-reversal
+asof: '2016-11-10T16:00:00-05:00'
+era: A
+episode_id: EP13-2016-REGIME
+truth_type: action
+mechanizable: 'no'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: null
+  theses:
+  - asset_class: rates
+    direction: short
+  - asset_class: fx
+    direction: long
+    region: USD
+  - asset_class: fx
+    direction: short
+    region: EUR
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - rates_us
+  - fx_usd
+  - fx_eur
+  action: enter
+window:
+  unit: business_days
+  n: 20
+citation: DS/2016-11-10_cnbc-squawk-box-post-election-sold-gold.md
+date_basis: 'pinned: CNBC interview date (note date)'
+seed_id: C31
+notes: Short global bonds (UST, Bunds, gilts, BTPs); long USD vs EUR; long value and materials.

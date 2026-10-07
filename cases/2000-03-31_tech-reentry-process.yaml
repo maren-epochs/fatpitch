@@ -1,0 +1,22 @@
+id: 2000-03-31_tech-reentry-process
+asof: '2000-03-31T16:00:00-05:00'
+era: B
+episode_id: EP06-1999-2000-TECH
+truth_type: process
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: true
+targets:
+  regime_direction: null
+  theses: []
+  expression:
+  - equity_us
+  action: flat
+window:
+  unit: business_days
+  n: 20
+citation: RS/2015-01-18_lost-tree-club-speech.md; DS/2000-04-28_soros-quantum-exit-overplayed-hand.md
+date_basis: 'conservative: re-entry dated only to March 2000 (Lost Tree; Soros-exit note); last trading day of Mar
+  2000'
+seed_id: C11
+notes: 'Process target: weak internals (breadth) and chart veto block re-entry (R-29). His action was a re-entry.'

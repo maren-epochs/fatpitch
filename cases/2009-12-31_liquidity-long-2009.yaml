@@ -1,0 +1,24 @@
+id: 2009-12-31_liquidity-long-2009
+asof: '2009-12-31T16:00:00-05:00'
+era: A
+episode_id: EP10-2009-LIQ
+truth_type: action
+mechanizable: 'yes'
+source_reliability: near-primary
+retrospective: false
+targets:
+  regime_direction: easing
+  theses:
+  - asset_class: equity
+    direction: long
+    region: US
+  expression:
+  - equity_us
+  action: hold
+window:
+  unit: business_days
+  n: 20
+citation: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md
+date_basis: 'conservative: Feig talk dated by internal evidence to Q4 2009; last trading day of 2009'
+seed_id: C19
+notes: 'Money growth above IP growth (R-02): stocks go up until a signal appears, despite a bearish macro view.'
