@@ -1,0 +1,1909 @@
+# Druckenmiller testable-claims catalogue (spec\claims\claims.yaml)
+# Built 2026-10-07 from library\discovered_sources (DS/), library\reference_sources (RS/), spec\process.md,
+# spec\data_catalogue.yaml (version 2026-10-07.1) and library\research\data_practices.md.
+# Not read: cases\, spec\scoring.md, spec\HOLDOUT.md, results\. No claim below was shaped by fidelity cases or scores.
+#
+# Field conventions
+#   testability     testable | partially_testable | untestable_free_data
+#   importance      1..5 (5 = core of the documented process; liquidity/policy/inflation weighted up)
+#   reliability     best source tier for the quote: P primary, NP near-primary transcript, S secondary summary
+#   quotes          <= 2 sentences each, verbatim as recorded in the cited library note (S quotes not audio-verified)
+#   timeline        held_from: earliest dated evidence he held/used the belief (basis stated = he gives the date,
+#                   inferred = date deduced from an action or retrospective context); changes: dated revisions;
+#                   held_until: null while no abandonment is evidenced; dating: adequate | thin
+#   thresholds      basis stated = his number; interpreted = pre-registered default with sensitivity range
+#   oos             out-of-sample = data after first_public_statement.date; in-sample = data before it
+#   data            ids from spec\data_catalogue.yaml unless marked NEW (free, not yet in the catalogue; loader needed)
+#                   or MISSING (no free source known). "(id unverified)" = FRED id not confirmed this session.
+#   PIT             outcome labels (NBER dates, realized returns) may use revised data; conditioning inputs are run
+#                   twice: vintage/first-release (real-time variant, primary) and latest revision (sensitivity).
+# Common definitions used by several claims
+#   EQ_US      US equity index: FF_MKT_RF_D + FF_RF_D cumulated (1926-07 ->, daily); SHILLER_SP monthly (1871 ->)
+#              for pre-1926 and long-horizon tests. S&P 500 daily (SP500) is MISSING; NASDAQCOM 1971 ->.
+#   BEAR       peak-to-trough decline >= 20% in EQ_US (closing basis), peak = prior all-time-high close.
+#   RECESSION  NBER_CYCLES / USREC (labels only).
+#   CPI_YOY    yoy(CPIAUCSL) 1948 ->; yoy(CPIAUCNS) 1914 -> for the long sample.
+#   FF         FEDFUNDS (1954-07 ->); pre-1954 policy-rate stand-in = MISSING in catalogue (NEW: NY Fed discount
+#              rate / commercial paper rate, NBER Macrohistory on FRED, id unverified).
+#   TG         Taylor gap per R-06 (FF minus rule rate; registry params policy.*).
+version: 2026-10-07.1
+claims:
+- id: C-01
+  title: Liquidity and the Fed, not earnings, move the overall market
+  topic: liquidity_policy
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-01, R-13]
+  quotes:
+  - {text: "The other thing he taught me is earnings don't move the overall market; it's the Federal Reserve Board.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  - {text: "I never use valuation to time the market. I use liquidity considerations and technical analysis for timing.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, date: 1991-12, reliability: P}
+  - {text: "I think the stock market is basically a function of central bank policy.", source: DS/2017-12-12_cnbc-closing-bell-kelly-evans.md, date: 2017-12-12, reliability: NP}
+  first_public_statement: {date: 1991-12, source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, note: "Interview Dec 1991, book 1992. The 'not earnings ... Federal Reserve Board' wording in NMW is widely quoted but unverified; Lost Tree 2015 is the verified verbatim."}
+  timeline:
+    held_from: {date: 1977, basis: inferred, evidence: "Lost Tree: Drelles taught him this before leaving ~3 months after promoting him; he joined Pittsburgh National Bank 1977 and the Shah fell (Jan 1979) 'right after he leaves'.", source: RS/2015-01-18_lost-tree-club-speech.md}
+    changes:
+    - {date: 2024-11-06, change: "Macro increasingly done 'bottom up' by listening to companies; company mosaics named main macro input (2026). Liquidity primacy not withdrawn.", source: RS/2024-11-06_nbim-in-good-company-podcast.md}
+    held_until: null
+    weight_history:
+    - {from: 1977, weight: core}
+    - {from: 2024, weight: core, note: "co-equal with company-level mosaics (DS/2026-02-27)"}
+    dating: adequate
+  statement: "Index-level US equity returns are driven mainly by monetary policy and liquidity, not by earnings growth."
+  hypothesis:
+    variables:
+      R12: "EQ_US forward 12m total return (monthly, overlapping; Newey-West)"
+      LIQ: "block {yoy(M2SL)-yoy(INDPRO) (R-02), 12m change FF, 12m change Fed assets/GDP (US_CB_ASSETS_M/GDP)}"
+      EPS: "block {realized 12m forward EPS growth (Shiller E, NEW loader field), trailing 12m EPS growth}"
+    thresholds:
+    - {param: horizon_m, basis: interpreted, default: 12, sensitivity: [6, 24]}
+    H1: "Incremental R2 of LIQ on R12 exceeds incremental R2 of trailing EPS growth (real-time information set). Secondary: contemporaneous 12m returns co-move more with LIQ than with same-period EPS growth."
+  test:
+    event: none (time-series regression)
+    sample: "1960-01 -> 2026-08 (M2SL from 1959); long variant 1919 -> with FF stand-in"
+    frequency: M
+    outcome: "partial R2, sign hit rate, rolling 10y stability"
+    holds_if: "LIQ block partial R2 > trailing-EPS partial R2 in full sample and in >= 2/3 of rolling decades"
+    fails_if: "trailing-EPS block dominates or LIQ partial R2 not distinguishable from 0 (p > 0.10)"
+  oos: {split: 1991-12-31, in_sample: "1960-1991", out_of_sample: "1992-2026", note: "Verified-wording split 2015-01-18 reported as sensitivity."}
+  data:
+    available: [M2SL (1959, vintage), INDPRO (1919, vintage), FEDFUNDS (1954), US_CB_ASSETS_M (1914), GDP (1947), FF_MKT_RF_D (1926), SHILLER_SP (1871)]
+    missing: ["Shiller earnings field not loaded (NEW: extend SHILLER_SP loader)", "realized forward EPS uses revised data (outcome-side only)"]
+  caveats: ["Realized forward EPS growth is look-ahead by construction; compare only real-time EPS block for the decision claim.", "Liquidity and earnings are endogenous (policy reacts to growth).", "Claim is about 'the overall market'; security-level earnings matter by his own account (Feig 2009)."]
+
+- id: C-02
+  title: Money supply growing much faster than industrial production lifts stocks
+  topic: liquidity_policy
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-02]
+  quotes:
+  - {text: "If you have the money supply growing a lot faster than industrial production, the stock market is generally going to go up.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, date: 2009-Q4, reliability: NP}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, note: "Internal evidence dates the talk to Q4 2009; 2009-10-01 is the conservative split."}
+  timeline:
+    held_from: {date: 2008-03, basis: inferred, evidence: "Feig 2009: March 2008 long commodities on expected global liquidity despite a bearish economic view.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+    changes:
+    - {date: 2013-05-08, change: "Liquidity framed via central-bank QE/balance sheets rather than M2-IP from Sohn 2013 onward (inferred: no later M2-IP statement).", source: DS/2013-05-08_sohn-commodities-conundrum.md}
+    - {date: 2023-05-09, change: "Money-supply level (M1 ~$19T vs ~$4T 2019) cited as residual liquidity (S).", source: DS/2023-05-09_sohn-2023-kiril-sokoloff.md}
+    held_until: null
+    weight_history:
+    - {from: 2008, weight: core, note: "era B measure"}
+    - {from: 2013, weight: reduced, note: "balance-sheet measures dominate statements (inferred)"}
+    dating: thin
+    dating_note: "No evidence before 2008 that M2-IP specifically was used; Drelles-era 'movement of liquidity' undefined."
+  statement: "When money growth exceeds industrial-production growth by a wide margin, US equities tend to rise."
+  hypothesis:
+    variables:
+      L2: "yoy(M2SL) - yoy(INDPRO_FR), vintage as of t"
+      R: "EQ_US forward 6m and 12m excess return"
+    thresholds:
+    - {param: liq.m2_ip.spread_pp ('a lot faster'), basis: interpreted, default: 3.0, sensitivity: [0.0, 6.0]}
+    - {param: growth window, basis: interpreted, default: 12m yoy, sensitivity: [6m annualized, 24m annualized]}
+    H1: "E[R | L2 > 3pp] > E[R | unconditional] and P(R > 0 | L2 > 3pp) > base rate; E[R | L2 < 0] < unconditional."
+  test:
+    event: "months with L2 above threshold (state); also first month of crossing (event, 3m confirmation per liq.confirm_periods)"
+    sample: "1960-01 -> 2026-08; flag 2020-03..2021-12 base-effect outliers (process.md R-02)"
+    frequency: M
+    outcome: "conditional vs unconditional forward excess return; hit rate; block bootstrap p-value"
+    holds_if: "conditional 12m mean excess return exceeds unconditional by > 2pp/yr and hit rate exceeds base rate, p < 0.10, in both halves"
+    fails_if: "difference <= 0 or sign reverses in one half"
+  oos: {split: 2009-10-01, in_sample: "1960-01 -> 2009-09", out_of_sample: "2009-10 -> 2026-08"}
+  data:
+    available: [M2SL (vintage ALFRED 1980-02 ->, RTDSM 1971-05 ->), INDPRO / INDPRO_FR (1919), FF_MKT_RF_D, SHILLER_SP]
+    pit: "M2SL pre-1971 latest revision only (usable=False); real-time variant starts 1971-05."
+    missing: []
+  caveats: ["M1/M2/base unspecified; M2 chosen (process.md R-02).", "2020 IP base effects dominate L2.", "Overlapping windows: few independent observations."]
+
+- id: C-03
+  title: Liquidity overrides a bearish economic view
+  topic: liquidity_policy
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-01, R-02, R-04, R-14, R-60]
+  quotes:
+  - {text: "I'm a liquidity guy. I'm not… that worried about markets.", source: DS/2019-06-07_cnbc-squawk-box-one-way-bet.md, date: 2019-06-07, reliability: NP}
+  - {text: "I underestimated how many red lines, and how far, the Fed would go.", source: DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md, date: 2020-06-08, reliability: S}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, note: "Long commodities Mar 2008 and long equities 2009 despite bearish economic view."}
+  timeline:
+    held_from: {date: 2008-03, basis: stated, evidence: "Feig 2009 retrospective on March 2008 commodities trade.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+    changes:
+    - {date: 2019-12-18, change: "Self-diagnosed under-risking a liquidity rally in 2019 ('couldn't have been more wrong') - lesson reaffirmed.", source: DS/2019-12-18_bloomberg-schatzker-couldnt-have-been-more-wrong.md}
+    - {date: 2020-06-08, change: "May 2020 bearish net-liquidity read reversed within four weeks; Fed scale plus breadth overrode it.", source: DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md}
+    held_until: null
+    weight_history: [{from: 2008, weight: core}]
+    dating: adequate
+  statement: "When liquidity is expanding, risk assets rise even while economic data are weak."
+  hypothesis:
+    variables:
+      WEAK: "yoy(INDPRO_FR) < 0 or RECESSION = 1 (label) or UNRATE_FR 6m change > +0.5pp"
+      LIQPOS: "L2 > liq.m2_ip.spread_pp (C-02) OR 6m change FF < 0 OR 26w change WALCL > 0 (2002 ->)"
+      R: "EQ_US forward 12m excess return"
+    thresholds:
+    - {param: weakness definition, basis: interpreted, default: "yoy INDPRO_FR < 0", sensitivity: ["UNRATE 6m +0.5pp", "USREC"]}
+    H1: "E[R | WEAK and LIQPOS] > 0 and > E[R | WEAK and not LIQPOS]."
+  test:
+    event: "state months"
+    sample: "1960 -> 2026"
+    frequency: M
+    outcome: "2x2 conditional mean returns; hit rates"
+    holds_if: "WEAK&LIQPOS mean > 0, exceeds WEAK&notLIQPOS by > 5pp, p < 0.10"
+    fails_if: "WEAK&LIQPOS mean <= WEAK&notLIQPOS"
+  oos: {split: 2009-10-01, in_sample: "1960 -> 2009-09", out_of_sample: "2009-10 -> 2026"}
+  data:
+    available: [M2SL, INDPRO_FR, FEDFUNDS, WALCL (2002-12), UNRATE_FR, USREC, FF_MKT_RF_D]
+    missing: []
+  caveats: ["Easing typically begins in weakness; selection overlaps with recession troughs (mechanical rebound).", "Counter-episodes 2001 and 2007-08: easing during bear markets."]
+
+- id: C-04
+  title: Stay long until the Fed tightens; tightening onset ends liquidity-driven rallies
+  topic: liquidity_policy
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-14, R-06]
+  quotes:
+  - {text: "And normally the playbook says exactly what you said. You don't have to move till they raise rates.", source: DS/2014-07-16_delivering-alpha-kernen.md, date: 2014-07-16, reliability: NP}
+  - {text: "This bubble has gone long enough and it's extended enough that the minute they start tightening, the equity market should go down a lot.", source: DS/2021-05-11_hustle-mfm-trung-phan.md, date: 2021-05-11, reliability: NP}
+  - {text: "The Fed had been tightening since January 1987, and the dollar was tanking, which suggested that the Fed was going to tighten some more.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, date: 1991-12, reliability: P}
+  first_public_statement: {date: 1991-12, source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, note: "Retrospective reads of 1981, 1987 (Fed) and 1989 (BoJ) tightening as sell triggers; general playbook verbatim 2014-07-16."}
+  timeline:
+    held_from: {date: 1981-06, basis: stated, evidence: "NMW: mid-1981 rates at 19% 'one of the more obvious sell situations'; June 1987 Fed tightening; late 1989 BoJ tightening 'three times as important'.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}
+    changes:
+    - {date: 2014-07-16, change: "Variant: watch the rate level more than the first hike; QE end also a risk event.", source: DS/2014-07-16_delivering-alpha-kernen.md}
+    - {date: 2021-05-11, change: "Variant: after a bubble, the first tightening itself is the trigger.", source: DS/2021-05-11_hustle-mfm-trung-phan.md}
+    held_until: null
+    weight_history: [{from: 1981, weight: core}]
+    dating: adequate
+  statement: "Equities keep rising while policy is easy; the onset of Fed tightening (and, in his 2014 variant, the level reached) precedes equity declines, especially after a bubble."
+  hypothesis:
+    variables:
+      ONSET: "first month with FF target (DFEDTAR/DFEDTARU; FEDFUNDS 3m-avg rise >= 50bp pre-1982) higher than 6m earlier after >= 12m without a hike"
+      DD: "max EQ_US drawdown within 6/12/18m of ONSET"
+      R: "EQ_US return over 12m after ONSET"
+      BUBBLE: "fragility_level = high (R-11) or CAPE top-quintile at ONSET"
+    thresholds:
+    - {param: drawdown threshold, basis: interpreted, default: 10%, sensitivity: [7%, 20%]}
+    - {param: window, basis: interpreted, default: 18m, sensitivity: [6m, 24m]}
+    - {param: 'rate-level variant (DA 2014)', basis: interpreted, default: "TG crosses above 0 (policy no longer loose)", sensitivity: ["FF > CPI_YOY", "TG > +1pp"]}
+    H1: "P(DD >= 10% within 18m | ONSET) > P(DD >= 10% within any 18m window); median R after ONSET < unconditional median."
+    H1b: "Among ONSETs, BUBBLE onsets have larger DD (supports 2021 variant)."
+    H1c: "Rate-level trigger has higher DD hit rate than ONSET trigger (supports 2014 variant)."
+  test:
+    event: "tightening onsets 1955 -> 2026 (~16 events); cross-country variant with BIS policy rates and OECD share prices (JP 1989, DE)"
+    sample: "1955-01 -> 2026-09"
+    frequency: M (D for drawdowns)
+    outcome: "hit rate vs base rate; conditional median returns; Fisher exact test"
+    holds_if: "hit-rate excess > 15pp and median 12m return below unconditional"
+    fails_if: "hit rate not above base rate"
+  oos: {split: 1991-12-31, in_sample: "onsets 1955-1988", out_of_sample: "onsets 1994, 1999, 2004, 2015, 2022 (2021-variant OOS: 2022 only)"}
+  data:
+    available: [FEDFUNDS (1954), DFEDTAR (1982-2008), DFEDTARU (2008), DFF, FF_MKT_RF_D, SHILLER_SP, JP_POLICY_RATE, DE_POLICY_RATE, GB_POLICY_RATE_BIS]
+    missing: ["FOMC_CALENDAR MISSING in catalogue (onset dating uses rate series)", "Foreign equity indices NEW: OECD SPASTT01{JP,DE,GB}M661N (FRED, id unverified)"]
+  caveats: ["n ~ 16 US onsets; overlap with recessions.", "1994 and 2004 onsets: no 10% decline within 18m in common recollection - verify in test, do not presume.", "Onset definition before 1982 (no target series) is interpreted."]
+
+- id: C-05
+  title: QE inflates financial asset prices
+  topic: liquidity_policy
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-12, R-14, R-24]
+  quotes:
+  - {text: "The one thing we learned in the United States about QE is it definitely inflates financial asset prices.", source: DS/2015-03-02_cnbc-closing-bell-kelly-evans.md, date: 2015-03-02, reliability: NP}
+  - {text: "When monetary stimulus is on, I'm long gold. When stimulus is off, I'm less long.", source: DS/2012-04-XX_grants-spring-conference-jim-grant.md, date: 2012-04, reliability: S}
+  first_public_statement: {date: 2012-04-15, source: DS/2012-04-XX_grants-spring-conference-jim-grant.md, note: "'Trade the monetary stimulus' (S). Verified verbatim 2015-03-02."}
+  timeline:
+    held_from: {date: 2009-Q4, basis: inferred, evidence: "Feig 2009: long equities on liquidity while Fed bought $20-25bn/week.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+    changes:
+    - {date: 2020-06-08, change: "Underestimated the scale effect of 2020 QE; belief strengthened.", source: DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md}
+    held_until: null
+    weight_history: [{from: 2009, weight: core}]
+    dating: adequate
+  statement: "Periods of central-bank asset purchases coincide with above-normal returns on equities, credit and gold."
+  hypothesis:
+    variables:
+      QE: "26w change in (TREAST + WSHOMCB) > 0 with a declared purchase program (US 2008-11 -> 2014-10, 2019-10 -> 2022-03); BoJ/ECB analogues from asset series"
+      R: "weekly excess returns EQ_US, GOLD_LBMA, BAA-GS10 spread change"
+    thresholds:
+    - {param: QE flag, basis: interpreted, default: "26w holdings change > 1% of GDP annualized", sensitivity: ["> 0", "> 2% of GDP"]}
+    H1: "Annualized excess return during QE > outside QE (2002 -> 2026), for EQ_US and gold; credit spreads narrow during QE."
+  test:
+    event: "QE-on vs QE-off weeks"
+    sample: "2002-12 -> 2026-09 (US); 2001 -> (BoJ), 2009 -> (ECB, BoE)"
+    frequency: W
+    outcome: "difference in annualized returns, block bootstrap"
+    holds_if: "QE-on excess return > QE-off by > 5pp/yr for EQ_US, p < 0.10, and same sign in >= 2 of 3 non-US regions"
+    fails_if: "difference <= 0"
+  oos: {split: 2012-04-15, in_sample: "2002-12 -> 2012-04", out_of_sample: "2012-04 -> 2026 (QE3, QE4)"}
+  data:
+    available: [TREAST, WSHOMCB, WALCL (2002-12), JPNASSETS, JP_BOJ_TOTAL_ASSETS (1998), EUROSYSTEM_TOTAL_ASSETS (1999), BOE_ASSETS (partial), GOLD_LBMA, BAA, GS10, FF_MKT_RF_D]
+    missing: ["Purchase-program announcement dates (FOMC_CALENDAR MISSING)"]
+  caveats: ["4 US QE episodes; regimes not independent.", "QE starts at market lows (mean-reversion confound)."]
+- id: C-06
+  title: Markets suffer setbacks within about six months of QE ending
+  topic: liquidity_policy
+  testability: partially_testable
+  importance: 4
+  reliability: NP
+  rules: [R-14]
+  quotes:
+  - {text: "The only nuance I would put is the market had a nasty setback after QE1 ended. Had a nasty setback after QE2 ended.", source: DS/2014-07-16_delivering-alpha-kernen.md, date: 2014-07-16, reliability: NP}
+  first_public_statement: {date: 2012-04-15, source: DS/2012-04-XX_grants-spring-conference-jim-grant.md, note: "QE rallies 'came apart within about six months of ending' (S summary)."}
+  timeline:
+    held_from: {date: 2010-06, basis: inferred, evidence: "Lesson drawn from QE1 end (2010-03) setback; stated 2012.", source: DS/2012-04-XX_grants-spring-conference-jim-grant.md}
+    changes: []
+    held_until: null
+    weight_history: [{from: 2012, weight: active}, {from: 2018, weight: active, note: "generalized into balance-sheet rate of change (C-07)"}]
+    dating: thin
+    dating_note: "No statement after 2014; status after 2014 inferred from C-07."
+  statement: "When a QE program ends, risk assets have a material setback within roughly six months."
+  hypothesis:
+    variables:
+      END: "QE program end dates: US 2010-03-31, 2011-06-30, 2012-12-31 (Twist), 2014-10-29, 2022-03-09; JP 2006-03-09; EA 2018-12-31, 2022-06-30"
+      DD: "max drawdown of local equity index within W months after END"
+    thresholds:
+    - {param: W, basis: stated, default: 6, sensitivity: [3, 9]}
+    - {param: setback size, basis: interpreted, default: 10%, sensitivity: [5%, 15%]}
+    H1: "P(DD >= 10% within 6m | END) > P(DD >= 10% within a random 6m window)."
+  test:
+    event: "program end dates (fixed list above, pre-registered)"
+    sample: "2006 -> 2026"
+    frequency: D
+    outcome: "hit count vs binomial base rate from all 6m windows 2002-2026"
+    holds_if: "hit rate >= 2x base rate"
+    fails_if: "hit rate <= base rate"
+  oos: {split: 2014-07-16, in_sample: "ends 2006-2012", out_of_sample: "ends 2014-10, 2018-12 (EA), 2022-03, 2022-06 (EA)"}
+  data:
+    available: [FF_MKT_RF_D, NASDAQCOM]
+    missing: ["Program end dates are a manual event list (FOMC_CALENDAR MISSING)", "Foreign index daily NEW"]
+  caveats: ["n = 8; binomial power minimal.", "Program-end dates are known in advance (announced tapers) - expectation effects."]
+
+- id: C-07
+  title: The rate of change of central-bank balance sheets drives risk assets
+  topic: liquidity_policy
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-03, R-12, R-14]
+  quotes:
+  - {text: "It's all about liquidity, and liquidity is going down.", source: DS/2018-10-09_grants-fall-conference-jim-grant.md, date: 2018-10-09, reliability: S}
+  - {text: "Fed should pause its double-barreled blitz of higher interest rates and tighter liquidity.", source: DS/2018-12-16_wsj-oped-warsh-fed-tightening-not-now.md, date: 2018-12-16, reliability: S}
+  first_public_statement: {date: 2018-09-06, source: RS/2018-09-06_sokoloff-real-vision-interview.md, note: "Global CB buying ~$1T/yr going to zero within 12 months (NP notes)."}
+  timeline:
+    held_from: {date: 2018-01, basis: inferred, evidence: "Real Vision: expected the rate of change to hit equities 'from mid-year' and was wrong for months.", source: RS/2018-09-06_sokoloff-real-vision-interview.md}
+    changes:
+    - {date: 2022-09-28, change: "QT netted against TGA drawdown and SPR releases.", source: DS/2022-09-28_delivering-alpha-kernen-transcript.md}
+    - {date: 2023-04-24, change: "Emergency facilities (SVB) counted as reversing QT.", source: DS/2023-04-24_nbim-annual-investment-conference.md}
+    held_until: null
+    weight_history: [{from: 2018, weight: core}]
+    dating: adequate
+  statement: "Equities weaken when aggregate central-bank asset growth decelerates (second derivative turns negative) and strengthen when it accelerates."
+  hypothesis:
+    variables:
+      G: "USD sum of Fed (WALCL), Eurosystem (EUROSYSTEM_TOTAL_ASSETS x DEXUSEU), BoJ (JP_BOJ_TOTAL_ASSETS / DEXJPUS)"
+      F: "12m change of G (flow); D2 = 6m change of F"
+      R: "EQ_US forward 6m excess return"
+    thresholds:
+    - {param: flow window, basis: interpreted, default: 12m, sensitivity: [6m, 24m]}
+    - {param: acceleration window, basis: interpreted, default: 6m, sensitivity: [3m, 12m]}
+    H1: "E[R | D2 < 0] < E[R | D2 > 0]; corr(D2_t, R_t+6m) > 0."
+  test:
+    event: "state (sign of D2); events = sign changes"
+    sample: "2003-01 -> 2026-09 (all three series)"
+    frequency: M
+    outcome: "conditional means, IC with HAC errors"
+    holds_if: "IC > 0.10 with p < 0.10 and conditional spread > 5pp/yr"
+    fails_if: "IC <= 0"
+  oos: {split: 2018-09-06, in_sample: "2003-2018-08", out_of_sample: "2018-09 -> 2026-09"}
+  data:
+    available: [WALCL (2002-12), EUROSYSTEM_TOTAL_ASSETS (1999), JP_BOJ_TOTAL_ASSETS (1998), DEXUSEU, DEXJPUS, FF_MKT_RF_D]
+    missing: ["PBoC/BoE weekly not in global sum (BoE partial)"]
+  caveats: ["FX translation moves G without policy action.", "Short sample (~23y), few QE/QT regimes."]
+
+- id: C-08
+  title: Net liquidity (Fed purchases minus Treasury net issuance) governs equity risk/reward
+  topic: liquidity_policy
+  testability: testable
+  importance: 4
+  reliability: S
+  rules: [R-03, R-04]
+  quotes:
+  - {text: "So it's the biggest liquidity injection relative to history I've ever seen.", source: RS/2020-05-12_economic-club-of-new-york.md, date: 2020-05-12, reliability: S}
+  - {text: "And then liquidity shrinks as far as the eye can see as the Treasury borrowing crowds out not only the private economy but even overwhelms Fed purchases.", source: RS/2020-05-12_economic-club-of-new-york.md, date: 2020-05-12, reliability: S}
+  first_public_statement: {date: 2020-05-12, source: RS/2020-05-12_economic-club-of-new-york.md, note: "Felder verbatim excerpt; ECNY transcript not reviewed."}
+  timeline:
+    held_from: {date: 2020-05-12, basis: stated, evidence: "ECNY 2020.", source: RS/2020-05-12_economic-club-of-new-york.md}
+    changes:
+    - {date: 2020-06-08, change: "Call reversed within four weeks; breadth thrust and Fed scale overrode the net-liquidity read.", source: DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md}
+    - {date: 2022-09-28, change: "Liquidity accounting extended to TGA drawdown and SPR.", source: DS/2022-09-28_delivering-alpha-kernen-transcript.md}
+    held_until: null
+    weight_history: [{from: 2020-05, weight: core}, {from: 2020-06, weight: reduced, note: "subordinate to breadth/price (inferred)"}]
+    dating: thin
+    dating_note: "No pre-2020 statement of the net formula."
+  statement: "When Treasury net issuance exceeds Fed purchases, effective liquidity shrinks and equity forward returns are poor."
+  hypothesis:
+    variables:
+      NETF: "13w change (TREAST + WSHOMCB) - TFD_NET_ISSUANCE_13W"
+      NL: "WALCL - WTREGEN - RRPONTSYD, 13w change (R-03 sensitivity)"
+      R: "EQ_US forward 13w and 26w excess return"
+    thresholds:
+    - {param: window, basis: interpreted, default: 13w, sensitivity: [4w, 26w]}
+    H1: "E[R | NETF < 0] < E[R | NETF > 0]."
+  test:
+    event: state
+    sample: "2005-06 -> 2026-09 (TFD 13w series start)"
+    frequency: W
+    outcome: "conditional means; IC"
+    holds_if: "spread > 5pp/yr, p < 0.10, both NETF and NL variants same sign"
+    fails_if: "spread <= 0"
+  oos: {split: 2020-05-12, in_sample: "2005-06 -> 2020-05", out_of_sample: "2020-05 -> 2026-09"}
+  data:
+    available: [TREAST, WSHOMCB, WALCL, WTREGEN, RRPONTSYD, TFD_NET_ISSUANCE_13W (2005-06), TFD_DEBT_HELD_PUBLIC (1997-09), FF_MKT_RF_D]
+    missing: ["pre-1997 daily issuance (FYGFDPUN quarterly only)"]
+  caveats: ["First OOS observation (2020-05) failed immediately.", "Bills vs coupons issuance mix ignored."]
+
+- id: C-09
+  title: Relative QE intensity drives relative equity performance across regions
+  topic: liquidity_policy
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-12, R-24]
+  quotes:
+  - {text: "The one thing we learned in the United States about QE is it definitely inflates financial asset prices.", source: DS/2015-03-02_cnbc-closing-bell-kelly-evans.md, date: 2015-03-02, reliability: NP}
+  first_public_statement: {date: 2013-05-08, source: DS/2013-05-08_sohn-commodities-conundrum.md, note: "Japan QE ~3x US relative to market cap -> 18-month Japan run (S)."}
+  timeline:
+    held_from: {date: 1989-Q4, basis: stated, evidence: "BoJ tightening as the dominant reason to short the Nikkei (relative policy read).", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}
+    changes: []
+    held_until: null
+    weight_history: [{from: 1989, weight: active}, {from: 2013, weight: core, note: "QE era"}]
+    dating: adequate
+  statement: "Equity markets of regions whose central bank expands faster (relative to GDP) outperform in local currency."
+  hypothesis:
+    variables:
+      REL: "12m change of CB assets/GDP region X minus US (CB_ASSETS_GDP_*)"
+      RR: "forward 12m local-currency equity return X minus US"
+    thresholds:
+    - {param: window, basis: interpreted, default: 12m, sensitivity: [6m, 24m]}
+    H1: "corr(REL_t, RR_t+12m) > 0 pooled across JP, EA/DE, GB."
+  test:
+    event: none (panel)
+    sample: "1999 -> 2026 (EA), 1960 -> (DE, GB, JP via BIS)"
+    frequency: Q
+    outcome: "pooled IC, hit rate"
+    holds_if: "pooled IC > 0.10, p < 0.10"
+    fails_if: "IC <= 0"
+  oos: {split: 2013-05-08, in_sample: "to 2013-05", out_of_sample: "2013-05 -> 2026"}
+  data:
+    available: [CB_ASSETS_GDP_US, CB_ASSETS_GDP_XM, CB_ASSETS_GDP_DE, CB_ASSETS_GDP_GB, CB_ASSETS_GDP_JP]
+    missing: ["Foreign equity indices NEW: OECD SPASTT01xxM661N (FRED, id unverified) or MSCI (not free)"]
+  caveats: ["Balance-sheet growth pre-2008 reflects currency demand, not policy.", "Quarterly BIS data lag."]
+
+- id: C-10
+  title: Bear markets, and the biggest profits, come from central-bank mistakes
+  topic: policy_error
+  testability: partially_testable
+  importance: 5
+  reliability: NP
+  rules: [R-05, R-06]
+  quotes:
+  - {text: "One of the things I would say is about 80 percent of the big, big money we made was in bear markets and equities because crazy things were going on in response to what I would call central bank mistakes during that 30-year period.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  first_public_statement: {date: 2014-07-16, source: DS/2014-07-16_delivering-alpha-kernen.md, note: "Kernen frames 'betting against central banks'; he refers to 'all the money my firm has made in the past due to improper monetary policies'. Verbatim 80% claim 2015-01-18."}
+  timeline:
+    held_from: {date: 1981, basis: inferred, evidence: "'30-year period' of Duquesne (1981-2010); first cited instance the 1981 Volcker bond bet.", source: RS/2015-01-18_lost-tree-club-speech.md}
+    changes:
+    - {date: 2018-09-06, change: "Different metric: ~70% of money from currencies and bonds; bear-market average return > 50%.", source: RS/2018-09-06_sokoloff-real-vision-interview.md}
+    held_until: null
+    weight_history: [{from: 1981, weight: core}]
+    dating: adequate
+  statement: "US equity bear markets are preceded by identifiable monetary-policy errors (too loose for too long, or tightening into weakness)."
+  hypothesis:
+    variables:
+      ERR: "within 36m before BEAR peak: TG < -2pp for >= 12 months (too loose) OR FF raised >= 150bp within 18m while yoy(INDPRO_FR) decelerating (too tight)"
+    thresholds:
+    - {param: TG loose threshold, basis: interpreted, default: -2pp, sensitivity: [-1pp, -3pp]}
+    - {param: lookback, basis: interpreted, default: 36m, sensitivity: [24m, 48m]}
+    H1: "Share of BEAR peaks with ERR > share of all months with ERR in the subsequent 36m window (base rate)."
+    untestable_part: "Share of his own profits earned in bear markets (no free Duquesne/Quantum return series)."
+  test:
+    event: "BEAR peaks 1955 -> 2026 (~10)"
+    sample: "1955 -> 2026"
+    frequency: M
+    outcome: "precondition hit rate vs base rate"
+    holds_if: ">= 80% of BEAR peaks preceded by ERR and hit rate exceeds base rate by > 20pp"
+    fails_if: "hit rate <= base rate"
+  oos: {split: 2015-01-18, in_sample: "bears to 2009", out_of_sample: "2020, 2022 bears"}
+  data:
+    available: [FEDFUNDS, CPIAUCSL, UNRATE, NROU, INDPRO_FR, FF_MKT_RF_D]
+    missing: ["Fund P&L by regime (untestable part)"]
+  caveats: ["'Mistake' is defined by the test's TG rule, not by him; circularity risk.", "2020 bear (pandemic) has no policy-error precondition by construction."]
+
+- id: C-11
+  title: Persistently too-loose policy (Taylor-rule gap) ends in a bust with a long lag
+  topic: policy_error
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-06, R-11, R-48]
+  quotes:
+  - {text: "So, we had great conviction that the Federal Reserve was making a mistake with way too loose monetary policy.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  - {text: "I just have the same horrific sense I had back in '04. And by the way, it lasted another two years.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  - {text: "Simply put, this is the biggest and longest dovish deviation from historical norms I have seen in my career.", source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md, date: 2016-05-04, reliability: P}
+  first_public_statement: {date: 2005-05, source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md, note: "Sohn 2005 Taylor-deviation housing call referenced in the 2016 prepared text; no 2005 recording located. Verified statement 2014-07-16."}
+  timeline:
+    held_from: {date: 2003-12, basis: stated, evidence: "Q4 2003 staff exercise: lowest guess 3%, highest 6% vs FF 1%.", source: RS/2015-01-18_lost-tree-club-speech.md}
+    changes:
+    - {date: 2005-05, change: "Formal Taylor-rule framing adopted (2003 exercise was 'data alone').", source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md}
+    - {date: 2024-10-16, change: "Restrictiveness judged from markets, 'not real-rate theory' - Taylor weight reduced in favour of FCI (C-12).", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md}
+    held_until: null
+    weight_history: [{from: 2003, weight: core}, {from: 2024-10, weight: reduced}]
+    dating: adequate
+  statement: "When the policy rate stays far below a Taylor-type benchmark for a long time, an asset bubble and bust follow, typically 1.5-3 years after the alert."
+  hypothesis:
+    variables:
+      TG: "FF - Taylor rule (R-06; real-time UNRATE_FR, NROU vintage, CPI_YOY)"
+      ALERT: "first month TG < -2pp after >= 12 consecutive months TG < -1pp"
+      BUST: "BEAR start or RECESSION start"
+    thresholds:
+    - {param: TG alert, basis: interpreted, default: -2pp, sensitivity: [-1pp, -3pp]}
+    - {param: lag window, basis: stated, default: "6-36m ('lasted another two years')", sensitivity: ["12-48m"]}
+    H1: "P(BUST within 6-36m | ALERT) > P(BUST within 6-36m of a random month); median lag in 12-36m."
+  test:
+    event: ALERT episodes
+    sample: "1960 -> 2026 (NROU vintages sparse pre-2000: report real-time and current-vintage)"
+    frequency: M
+    outcome: "hit rate vs base rate; lag distribution"
+    holds_if: "hit rate exceeds base rate by > 20pp and >= 2/3 of busts arrive in window"
+    fails_if: "hit rate <= base rate"
+  oos: {split: 2005-05-01, in_sample: "1960 -> 2005-04", out_of_sample: "2005-05 -> 2026 (2016-17 alert: no bust within 36m except 2020 exogenous; 2021 alert -> 2022 bear)"}
+  data:
+    available: [FEDFUNDS, UNRATE_FR, NROU (vintage, sparse), CPIAUCSL, GDPPOT, FF_MKT_RF_D, USREC]
+    missing: ["CPILFESL MISSING (core variant)"]
+  caveats: ["Taylor coefficients and r* chosen ex post; use registry defaults only.", "Long-lag claims are hard to falsify (any later bust 'confirms').", "Overlapping episodes 2009-2021 nearly continuous."]
+- id: C-12
+  title: Markets (financial conditions) gauge restrictiveness better than real-rate theory
+  topic: policy_error
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-58, R-06]
+  quotes:
+  - {text: "I don't really go buy theory. I'm a market animal. Frankly, we've found over the years that markets are better predictors than professors.", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md, date: 2024-10-16, reliability: NP}
+  - {text: "Once financial conditions took off, it became very clear that this thing could go either way. So I exited the position.", source: DS/2024-05-07_cnbc-squawk-box-forward-guidance-ai-argentina.md, date: 2024-05-07, reliability: NP}
+  first_public_statement: {date: 2019-06-03, source: DS/2019-06-03_econclub-ny-bessent.md, note: "'sneak one in every time financial conditions allowed' (S). Verbatim principle 2024-10-16."}
+  timeline:
+    held_from: {date: 2019-06-03, basis: inferred, evidence: "ECNY 2019; 'over the years' (2024) is undated.", source: DS/2019-06-03_econclub-ny-bessent.md}
+    changes: [{date: 2024-10-16, change: "Explicitly preferred over real-rate theory.", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md}]
+    held_until: null
+    weight_history: [{from: 2019, weight: active}, {from: 2024, weight: core}]
+    dating: thin
+  statement: "Financial-conditions indices predict subsequent growth and inflation better than real-rate or Taylor-gap measures of policy stance."
+  hypothesis:
+    variables:
+      NFCI: "NFCI (vintage), level and 13w change"
+      RRG: "FF - CPI_YOY - r* (registry policy.taylor_rstar_pct); TG sensitivity"
+      Y: "next-12m change in yoy(INDPRO_FR) and next-12m change in CPI_YOY"
+    thresholds: [{param: horizon, basis: interpreted, default: 12m, sensitivity: [6m, 18m]}]
+    H1: "Out-of-sample R2 (expanding window, start 1985) of NFCI model > RRG model for both targets."
+  test: {event: none, sample: "1971-01 -> 2026-09", frequency: M, outcome: "OOS R2 difference, Clark-West test", holds_if: "NFCI beats RRG for growth and inflation, p < 0.10", fails_if: "RRG beats NFCI on both"}
+  oos: {split: 2019-06-03, in_sample: "1971 -> 2019-05", out_of_sample: "2019-06 -> 2026"}
+  data: {available: [NFCI (1971, vintage), FEDFUNDS, CPIAUCSL, INDPRO_FR, UNRATE_FR, NROU], missing: []}
+  caveats: ["NFCI is revised and partly constructed ex post; real-time vintages only from ALFRED coverage.", "Claim may refer to asset prices broadly (equities, gold, crypto, spreads), not NFCI specifically."]
+
+- id: C-13
+  title: Easing as inflation falls, with loose conditions, brings a second inflation wave (1970s pattern)
+  topic: inflation
+  testability: partially_testable
+  importance: 3
+  reliability: NP
+  rules: [R-58, R-07]
+  quotes:
+  - {text: "Equities at record high, gold at a record high, GDP above trend, credit tight… we don't see any restriction whatsoever.", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md, date: 2024-10-16, reliability: NP}
+  - {text: "I've switched to being more worried about inflation going forward than the economy itself.", source: RS/2024-11-06_nbim-in-good-company-podcast.md, date: 2024-11-06, reliability: NP}
+  first_public_statement: {date: 2024-10-16, source: DS/2024-10-16_bloomberg-tv-sonali-basak.md, note: "1970s: Fed eased as inflation fell to 3% and it re-accelerated to 12%."}
+  timeline:
+    held_from: {date: 2024-09-18, basis: stated, evidence: "Shorted bonds the day of the 50bp cut.", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md}
+    changes: []
+    held_until: null
+    weight_history: [{from: 2024, weight: active}]
+    dating: thin
+  statement: "After inflation falls from a high peak, cutting rates while financial conditions are loose is followed by renewed inflation."
+  hypothesis:
+    variables:
+      EP: "episode: CPI_YOY peak > 5%, then falls below 4%, and FF cut >= 50bp within 6m while NFCI < 0 (loose)"
+      Y: "max CPI_YOY rise within 24m after first cut"
+    thresholds: [{param: re-acceleration, basis: interpreted, default: +2pp, sensitivity: [+1pp, +3pp]}]
+    H1: "P(Y >= 2pp | EP) > P(Y >= 2pp | cuts after disinflation with NFCI >= 0)."
+  test: {event: EP list, sample: "1955 -> 2026 (NFCI from 1971; pre-1971 conditions = BAA-GS10 spread below median)", frequency: M, outcome: "case table, counts", holds_if: "majority of EP followed by re-acceleration and rate above comparison set", fails_if: "no excess"}
+  oos: {split: 2024-10-16, in_sample: "1955 -> 2024-09", out_of_sample: "2024-10 -> (2024-09 cut is the first OOS case)"}
+  data: {available: [CPIAUCSL, FEDFUNDS, NFCI, BAA, GS10], missing: []}
+  caveats: ["n ~ 3-5 (1970s, 1980s); effectively a case study.", "Oil shocks confound 1970s."]
+
+- id: C-14
+  title: No soft landing after inflation has exceeded 4.5%
+  topic: inflation
+  testability: testable
+  importance: 5
+  reliability: S
+  rules: [R-07]
+  quotes:
+  - {text: "We've never had a soft landing after inflation has got above 4.5%.", source: RS/2022-06-10_sohn-2022-collison-conversation.md, date: 2022-06-10, reliability: S}
+  first_public_statement: {date: 2022-06-10, source: RS/2022-06-10_sohn-2022-collison-conversation.md, note: "Recording late May/early June 2022; YouTube published 2022-06-10."}
+  timeline:
+    held_from: {date: 2022-06-10, basis: stated, evidence: "Sohn 2022; 'only 2-3 soft landings in history (1994-95)'.", source: RS/2022-06-10_sohn-2022-collison-conversation.md}
+    changes: [{date: 2024-11-06, change: "Conceded the 2023 hard-landing call was 'completely wrong'; rule not restated.", source: RS/2024-11-06_nbim-in-good-company-podcast.md}]
+    held_until: null
+    weight_history: [{from: 2022, weight: core}, {from: 2024, weight: unknown}]
+    dating: thin
+    dating_note: "Retrospective 'never' implies a long-held historical reading; no earlier dated statement."
+  statement: "Once CPI inflation exceeds 4.5%, the subsequent Fed tightening cycle ends in recession."
+  hypothesis:
+    variables:
+      EP: "tightening cycles (C-04 onset to last hike) during which or within 12m before which CPI_YOY > 4.5%"
+      SOFT: "no RECESSION within 24m after the last hike of the cycle"
+    thresholds:
+    - {param: inflation threshold, basis: stated, default: 4.5%, sensitivity: [4.0%, 5.0%]}
+    - {param: landing window, basis: interpreted, default: 24m, sensitivity: [18m, 36m]}
+    H1: "Count of EP with SOFT = 0 (no counterexample)."
+  test: {event: EP list, sample: "1914 -> 2026 (CPIAUCNS; FF stand-in pre-1954)", frequency: M, outcome: "counterexample count; soft-landing rate vs cycles with CPI <= 4.5%", holds_if: "zero counterexamples in-sample", fails_if: ">= 1 counterexample in-sample; OOS: 2022-23 cycle soft landing counts against"}
+  oos: {split: 2022-06-10, in_sample: "cycles to 2021", out_of_sample: "2022-2023 cycle (CPI 9.1%; no NBER recession as of 2026-09 per USREC)"}
+  data: {available: [CPIAUCSL (1947), CPIAUCNS (1913), FEDFUNDS (1954), USREC, NBER_CYCLES], missing: ["pre-1954 policy rate NEW"]}
+  caveats: ["n of qualifying cycles ~8; 'soft landing' definition chosen here.", "NBER labels announced with 5-21m lag (outcome-side use only).", "OOS outcome as of 2026-09: CPI peak 9.1% (2022-06) with no NBER recession - a counterexample unless a recession is later dated within the window."]
+
+- id: C-15
+  title: Inflation above 5% has not fallen without fed funds above CPI
+  topic: inflation
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-08]
+  quotes:
+  - {text: "Once inflation gets above 5%, it's never come down unless Fed funds have gotten above the CPI.", source: DS/2022-06-XX_sohn-2022-john-collison.md, date: 2022-06, reliability: NP}
+  first_public_statement: {date: 2022-06-10, source: DS/2022-06-XX_sohn-2022-john-collison.md, note: "Same conversation: expected the rule to break this cycle (FF would need ~8%)."}
+  timeline:
+    held_from: {date: 2022-06-10, basis: stated, evidence: "Sohn 2022.", source: DS/2022-06-XX_sohn-2022-john-collison.md}
+    changes: [{date: 2022-06-10, change: "Stated together with his expectation that it 'will probably be broken' in 2022-23.", source: RS/2022-06-10_sohn-2022-collison-conversation.md}]
+    held_until: 2022-06-10
+    held_until_note: "Held as history, not as a forecast, from its first statement."
+    weight_history: [{from: 2022, weight: "veto flag only"}]
+    dating: thin
+  statement: "Historically, US inflation above 5% only declined after the funds rate rose above the inflation rate."
+  hypothesis:
+    variables:
+      EP: "episodes with CPI_YOY > 5%; DECLINE = CPI_YOY falls by >= half of (peak - 2%) from peak"
+      COND: "FF > CPI_YOY in any month between peak-12m and the DECLINE date"
+    thresholds: [{param: inflation threshold, basis: stated, default: 5%, sensitivity: [4.5%, 6%]}, {param: decline definition, basis: interpreted, default: "half the excess over 2%", sensitivity: ["below 4%", "below 3%"]}]
+    H1: "Every EP with a DECLINE has COND = true."
+  test: {event: EP list, sample: "1954 -> 2026 (FF); 1914 -> with stand-in", frequency: M, outcome: "counterexample count", holds_if: "zero counterexamples 1954-2021", fails_if: ">= 1 counterexample 1954-2021"}
+  oos: {split: 2022-06-10, in_sample: "1954 -> 2021", out_of_sample: "2022-2023 disinflation (he predicted a counterexample)"}
+  data: {available: [CPIAUCSL, CPIAUCNS, FEDFUNDS, DFF], missing: ["pre-1954 policy rate NEW (1946-1951 peg and 1920s-40s episodes otherwise excluded)"]}
+  caveats: ["Headline CPI includes energy shocks (1990 Gulf episode near 6%).", "The 2022 'break' depends on decline definition: FF exceeded headline CPI ~2023-05."]
+
+- id: C-16
+  title: Inflation above 5% has never been tamed without a recession
+  topic: inflation
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-09]
+  quotes:
+  - {text: "Once inflation >5%, never tamed without a recession - he expects this rule to hold.", source: RS/2022-06-10_sohn-2022-collison-conversation.md, date: 2022-06-10, reliability: S, note: "Summary wording; fan transcript note DS/2022-06-XX gives the same content as a summary, no verbatim sentence."}
+  first_public_statement: {date: 2022-06-10, source: DS/2022-06-XX_sohn-2022-john-collison.md}
+  timeline:
+    held_from: {date: 2022-06-10, basis: stated, evidence: "Sohn 2022.", source: DS/2022-06-XX_sohn-2022-john-collison.md}
+    changes:
+    - {date: 2023-06-07, change: "Hard landing still central case.", source: DS/2023-06-07_bloomberg-invest-sonali-basak.md}
+    - {date: 2024-11-06, change: "Concedes being wrong on the economy.", source: RS/2024-11-06_nbim-in-good-company-podcast.md}
+    held_until: null
+    weight_history: [{from: 2022, weight: core}, {from: 2024, weight: unknown}]
+    dating: thin
+  statement: "Every US episode in which inflation exceeded 5% and was brought back down involved a recession."
+  hypothesis:
+    variables:
+      EP: "CPI_YOY > 5% episodes with a DECLINE (C-15 definition)"
+      REC: "RECESSION month between peak-12m and DECLINE+12m"
+    thresholds: [{param: threshold, basis: stated, default: 5%, sensitivity: [4.5%, 6%]}, {param: window, basis: interpreted, default: "peak-12m to decline+12m", sensitivity: ["peak to decline+24m"]}]
+    H1: "Every EP with DECLINE contains REC."
+  test: {event: EP list, sample: "1914 -> 2026", frequency: M, outcome: "counterexample count", holds_if: "zero counterexamples to 2021", fails_if: ">= 1"}
+  oos: {split: 2022-06-10, in_sample: "1914 -> 2021", out_of_sample: "2022-2024 disinflation (no NBER recession dated as of 2026-09)"}
+  data: {available: [CPIAUCNS (1913), CPIAUCSL, USREC, NBER_CYCLES], missing: []}
+  caveats: ["Postwar episodes (1946-48, 1951) are supply/demobilization driven.", "Base rate: recessions occur every ~6y, so long windows inflate hit rate - report window sensitivity."]
+
+- id: C-17
+  title: Once inflation is lit it rotates into wages
+  topic: inflation
+  testability: testable
+  importance: 2
+  reliability: NP
+  rules: []
+  quotes:
+  - {text: "You don't cure inflation with an inflationary act.", source: DS/2022-09-28_delivering-alpha-kernen-transcript.md, date: 2022-09-28, reliability: NP, note: "Wage-rotation point (UK unions, 24% railroad contract) is in the note summary, not verbatim."}
+  first_public_statement: {date: 2022-09-28, source: DS/2022-09-28_delivering-alpha-kernen-transcript.md}
+  timeline: {held_from: {date: 2022-09-28, basis: stated, evidence: "DA 2022, 1970s analogy.", source: DS/2022-09-28_delivering-alpha-kernen-transcript.md}, changes: [], held_until: null, weight_history: [{from: 2022, weight: active}], dating: thin}
+  statement: "After CPI inflation exceeds ~5%, wage growth accelerates with a lag and stays elevated after CPI peaks."
+  hypothesis:
+    variables: {W: "yoy(AHETPI) (NEW, 1964 ->)", EP: "CPI_YOY crossing above 5%"}
+    thresholds: [{param: threshold, basis: interpreted, default: 5%, sensitivity: [4%, 6%]}]
+    H1: "Within 18m of EP, W rises >= 1pp and W peak lags CPI peak by > 0 months."
+  test: {event: EP crossings, sample: "1964 -> 2026", frequency: M, outcome: "lag of wage peak vs CPI peak; hit count", holds_if: "all episodes show positive lag and >= 1pp acceleration", fails_if: "majority show none"}
+  oos: {split: 2022-09-28, in_sample: "1964 -> 2022-08", out_of_sample: "2022-09 -> 2026"}
+  data: {available: [CPIAUCSL], missing: ["AHETPI / ECI NEW (FRED)"]}
+  caveats: ["n ~ 5 episodes; composition effects in 2020."]
+
+- id: C-18
+  title: Deflations follow asset bubbles, not the zero bound
+  topic: bubbles_fragility
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-11]
+  quotes:
+  - {text: "We have never had deflation that I can find that started because we were near the zero bound; we have deflation in every instance because there was an asset bubble.", source: DS/2019-06-07_cnbc-squawk-box-one-way-bet.md, date: 2019-06-07, reliability: NP}
+  - {text: "So, the fed keeps talking about deflation, but there is nothing more deflationary than creating a phony asset bubble, having a bunch of investors plow into it and then having it pop.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  first_public_statement: {date: 2015-01-18, source: RS/2015-01-18_lost-tree-club-speech.md}
+  timeline:
+    held_from: {date: 2005-06, basis: inferred, evidence: "Lost Tree: late 2003 expected inflation; by mid-2005 'figured out ... this is going to end in deflation'.", source: RS/2015-01-18_lost-tree-club-speech.md}
+    changes: [{date: 2022-06-10, change: "Restated: deflation has followed every asset bubble (S).", source: RS/2022-06-10_sohn-2022-collison-conversation.md}]
+    held_until: null
+    weight_history: [{from: 2005, weight: active}]
+    dating: adequate
+  statement: "Every deflation episode was preceded by an asset bubble; none began merely because rates were near zero."
+  hypothesis:
+    variables:
+      DEFL: "start of CPI yoy < 0 lasting >= 6 months (US CPIAUCNS 1914 ->; Shiller CPI 1871 ->; JST 17 countries 1870 -> annual)"
+      BUB: "real equity or house price > 1.5 sd above 10y log-trend, or >= 100% real rise over 5y, within 60m before DEFL"
+      ZLB: "short rate < 1% at DEFL start"
+    thresholds: [{param: bubble definition, basis: interpreted, default: "1.5 sd above trend", sensitivity: ["1.0 sd", "2.0 sd", "100% 5y rise"]}]
+    H1: "P(BUB | DEFL) > P(BUB) unconditional; no DEFL with ZLB and without BUB."
+  test: {event: DEFL starts, sample: "1871 -> 2026 (US); JST panel 1870 -> 2020", frequency: "M (US), A (JST)", outcome: "share with prior bubble vs base rate; counterexamples", holds_if: "share with BUB >= 80% and > base rate by 30pp", fails_if: "share near base rate"}
+  oos: {split: 2015-01-18, in_sample: "to 2014", out_of_sample: "2015 -> 2026 (euro area 2015, Japan episodes)"}
+  data: {available: [CPIAUCNS, SHILLER_SP], missing: ["Shiller CPI field and JST Macrohistory NEW (JST licence CC BY-NC-SA)", "House prices pre-1975 via JST only"]}
+  caveats: ["19th-century deflations under the gold standard are structural, not post-bubble.", "Bubble definition is the decisive choice; pre-register before running."]
+- id: C-19
+  title: Severe economic outcomes follow asset bubbles
+  topic: bubbles_fragility
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-11, R-61]
+  quotes:
+  - {text: "I have never seen... a really bad economic outcome... without an asset bubble.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md, date: 2026-01-30, reliability: NP}
+  - {text: "The worst economic outcomes tend to follow asset bubbles.", source: DS/2023-05-09_sohn-2023-kiril-sokoloff.md, date: 2023-05-09, reliability: S}
+  first_public_statement: {date: 2023-05-09, source: DS/2023-05-09_sohn-2023-kiril-sokoloff.md}
+  timeline: {held_from: {date: 2015-01-18, basis: inferred, evidence: "Lost Tree link of bubble pop to deflationary event.", source: RS/2015-01-18_lost-tree-club-speech.md}, changes: [], held_until: null, weight_history: [{from: 2015, weight: active}], dating: adequate}
+  statement: "Recessions that are deep (top-tercile output loss) are preceded by asset bubbles; mild recessions need not be."
+  hypothesis:
+    variables: {SEV: "recession with peak-to-trough decline in INDPRO (or real GDP, JST) in top tercile", BUB: "C-18 bubble definition within 36m before NBER peak"}
+    thresholds: [{param: severity tercile, basis: interpreted, default: top tercile, sensitivity: [top half, top quartile]}]
+    H1: "P(BUB | SEV) > P(BUB | non-severe recession); zero SEV without BUB."
+  test: {event: NBER recessions 1871 -> 2020 (US); JST panel, sample: "1871 -> 2026", frequency: "M/A", outcome: "2x2 table, Fisher test, counterexamples", holds_if: "P(BUB|SEV) - P(BUB|mild) > 30pp", fails_if: "<= 0"}
+  oos: {split: 2023-05-09, in_sample: "to 2023-04", out_of_sample: "recessions dated after 2023-05 (none as of 2026-09)"}
+  data: {available: [INDPRO (1919), SHILLER_SP, USREC, NBER_CYCLES], missing: ["JST NEW", "Shiller CPI NEW"]}
+  caveats: ["War/pandemic recessions (1945, 2020) need a pre-registered exclusion rule.", "Small n."]
+
+- id: C-20
+  title: A bubble becomes systemic only when excess enters the banking system
+  topic: bubbles_fragility
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-11]
+  quotes:
+  - {text: "While the Fed thought the crisis was containable, we thought no such thing because when the bad stuff gets into the banking system itself, it has huge, wider implications for the broader economy.", source: DS/2014-07-16_delivering-alpha-kernen.md, date: 2014-07-16, reliability: NP}
+  first_public_statement: {date: 2014-07-16, source: DS/2014-07-16_delivering-alpha-kernen.md}
+  timeline: {held_from: {date: 2005-06, basis: stated, evidence: "DA 2014 retrospective on 2005-06 double leverage via shadow banking.", source: DS/2014-07-16_delivering-alpha-kernen.md}, changes: [{date: 2023-06-07, change: "Regional-bank CRE exposure named as transmission channel.", source: DS/2023-06-07_bloomberg-invest-sonali-basak.md}], held_until: null, weight_history: [{from: 2005, weight: active}], dating: adequate}
+  statement: "Asset-price busts preceded by a bank-credit boom produce deeper recessions than busts without one."
+  hypothesis:
+    variables: {BUST: "real equity or house price fall >= 25% (JST/US)", BOOM: "bank credit/GDP gap > 2pp (BIS gap, or JST loans/GDP 5y change > 1 sd) at bust start", Y: "cumulative real GDP loss over 3y after bust"}
+    thresholds: [{param: credit gap, basis: interpreted, default: 2pp, sensitivity: [0pp, 4pp, 10pp]}]
+    H1: "E[Y | BUST and BOOM] worse than E[Y | BUST and not BOOM]."
+  test: {event: BUST episodes, sample: "JST 1870 -> 2020; US quarterly 1952 ->", frequency: "A/Q", outcome: "difference in mean output loss; local projections", holds_if: "difference > 2pp of GDP, p < 0.10", fails_if: "<= 0"}
+  oos: {split: 2014-07-16, in_sample: "to 2013", out_of_sample: "2014 -> 2026 (2020 bust, 2022 bust)"}
+  data: {available: [BCNSDODNS (1945), GDP], missing: ["BIS credit gap NEW", "JST NEW", "US bank credit TOTBKCR NEW (1973, id per data_practices)"]}
+  caveats: ["Literature (Jorda-Schularick-Taylor) already supports a version; risk of confirming a known result rather than his specific claim."]
+
+- id: C-21
+  title: Bear markets that follow asset bubbles last longer than six months
+  topic: bubbles_fragility
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-61]
+  quotes:
+  - {text: "Six months bear markets preceded by asset bubbles don't exist, historically.", source: DS/2022-06-XX_sohn-2022-john-collison.md, date: 2022-06, reliability: NP}
+  first_public_statement: {date: 2022-06-10, source: DS/2022-06-XX_sohn-2022-john-collison.md}
+  timeline: {held_from: {date: 2022-06-10, basis: stated, evidence: "Sohn 2022.", source: DS/2022-06-XX_sohn-2022-john-collison.md}, changes: [], held_until: null, weight_history: [{from: 2022, weight: active}], dating: thin, dating_note: "2000-02 experience implies earlier awareness; not dated."}
+  statement: "When a bear market follows a bubble, peak-to-trough lasts more than six months."
+  hypothesis:
+    variables: {BEAR: "EQ_US and NASDAQCOM declines >= 20%", BUB: "C-18 bubble definition on the same index within 24m before peak, or fragility_level high (R-11)", DUR: "months peak to trough"}
+    thresholds: [{param: duration, basis: stated, default: 6m, sensitivity: []}, {param: bubble definition, basis: interpreted, default: "1.5 sd above trend", sensitivity: ["1.0 sd", "2.0 sd"]}]
+    H1: "No BEAR with BUB has DUR <= 6m."
+  test: {event: BEAR list, sample: "1871 -> 2026 (monthly Shiller), 1926 -> (daily French), 1971 -> (NASDAQ)", frequency: D/M, outcome: "counterexample count; DUR distribution BUB vs non-BUB", holds_if: "zero counterexamples", fails_if: ">= 1 counterexample"}
+  oos: {split: 2022-06-10, in_sample: "to 2021", out_of_sample: "2022 bear (peak 2022-01, trough 2022-10: >6m) and later"}
+  data: {available: [SHILLER_SP, FF_MKT_RF_D, NASDAQCOM], missing: []}
+  caveats: ["1987 crash (~3m) and 2020 (~1m) are the decisive cases: was there a 'bubble'? Pre-register the bubble rule.", "Monthly averages (Shiller) shorten measured declines."]
+
+- id: C-22
+  title: 80%+ unprofitable IPOs occur only at bubble peaks
+  topic: bubbles_fragility
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-11]
+  quotes:
+  - {text: "If you look at IPOs, 80 percent of them are unprofitable when they come. The only other time we've been at 80 percent or higher was 1999.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  first_public_statement: {date: 2014-07-16, source: DS/2014-07-16_delivering-alpha-kernen.md, note: "'In 99, 83 percent ... Today that's 80 percent.'"}
+  timeline: {held_from: {date: 2014-07-16, basis: stated, evidence: "DA 2014.", source: DS/2014-07-16_delivering-alpha-kernen.md}, changes: [], held_until: null, weight_history: [{from: 2014, weight: "alert, non-gating"}], dating: adequate}
+  statement: "A share of unprofitable IPOs at or above 80% marks speculative excess that precedes a major decline."
+  hypothesis:
+    variables: {U: "RITTER_UNPROF_IPO annual share", DD: "max EQ_US / NASDAQCOM drawdown within 36m after year-end"}
+    thresholds: [{param: share threshold, basis: stated, default: 80%, sensitivity: [70%, 75%]}, {param: drawdown, basis: interpreted, default: 20%, sensitivity: [15%, 30%]}]
+    H1: "Years with U >= 80% (in-sample: only 1999/2000 per his claim) are followed by DD >= 20% within 36m more often than other years."
+  test: {event: "years with U >= threshold", sample: "1980 -> 2025", frequency: A, outcome: "list of qualifying years; conditional drawdown frequency", holds_if: "qualifying years limited to bubble years and followed by DD in all cases", fails_if: "qualifying years without later DD or high-U years not flagged"}
+  oos: {split: 2015-01-18, in_sample: "1980 -> 2014", out_of_sample: "2015 -> 2025 (check 2020-2021 shares; outcome not presumed)"}
+  data: {available: [RITTER_UNPROF_IPO (1980, annual, publication-lag rule), FF_MKT_RF_D, NASDAQCOM], missing: []}
+  caveats: ["Annual data, n ~ 45; 2014 signal lasted 'another two years' before a ~14% drawdown, not 20%.", "Ritter definition (negative EPS trailing 12m) and sample filters revised over time."]
+
+- id: C-23
+  title: Credit-excess indicators are alerts with a long lead, not timing signals
+  topic: bubbles_fragility
+  testability: partially_testable
+  importance: 3
+  reliability: NP
+  rules: [R-11, R-48]
+  quotes:
+  - {text: "Today 71 percent of the debt that's been issued in the last two years is B rated.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  - {text: "I think the risk of a credit bubble is extremely high.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md, date: 2015-04-15, reliability: NP}
+  first_public_statement: {date: 2014-07-16, source: DS/2014-07-16_delivering-alpha-kernen.md}
+  timeline:
+    held_from: {date: 1988-03, basis: inferred, evidence: "Barron's 1988 'buyout craze' segment (teaser only).", source: DS/1988-03-28_barrons-still-bearish.md}
+    changes: [{date: 2015-01-18, change: "Explicitly 'not timing': 'it lasted another two years'.", source: RS/2015-01-18_lost-tree-club-speech.md}]
+    held_until: null
+    weight_history: [{from: 2004, weight: "alert"}, {from: 2014, weight: "alert, non-gating"}]
+    dating: thin
+    dating_note: "1988 evidence is a headline only; first substantive dated use 2004-05."
+  statement: "High corporate leverage growth and low credit quality raise the probability of a credit-driven bust within roughly 1-3 years but do not time it."
+  hypothesis:
+    variables: {CG: "8q change in BCNSDODNS/GDP", HY: "SIFMA_HY_SHARE_A", OAS: "BAMLH0A0HYM2 (inverted)", EV: "HY default wave proxy: BAA-AAA widening >= 100bp or BEAR"}
+    thresholds: [{param: alert percentile, basis: interpreted, default: 80th expanding, sensitivity: [70th, 90th]}, {param: lead window, basis: stated, default: "12-36m", sensitivity: ["6-48m"]}]
+    H1: "P(EV within 12-36m | alert) > base rate, while P(EV within 0-6m | alert) is not above base rate."
+  test: {event: alert months, sample: "1952 -> 2026 (CG); 1996 -> (HY share, OAS)", frequency: Q, outcome: "hit rate by lead bucket", holds_if: "excess hit rate concentrated in 12-36m bucket", fails_if: "no excess at any lead or excess only at 0-6m"}
+  oos: {split: 2014-07-16, in_sample: "to 2014-06", out_of_sample: "2014-07 -> 2026"}
+  data: {available: [BCNSDODNS (1945), GDP, SIFMA_HY_SHARE_A (1996), BAMLH0A0HYM2 (1996; FRED keeps 3y from 2026-04 - capture), BAA, AAA], missing: ["B-rated issuance share and covenant-lite share: MISSING (no free history)"]}
+  caveats: ["His two strongest gauges (B share, cov-lite) cannot be tested.", "Long variable lead means any later event confirms; pre-registered window required."]
+
+- id: C-24
+  title: Zero or negative real rates swell corporate debt and suppress bankruptcies (zombies)
+  topic: bubbles_fragility
+  testability: partially_testable
+  importance: 3
+  reliability: NP
+  rules: [R-11, R-06]
+  quotes:
+  - {text: "If rates stay at zero, the debt is going to explode. When do you ever pull the trigger?", source: DS/2014-07-16_delivering-alpha-kernen.md, date: 2014-07-16, reliability: NP}
+  - {text: "If that rate is not up there somewhere around three or four, people are going to get crazy… Zombies are going to stay in business.", source: DS/2019-06-07_cnbc-squawk-box-one-way-bet.md, date: 2019-06-07, reliability: NP}
+  first_public_statement: {date: 2014-07-16, source: DS/2014-07-16_delivering-alpha-kernen.md}
+  timeline: {held_from: {date: 2014-07-16, basis: stated, evidence: "DA 2014; Lost Tree 2015 'the longer rates stay at zero ... the more egregious behavior'.", source: DS/2014-07-16_delivering-alpha-kernen.md}, changes: [{date: 2023-11-01, change: "Normalization restores a 'hurdle rate'.", source: DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md}], held_until: null, weight_history: [{from: 2014, weight: active}], dating: adequate}
+  statement: "The lower and longer real policy rates stay near or below zero, the faster nonfinancial corporate debt grows and the fewer business failures occur."
+  hypothesis:
+    variables: {RR: "FF - CPI_YOY (12m avg)", DG: "forward 8q growth of BCNSDODNS/GDP", BK: "business bankruptcy filings per 1,000 firms (MISSING)"}
+    thresholds: [{param: real rate state, basis: interpreted, default: "RR < 0", sensitivity: ["RR < 1%", "TG < -2pp"]}]
+    H1: "E[DG | RR < 0] > E[DG | RR >= 0]; bankruptcy rate lower when RR < 0 (if data obtained)."
+  test: {event: state, sample: "1955 -> 2026", frequency: Q, outcome: "conditional means, regression with cycle controls", holds_if: "DG higher by > 1pp of GDP per 8q, p < 0.10", fails_if: "<= 0"}
+  oos: {split: 2014-07-16, in_sample: "1955 -> 2014-06", out_of_sample: "2014-07 -> 2026"}
+  data: {available: [BCNSDODNS, GDP, FEDFUNDS, CPIAUCSL], missing: ["Business bankruptcy series: MISSING in catalogue (US Courts / ABI quarterly; free status unverified)"]}
+  caveats: ["Negative real rates concentrate in 1970s (inflation) and 2009-2021: era confound.", "Bankruptcy leg untestable until a free series is located."]
+
+- id: C-25
+  title: Heavy central-bank intervention suppresses market price signals
+  topic: bubbles_fragility
+  testability: partially_testable
+  importance: 2
+  reliability: S
+  rules: [R-17, R-30, R-51]
+  quotes:
+  - {text: "The market is not speaking right now.", source: DS/2021-06-10_email-to-cnbc-kernen-market-not-speaking.md, date: 2021-06-10, reliability: S}
+  - {text: "…until the Fed stops canceling market signals.", source: DS/2021-06-10_email-to-cnbc-kernen-market-not-speaking.md, date: 2021-06-10, reliability: S}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, note: "Foreign central-bank Treasury buying suppresses the bond-market signal."}
+  timeline: {held_from: {date: 2009-10-01, basis: stated, evidence: "Feig 2009.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}, changes: [{date: 2023-11-01, change: "QE2 removed the bond market's fiscal check.", source: DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md}], held_until: null, weight_history: [{from: 2009, weight: active}], dating: adequate}
+  statement: "During QE, asset prices react less to adverse macro news (inflation surprises, deficits) than outside QE."
+  hypothesis:
+    variables: {S: "CPI release surprise proxy: actual - prior-month value (consensus not free)", RX: "1-day DGS10 change and EQ_US return on CPI release days", QE: "C-05 flag"}
+    thresholds: [{param: surprise proxy, basis: interpreted, default: "actual - prior", sensitivity: ["actual - 12m trend"]}]
+    H1: "|beta(RX on S)| during QE < outside QE."
+  test: {event: CPI release days, sample: "1998 -> 2026", frequency: event, outcome: "interaction coefficient", holds_if: "QE-period sensitivity lower by > 30%, p < 0.10", fails_if: "no difference"}
+  oos: {split: 2021-06-10, in_sample: "to 2021-06", out_of_sample: "2021-06 -> 2026"}
+  data: {available: [CPIAUCSL (vintage), DGS10, FF_MKT_RF_D], missing: ["CPI release-date calendar (ALFRED release dates usable)", "consensus surprises MISSING"]}
+  caveats: ["Surprise proxy is weak; null result is uninformative."]
+
+- id: C-26
+  title: At the end of a capex buildout, supplier earnings collapse on a rate-of-change basis
+  topic: cycle_fundamentals
+  testability: partially_testable
+  importance: 2
+  reliability: NP
+  rules: [R-25]
+  quotes:
+  - {text: "The construction cycle is late enough that people need to start to be wary.", source: DS/2026-09-10_piper-sandler-closed-door-event.md, date: 2026-09-10, reliability: S}
+  first_public_statement: {date: 2021-05-11, source: DS/2021-05-11_hustle-mfm-trung-phan.md, note: "'railroad ties' account of 2000 infrastructure suppliers (summary)."}
+  timeline: {held_from: {date: 2000-03, basis: inferred, evidence: "Retrospective on 2000 suppliers.", source: DS/2021-05-11_hustle-mfm-trung-phan.md}, changes: [{date: 2026-09-10, change: "Applied to AI buildout; AI exposure cut to ~20%.", source: DS/2026-09-10_piper-sandler-closed-door-event.md}], held_until: null, weight_history: [{from: 2021, weight: active}], dating: thin}
+  statement: "When investment growth in a buildout category peaks and decelerates, the supplier industry underperforms over the next 12-24 months."
+  hypothesis:
+    variables: {INV: "yoy real private investment, information processing equipment + software (BEA NIPA 5.3.6; FRED id unverified, NEW)", RS: "FRENCH12_BusEq minus market, forward 12m"}
+    thresholds: [{param: deceleration, basis: interpreted, default: "INV yoy falls >= 5pp from 4q peak", sensitivity: ["3pp", "8pp"]}]
+    H1: "E[RS | deceleration] < 0 and < unconditional."
+  test: {event: deceleration onsets, sample: "1960 -> 2026", frequency: Q, outcome: "conditional relative return", holds_if: "negative and below unconditional in >= 2/3 of events", fails_if: "not"}
+  oos: {split: 2021-05-11, in_sample: "to 2021", out_of_sample: "2021 -> 2026"}
+  data: {available: [FRENCH12_BusEq (substitute)], missing: ["NIPA investment series NEW"]}
+  caveats: ["n small; BusEq is broader than 'suppliers'."]
+- id: C-27
+  title: Stocks lead the fundamentals by 6-12 months
+  topic: internals_breadth
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-15]
+  quotes:
+  - {text: "Stocks tend to lead the fundamentals by somewhere between 6 and 12 months.", source: DS/2022-06-XX_sohn-2022-john-collison.md, date: 2022-06, reliability: NP}
+  - {text: "the best economic indicators are inside the stock market", source: DS/2019-06-03_econclub-ny-bessent.md, date: 2019-06-03, reliability: S}
+  first_public_statement: {date: 2015-04-15, source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md, note: "'6 to 12 months down the road'; verbatim general form 2022."}
+  timeline: {held_from: {date: 1977, basis: inferred, evidence: "Drelles 'visualize 18 months'; Real Vision 2018: used internal market groups to predict the economy over his career.", source: RS/2018-09-06_sokoloff-real-vision-interview.md}, changes: [], held_until: null, weight_history: [{from: 1977, weight: core}], dating: adequate}
+  statement: "US equity prices turn 6-12 months before industrial production and earnings."
+  hypothesis:
+    variables: {R: "yoy EQ_US price", F1: "yoy INDPRO (revised; outcome side)", F2: "yoy Shiller earnings", TP: "turning points (Bry-Boschan) of EQ_US vs NBER peaks/troughs"}
+    thresholds: [{param: lead range, basis: stated, default: "6-12m", sensitivity: ["3-15m"]}]
+    H1: "Lag maximizing corr(R_t, F_t+k) lies in 6-12m; median lead of equity troughs before NBER troughs in 6-12m."
+  test: {event: "cross-correlation; turning points", sample: "1919 -> 2026 (INDPRO); 1871 -> (Shiller E)", frequency: M, outcome: "peak-correlation lag with bootstrap CI; lead distribution", holds_if: "CI of peak lag overlaps 6-12m and median turning-point lead in range", fails_if: "peak lag < 3m or > 15m"}
+  oos: {split: 2015-04-15, in_sample: "to 2015-03", out_of_sample: "2015-04 -> 2026"}
+  data: {available: [INDPRO, FF_MKT_RF_D, SHILLER_SP, NBER_CYCLES], missing: ["Shiller earnings field NEW"]}
+  caveats: ["Peaks lead more variably than troughs.", "False signals (1987, 1966) are part of the record; report false-positive rate."]
+
+- id: C-28
+  title: Price reflects the situation about 18 months ahead (never invest in the present)
+  topic: internals_breadth
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-20, R-21]
+  quotes:
+  - {text: "He taught me that you have to visualize the situation 18 months from now, and whatever that is, that's where the price will be, not where it is today.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  - {text: "Always try and envision the situation as you see it in 18 to 24 months, and then see if you feel things will be differently than they are now.", source: RS/2024-11-06_nbim-in-good-company-podcast.md, date: 2024-11-06, reliability: NP}
+  first_public_statement: {date: 2015-01-18, source: RS/2015-01-18_lost-tree-club-speech.md}
+  timeline:
+    held_from: {date: 1977, basis: stated, evidence: "Drelles lesson.", source: RS/2015-01-18_lost-tree-club-speech.md}
+    changes:
+    - {date: 2015-04-15, change: "'6 to 12 months down the road'.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}
+    - {date: 2022-06-10, change: "12-18 months (S summary).", source: RS/2022-06-10_sohn-2022-collison-conversation.md}
+    - {date: 2023-04-24, change: "'higher in a year or two'.", source: DS/2023-04-24_nbim-annual-investment-conference.md}
+    - {date: 2024-11-06, change: "18-24 months; 2-4 year trends.", source: RS/2024-11-06_nbim-in-good-company-podcast.md}
+    - {date: 2026-01-30, change: "18 months to 3 years.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}
+    held_until: null
+    weight_history: [{from: 1977, weight: core, note: "horizon 18m"}, {from: 2024, weight: core, note: "horizon 18-36m"}]
+    dating: adequate
+  statement: "Current prices correlate more with fundamentals ~18 months ahead than with current fundamentals."
+  hypothesis:
+    variables: {P: "log real EQ_US detrended", E: "log real Shiller earnings detrended (and INDPRO)", k: "lead in months 0..36"}
+    thresholds: [{param: lead, basis: stated, default: 18m, sensitivity: [6m, 12m, 24m, 36m]}]
+    H1: "corr(P_t, E_t+18) > corr(P_t, E_t); argmax_k within 12-24m."
+  test: {event: none, sample: "1871 -> 2026", frequency: M, outcome: "lead profile of correlations with CI", holds_if: "corr at 18m exceeds corr at 0m, CI-separated", fails_if: "contemporaneous corr highest"}
+  oos: {split: 2015-01-18, in_sample: "to 2014", out_of_sample: "2015 -> 2026"}
+  data: {available: [SHILLER_SP, INDPRO], missing: ["Shiller earnings/CPI fields NEW"]}
+  caveats: ["Overlaps C-27 (6-12m); the horizon shift over time is the point of the timeline.", "Shiller earnings interpolated monthly."]
+
+- id: C-29
+  title: Leading industries turn before the economy; defensives over cyclicals signals late cycle
+  topic: internals_breadth
+  testability: partially_testable
+  importance: 4
+  reliability: NP
+  rules: [R-16, R-15]
+  quotes:
+  - {text: "They're predicting we're in a very, very late cycle", source: DS/2018-11-21_wsj-interview-risky-to-be-tightening.md, date: 2018-11-21, reliability: S}
+  - {text: "Stocks tend to lead the fundamentals by somewhere between 6 and 12 months.", source: DS/2022-06-XX_sohn-2022-john-collison.md, date: 2022-06, reliability: NP}
+  first_public_statement: {date: 2018-09-06, source: RS/2018-09-06_sokoloff-real-vision-interview.md, note: "Career-long use of internal groups; specific industries named 2018-11 to 2023-05."}
+  timeline:
+    held_from: {date: 1983, basis: inferred, evidence: "Real Vision 2018: price/relative-strength signals used for 35 years.", source: RS/2018-09-06_sokoloff-real-vision-interview.md}
+    changes:
+    - {date: 2018-09-06, change: "Algos cancelled relative-strength signals (pharma example).", source: RS/2018-09-06_sokoloff-real-vision-interview.md}
+    - {date: 2023-05-09, change: "Trucking lead 6-8 months (S).", source: DS/2023-05-09_sohn-2023-kiril-sokoloff.md}
+    - {date: 2026-01-30, change: "Internals and company mosaics remain main macro inputs.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}
+    held_until: null
+    weight_history: [{from: 1983, weight: core}, {from: 2018, weight: active, note: "signal quality questioned"}]
+    dating: thin
+  statement: "Relative weakness in homebuilders, transports, retail, banks, metals and small caps (and defensives outperforming cyclicals) precedes economic downturns by 6-12 months."
+  hypothesis:
+    variables: {LRS: "median 6m relative return of leading set (process.md R-16 mapping) vs market", DEF: "6m return (Utils+NoDur+Hlth) minus (Durbl+Manuf+Money+Shops)", REC: "NBER peak within 12m"}
+    thresholds: [{param: weakness, basis: interpreted, default: "LRS < -10% (6m)", sensitivity: ["-5%", "-15%"]}, {param: lead window, basis: stated, default: "6-12m", sensitivity: ["3-18m"]}]
+    H1: "P(REC peak within 6-12m | LRS signal) > base rate; false-alarm rate reported."
+  test: {event: signal onsets, sample: "1926 -> 2026 (French 12 substitute)", frequency: M, outcome: "hit and false-alarm rates; lead distribution", holds_if: "hit rate exceeds base by > 25pp", fails_if: "no excess"}
+  oos: {split: 2018-11-21, in_sample: "to 2018-10", out_of_sample: "2018-11 -> 2026 (2018-19 and 2022-23 signals without recession are OOS evidence)"}
+  data: {available: [FRENCH12_* (substitute grade), ETF_XHB/IYT/XRT/KBE/XME/IWM (2021-09 ->)], missing: ["FRENCH49 MISSING (homebuilding, trucking, retail, steel not separable in French 12)"]}
+  caveats: ["French 12 mapping is coarse; claim partially testable until French 49 loads.", "Signals 2019 and 2022-23 fired with no recession."]
+
+- id: C-30
+  title: Momentum bottoms 12-18 months before fundamentals
+  topic: internals_breadth
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-18]
+  quotes:
+  - {text: "The momentum tools bottom 12-18 months before fundamentals.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, date: 2009-Q4, reliability: NP, note: "Note summary wording, not a verbatim sentence."}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+  timeline: {held_from: {date: 2009-10-01, basis: stated, evidence: "Feig 2009 (272 charts, second-derivative RoC).", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}, changes: [{date: 2023-04-24, change: "RoC charts used for idea generation and as bias check.", source: DS/2023-04-24_nbim-annual-investment-conference.md}], held_until: null, weight_history: [{from: 2009, weight: active}], dating: thin}
+  statement: "Second-derivative price momentum troughs 12-18 months before earnings/activity trough."
+  hypothesis:
+    variables: {MB: "month where 6m change of 12m ROC of EQ_US turns positive while 12m ROC < 0 (R-18)", FT: "trough of yoy Shiller earnings / INDPRO"}
+    thresholds: [{param: lead, basis: stated, default: "12-18m", sensitivity: ["6-24m"]}, {param: ROC windows, basis: interpreted, default: "12m / 6m", sensitivity: ["6m/3m", "24m/6m"]}]
+    H1: "Median lead MB -> FT within 12-18m; distinct from C-27's 6-12m."
+  test: {event: fundamental troughs, sample: "1871 -> 2026", frequency: M, outcome: "lead distribution; spurious-MB rate", holds_if: "median lead in 12-18m with IQR overlapping", fails_if: "median lead < 6m"}
+  oos: {split: 2009-10-01, in_sample: "to 2009-09", out_of_sample: "2009-10 -> 2026"}
+  data: {available: [SHILLER_SP, INDPRO, FF_MKT_RF_D], missing: ["Shiller earnings NEW"]}
+  caveats: ["Many MB events without a fundamental trough; matching rule must be pre-registered (nearest subsequent trough within 36m)."]
+
+- id: C-31
+  title: A stock-market explosion on record breadth and volume signals exit from recession within 6-12 months
+  topic: internals_breadth
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-60]
+  quotes:
+  - {text: "Whenever I've seen a stock market explode on record volume and record breadth… 6 to 12 months down the road, you're out of recession.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md, date: 2015-04-15, reliability: NP}
+  first_public_statement: {date: 2015-04-15, source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}
+  timeline: {held_from: {date: 2015-04-15, basis: stated, evidence: "'Whenever I've seen' implies career-long observation; undated.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}, changes: [{date: 2015-04-15, change: "Applied to China; confidence cut to ~70%; failed.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}, {date: 2020-06-08, change: "Breadth thrust reversed his bearish call.", source: DS/2020-06-08_cnbc-squawk-box-humbled-underestimated-fed.md}], held_until: null, weight_history: [{from: 2015, weight: active}, {from: 2020, weight: core, note: "overrides net-liquidity read"}], dating: thin}
+  statement: "Breadth thrusts during weak activity are followed within 6-12 months by economic recovery (no recession or recession ended)."
+  hypothesis:
+    variables: {BT: "Zweig thrust: 10d EMA of adv/(adv+dec) from < 0.40 to > 0.615 within 10 days (ZWEIG_EMA10)", UPV: "sensitivity: 10d up-volume share > 0.77", OUT: "USREC = 0 at t+12m, and if USREC = 1 at t, recession ends within 12m"}
+    thresholds: [{param: thrust definition, basis: interpreted, default: Zweig 0.40/0.615, sensitivity: ["up-volume 90% days", "pct-above-50dma thrust"]}, {param: horizon, basis: stated, default: "6-12m", sensitivity: []}]
+    H1: "P(OUT | BT) > P(OUT) base rate; forward 12m EQ_US return after BT > unconditional."
+  test: {event: BT dates, sample: "1965-03 -> 2020-02 (NYSE); 2021-09 -> (S&P members); gap fallback flagged", frequency: D, outcome: "hit rate; conditional returns", holds_if: "OUT in >= 90% of BT and returns above unconditional", fails_if: "OUT rate <= base rate"}
+  oos: {split: 2015-04-15, in_sample: "1965 -> 2015-03", out_of_sample: "2015-04 -> 2026 (US only; China 2015 out of scope by rule)"}
+  data: {available: [NYSE_ADV, NYSE_DEC, NYSE_UPVOL, NYSE_DNVOL (1965-03 -> 2020-02-10), ZWEIG_EMA10, SPX_PCT_ADV (2021-09), USREC], missing: ["2020-02-11 -> 2021-09-21 breadth gap (French industry fallback)"]}
+  caveats: ["Base rate of 'no recession in 12m' is ~85%: test must use the conditional-on-weakness subset (thrust while INDPRO yoy < 0) for power.", "'Record' volume/breadth not operationalized by him."]
+
+- id: C-32
+  title: No bear market starts without leadership narrowing
+  topic: internals_breadth
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-59]
+  quotes:
+  - {text: "We've never had a bear market start without the leadership narrowing... it's a yellow light, it's not a red light.", source: RS/2024-11-06_nbim-in-good-company-podcast.md, date: 2024-11-06, reliability: NP}
+  first_public_statement: {date: 2024-11-06, source: RS/2024-11-06_nbim-in-good-company-podcast.md}
+  timeline: {held_from: {date: 2000-01, basis: inferred, evidence: "1999-2000 breadth divergence (13 new highs vs 242 new lows) cited in secondary accounts.", source: DS/2000-04-28_soros-quantum-exit-overplayed-hand.md}, changes: [], held_until: null, weight_history: [{from: 2024, weight: "necessary condition, non-gating"}], dating: thin}
+  statement: "Every bear market is preceded by narrowing participation while the index is near highs; narrowing alone does not imply a bear market."
+  hypothesis:
+    variables: {NAR: "share of industries above 40w trend falls >= 20pts over 6m while EQ_US within 5% of high (R-59 params)", BEAR: "EQ_US >= 20% decline"}
+    thresholds: [{param: narrowing drop, basis: interpreted, default: 20pts, sensitivity: [10pts, 30pts]}, {param: lookback before peak, basis: interpreted, default: 12m, sensitivity: [6m, 18m]}]
+    H1: "Zero BEAR peaks without NAR in prior 12m (necessity); P(BEAR within 12m | NAR) reported (non-sufficiency expected)."
+  test: {event: BEAR peaks, sample: "1926 -> 2026 (French daily industries; French 12 substitute, French 49 preferred)", frequency: W, outcome: "counterexample count; false-positive rate", holds_if: "zero counterexamples", fails_if: ">= 1 counterexample"}
+  oos: {split: 2024-11-06, in_sample: "to 2024-10", out_of_sample: "2024-11 -> (2025 ~19% decline is below threshold; record only)"}
+  data: {available: [FRENCH12_* (substitute), ETF_RSP, ETF_SPY (2021-09)], missing: ["FRENCH49 MISSING (12 industries too coarse for breadth)", "NYSE new highs/lows MISSING"]}
+  caveats: ["Fast crashes (1987, 2020) are the decisive cases.", "With 12 industries the narrowing measure is noisy."]
+
+- id: C-33
+  title: Rising stock prices transmit to confidence and the economy
+  topic: internals_breadth
+  testability: testable
+  importance: 2
+  reliability: NP
+  rules: []
+  quotes:
+  - {text: "It evaporates… You know what happens when stock prices go up? Wealth goes up. Confidence goes up.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md, date: 2015-04-15, reliability: NP}
+  first_public_statement: {date: 2015-04-15, source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}
+  timeline: {held_from: {date: 2015-04-15, basis: stated, evidence: "Bloomberg 2015.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}, changes: [], held_until: null, weight_history: [{from: 2015, weight: active}], dating: thin}
+  statement: "Equity returns Granger-cause consumer confidence and consumption growth."
+  hypothesis:
+    variables: {R6: "6m EQ_US return", C: "UMCSENT (NEW, 1952 ->)", PCE: "real PCE growth (NEW)"}
+    thresholds: [{param: lag, basis: interpreted, default: "1-6m", sensitivity: ["1-12m"]}]
+    H1: "R6 Granger-causes C and PCE; reverse causality weaker."
+  test: {event: none, sample: "1960 -> 2026", frequency: M, outcome: "Granger F-tests", holds_if: "p < 0.05 forward, forward effect larger than reverse", fails_if: "no causality"}
+  oos: {split: 2015-04-15, in_sample: "to 2015-03", out_of_sample: "2015-04 -> 2026"}
+  data: {available: [FF_MKT_RF_D], missing: ["UMCSENT, PCEC96 NEW (FRED)"]}
+  caveats: ["Granger causality is not causation; known literature result."]
+
+- id: C-34
+  title: Market internals forecast election outcomes
+  topic: political
+  testability: partially_testable
+  importance: 1
+  reliability: NP
+  rules: [R-22]
+  quotes:
+  - {text: "the inside of the market (banks, crypto, DJT, deregulation beneficiaries) signalled a Trump win", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md, date: 2024-10-16, reliability: NP, note: "Note summary wording; 1980 Reagan cited as precedent."}
+  first_public_statement: {date: 2024-10-16, source: DS/2024-10-16_bloomberg-tv-sonali-basak.md}
+  timeline: {held_from: {date: 1980-11, basis: inferred, evidence: "1980 cited as precedent.", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md}, changes: [], held_until: null, weight_history: [{from: 2024, weight: minor}], dating: thin}
+  statement: "Relative performance of policy-sensitive sectors in the 3 months before a US presidential election predicts the winner."
+  hypothesis:
+    variables: {S: "3m pre-election relative return of party-sensitive sector basket (pre-registered map: Money, Enrgy vs Hlth, Utils)", W: "winning party"}
+    thresholds: [{param: basket, basis: interpreted, default: "French 12 Money+Enrgy vs Hlth", sensitivity: []}]
+    H1: "sign(S) predicts W with hit rate > 50%."
+  test: {event: elections 1928 -> 2024, sample: "25 elections", frequency: event, outcome: "hit rate, binomial test", holds_if: "hit rate >= 70%", fails_if: "<= 50%"}
+  oos: {split: 2024-10-16, in_sample: "1928-2020", out_of_sample: "2024 onward"}
+  data: {available: [FRENCH12_*], missing: ["Election results table (manual, public)"]}
+  caveats: ["n = 25; sector-party mapping varies by era - partially testable only."]
+- id: C-35
+  title: The 10-year yield trades around nominal GDP growth
+  topic: rates_bonds
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-56]
+  quotes:
+  - {text: "The golden rule I've always had is the ten year's to trade around where nominal GDP is, which is five and a half percent.", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md, date: 2024-10-16, reliability: NP}
+  first_public_statement: {date: 2023-10-24, source: DS/2023-10-24_robin-hood-paul-tudor-jones.md, note: "10y fair value 4.5-5% with 2% inflation (S). Verbatim rule 2024-10-16."}
+  timeline: {held_from: {date: unknown, basis: stated, evidence: "'I've always had' - undated career-long claim.", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md}, changes: [{date: 2026-08-24, change: "10y 'at or below nominal GDP growth' used as evidence yields too low.", source: DS/2026-08-24_wsj-oped-let-the-bond-market-speak.md}], held_until: null, weight_history: [{from: 2023, weight: active}], dating: thin, dating_note: "No dated use before 2023."}
+  statement: "The 10-year Treasury yield mean-reverts toward trailing nominal GDP growth; a large negative gap predicts rising yields."
+  hypothesis:
+    variables: {GAP: "DGS10 (GS10 pre-1962) - yoy(GDP vintage)", GAP5: "sensitivity: 5y average nominal GDP growth", dY: "forward 12m change in DGS10"}
+    thresholds: [{param: anchor gap, basis: interpreted, default: "-1.5pp", sensitivity: ["-1pp", "-2.5pp"]}]
+    H1: "Full-sample mean GAP not different from 0 (+/-1pp); E[dY | GAP < -1.5pp] > 0 and corr(GAP, dY) < 0."
+  test: {event: state, sample: "1953 -> 2026", frequency: Q, outcome: "mean gap; predictive regression of dY on GAP", holds_if: "|mean GAP| <= 1pp and slope < 0, p < 0.10", fails_if: "persistent gap or slope >= 0"}
+  oos: {split: 2023-10-24, in_sample: "1953 -> 2023-09", out_of_sample: "2023-10 -> 2026"}
+  data: {available: [DGS10 (1962), GS10 (1953), GDP (vintage)], missing: []}
+  caveats: ["1980s gap persistently positive, 2009-2021 negative: regime-dependent.", "Quarterly GDP noise; use 4q yoy."]
+
+- id: C-36
+  title: Deficits and Treasury supply drive long yields (lifelong rule reversed in 2023)
+  topic: rates_bonds
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-63]
+  quotes:
+  - {text: "I made a lot of money this year betting on bonds going down because of the debt and had nothing do with the economy.", source: DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md, date: 2023-11-01, reliability: NP}
+  - {text: "In contrast, now with the economy in decline, the deficit ballooning, and the administration and the Fed in a state of panic, the public should be wary about the risk in holding long-term bonds.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, date: 1991-12, reliability: P}
+  first_public_statement: {date: 2023-10-24, source: DS/2023-10-24_robin-hood-paul-tudor-jones.md, note: "Threw out his lifelong rule of never letting deficit concerns drive trading (S)."}
+  timeline:
+    held_from: {date: 2023-01, basis: stated, evidence: "2023 bond short 'because of the debt'.", source: DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md}
+    changes:
+    - {date: 1991-12, change: "Counter-evidence to the 'lifelong rule': deficit cited as long-bond risk in 1991.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}
+    - {date: 2023-10-24, change: "Prior rule (deficits do not drive trading) abandoned.", source: DS/2023-10-24_robin-hood-paul-tudor-jones.md}
+    held_until: null
+    weight_history: [{from: 1981, weight: "excluded from trading (stated rule)"}, {from: 2023, weight: active}]
+    dating: adequate
+  statement: "Higher deficits and net Treasury supply raise the term premium on long bonds; the effect became tradeable only recently (his era split)."
+  hypothesis:
+    variables: {TP: "ACM 10y term premium (NEW, NY Fed, 1961 ->)", DEF: "deficit/GDP (FYFSGDA188S MISSING; Treasury MTS NEW)", ISS: "12m net marketable issuance / GDP (TFD_NET_MARKETABLE_M, 2001 ->)"}
+    thresholds: [{param: deficit level, basis: interpreted, default: "> 3% of GDP at UNRATE < NROU", sensitivity: ["> 4%", "> 5%"]}]
+    H1: "beta(TP on DEF, ISS) > 0 controlling for inflation and FF; H1-era: beta larger post-2008 than 1961-2007 (would explain the rule reversal)."
+  test: {event: none, sample: "1961 -> 2026", frequency: Q, outcome: "regression coefficients by era; Chow test at 2008 and 2023", holds_if: "positive, significant beta in full sample", fails_if: "beta <= 0"}
+  oos: {split: 2023-10-24, in_sample: "1961 -> 2023-09", out_of_sample: "2023-10 -> 2026"}
+  data: {available: [TFD_NET_MARKETABLE_M (2001), FYGFDPUN (1970), GDP, UNRATE, NROU, DGS10], missing: ["ACM term premium NEW", "FYFSGDA188S MISSING (catalogue)"]}
+  caveats: ["Term-premium models are estimates.", "Deficits countercyclical - control for cycle."]
+
+- id: C-37
+  title: The bond market was historically prescient; QE corrupted it; the curve is an over-rated trade
+  topic: rates_bonds
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-17]
+  quotes:
+  - {text: "Bond market used to be prescient but central-bank buying has suppressed the signal for 10-11 years.", source: RS/2022-06-10_sohn-2022-collison-conversation.md, date: 2022-06-10, reliability: S, note: "summary wording"}
+  - {text: "The yield curve as a trade is over-rated.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md, date: 2026-01-30, reliability: NP, note: "note paraphrase ('over-rated')"}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, note: "Foreign CB buying suppresses the bond signal."}
+  timeline:
+    held_from: {date: 1989-Q4, basis: stated, evidence: "JGBs plummeting while Nikkei made highs (bond signal used).", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}
+    changes:
+    - {date: 2022-06-10, change: "Signal impaired ~2011-2022 by QE.", source: DS/2022-06-XX_sohn-2022-john-collison.md}
+    - {date: 2023-05-09, change: "Inverted 3m/10y cited as recession sign (S).", source: DS/2023-05-09_sohn-2023-kiril-sokoloff.md}
+    - {date: 2026-01-30, change: "Curve as a trade over-rated.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}
+    held_until: null
+    weight_history: [{from: 1989, weight: active}, {from: 2009, weight: reduced}]
+    dating: adequate
+  statement: "Curve inversion predicted recessions well before QE and poorly after; curve trades themselves do not pay reliably."
+  hypothesis:
+    variables: {INV: "DGS10 - DGS3MO < 0 (GS10 - TB3MS pre-1981) for >= 1 month", REC: "NBER peak within 6-24m", QEERA: "2009-01 -> 2022-03", STEEP: "return of 2s10s steepener (duration-neutral) 12m after inversion"}
+    thresholds: [{param: lead window, basis: interpreted, default: "6-24m", sensitivity: ["3-18m", "6-30m"]}]
+    H1a: "Pre-2009 inversion hit rate high (>= 80%); post-2009 hit rate lower."
+    H1b: "STEEP returns after inversion not significantly > 0."
+  test: {event: inversion onsets, sample: "1934 -> 2026", frequency: M, outcome: "hit rates by era; steepener return distribution", holds_if: "H1a and H1b both hold", fails_if: "post-2009 hit rate >= pre-2009"}
+  oos: {split: 2022-06-10, in_sample: "to 2022-05", out_of_sample: "2022-07 inversion episode (no recession as of 2026-09)"}
+  data: {available: [DGS10, DGS3MO (1981), GS10 (1953), TB3MS (1934), DGS2 (1976), USREC], missing: []}
+  caveats: ["n ~ 9 inversions; post-2009 only 2019 and 2022."]
+
+- id: C-38
+  title: Bonds falling while equities make highs is a warning
+  topic: rates_bonds
+  testability: testable
+  importance: 2
+  reliability: P
+  rules: [R-17, R-12]
+  quotes:
+  - {text: "Finally, and most important—three times as important as everything I just said—the Bank of Japan had started to dramatically tighten monetary policy.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, date: 1991-12, reliability: P, note: "Context: JGBs plummeting while the Nikkei made highs (summary)."}
+  first_public_statement: {date: 1991-12, source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}
+  timeline: {held_from: {date: 1989-Q4, basis: stated, evidence: "Nikkei short.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}, changes: [], held_until: null, weight_history: [{from: 1989, weight: active}], dating: thin}
+  statement: "A sharp rise in long yields while the equity index is at a 12-month high precedes below-normal equity returns."
+  hypothesis:
+    variables: {DIV: "6m rise in 10y yield >= 100bp while equity index within 2% of 12m high", R: "forward 12m equity return"}
+    thresholds: [{param: yield rise, basis: interpreted, default: 100bp, sensitivity: [75bp, 150bp]}]
+    H1: "E[R | DIV] < unconditional; pooled US, JP, DE, GB."
+  test: {event: DIV onsets, sample: "1960 -> 2026", frequency: M, outcome: "conditional returns pooled", holds_if: "below unconditional by > 5pp, p < 0.10", fails_if: "not"}
+  oos: {split: 1991-12-31, in_sample: "to 1991", out_of_sample: "1992 -> 2026"}
+  data: {available: [IRLTLT01USM156N, IRLTLT01JPM156N (1989), IRLTLT01DEM156N, IRLTLT01GBM156N, FF_MKT_RF_D], missing: ["Foreign equity indices NEW"]}
+  caveats: ["Japan yields only from 1989 in catalogue - his originating case sits at the series start."]
+
+- id: C-39
+  title: Fed tightening with a falling dollar implies further tightening
+  topic: rates_bonds
+  testability: testable
+  importance: 1
+  reliability: P
+  rules: [R-14]
+  quotes:
+  - {text: "The Fed had been tightening since January 1987, and the dollar was tanking, which suggested that the Fed was going to tighten some more.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, date: 1991-12, reliability: P}
+  first_public_statement: {date: 1991-12, source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}
+  timeline: {held_from: {date: 1987-06, basis: stated, evidence: "June 1987 read.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}, changes: [], held_until: null, weight_history: [{from: 1987, weight: minor}], dating: thin}
+  statement: "During a hiking phase, a falling dollar raises the probability of further hikes."
+  hypothesis:
+    variables: {H: "FF up >= 25bp over prior 6m", USD6: "6m change USD_BROAD", NEXT: "FF change next 6m"}
+    thresholds: [{param: dollar fall, basis: interpreted, default: "-5% (6m)", sensitivity: ["-3%", "-8%"]}]
+    H1: "E[NEXT | H and USD6 < -5%] > E[NEXT | H and USD6 >= 0]."
+  test: {event: state, sample: "1973 -> 2026", frequency: M, outcome: "conditional mean FF change", holds_if: "difference > 25bp", fails_if: "<= 0"}
+  oos: {split: 1991-12-31, in_sample: "1973-1991", out_of_sample: "1992-2026"}
+  data: {available: [FEDFUNDS, USD_BROAD (1973)], missing: []}
+  caveats: ["Few hiking phases with a falling dollar."]
+
+- id: C-40
+  title: Rates, oil and the dollar rising together precede falling earnings and stocks
+  topic: cross_asset
+  testability: testable
+  importance: 5
+  reliability: NP
+  rules: [R-10]
+  quotes:
+  - {text: "...the dollar is up, interest rates are up, and oil is up, three death knells for markets, if you look at history.", source: RS/2024-11-06_nbim-in-good-company-podcast.md, date: 2024-11-06, reliability: NP}
+  - {text: "...the price of oil is going up, the dollar is going way up, and interest rates were going up... I knew that, normally, this particular cocktail had always been negative for earnings...", source: RS/2018-09-06_sokoloff-real-vision-interview.md, date: 2018-09-06, reliability: NP}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, note: "2000 rationale (oil and rates spiking, Hyman -36% vs +18%). Verbatim rule 2018-09-06."}
+  timeline: {held_from: {date: 2000-09, basis: stated, evidence: "Sept 2000 Treasury trade; 'had always been negative' implies earlier.", source: RS/2024-11-06_nbim-in-good-company-podcast.md}, changes: [], held_until: null, weight_history: [{from: 2000, weight: core}], dating: adequate}
+  statement: "When long rates, oil and the trade-weighted dollar have all risen over the prior months, earnings growth and equity returns over the next year are below normal."
+  hypothesis:
+    variables: {TRIO: "dGS10 > 0 AND dWTI > 0 AND dUSD_BROAD > 0 over window (R-10)", TRIOm: "magnitude variant: each change > 0.5 sd", EPS: "forward 12m Shiller earnings growth", R: "forward 12m EQ_US return"}
+    thresholds: [{param: xasset.window_m, basis: interpreted, default: 6m, sensitivity: [3m, 12m]}, {param: magnitude, basis: interpreted, default: "direction only", sensitivity: ["0.5 sd", "1 sd"]}]
+    H1: "E[R | TRIO] < unconditional and E[EPS | TRIO] < unconditional."
+  test: {event: state and onsets, sample: "1973-01 -> 2026 (USD); 1953 -> with dollar omitted as sensitivity", frequency: M, outcome: "conditional means; hit rate of negative 12m EPS growth", holds_if: "both conditional means below unconditional, R by > 5pp, p < 0.10", fails_if: "R conditional >= unconditional"}
+  oos: {split: 2009-10-01, in_sample: "1973 -> 2009-09", out_of_sample: "2009-10 -> 2026 (verbatim-wording split 2018-09-06 as sensitivity)"}
+  data: {available: [GS10, DGS10, WTISPLC (1946), DCOILWTICO (1986), USD_BROAD (1973), FF_MKT_RF_D], missing: ["Shiller earnings NEW"]}
+  caveats: ["Trio occurs in late-cycle booms - overlaps with tightening (C-04).", "Hyman regression figures differ across tellings (-25%, -35%, -36%)."]
+
+- id: C-41
+  title: Bonds and currencies provide the returns in equity bear markets; Treasuries beat equity shorts
+  topic: cross_asset
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-26, R-62]
+  quotes:
+  - {text: "...I'd rather have a menu of assets to choose from to make my big bets and particularly since a lot of these assets go up when equities go down, and that's how it was moving.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP, note: "Sentence from the OCR transcript the note cites; not reproduced in the note text."}
+  - {text: "you get these vicious rallies, you get squeezed out of shorts.", source: DS/2018-12-18_bloomberg-tv-erik-schatzker.md, date: 2018-12-18, reliability: S}
+  first_public_statement: {date: 2015-01-18, source: RS/2015-01-18_lost-tree-club-speech.md}
+  timeline: {held_from: {date: 1983, basis: stated, evidence: "'By the early to mid-80s' multi-asset menu philosophy.", source: RS/2015-01-18_lost-tree-club-speech.md}, changes: [{date: 2024-11-06, change: "'five buckets'; bonds/currencies more liquid and active in equity bear markets.", source: RS/2024-11-06_nbim-in-good-company-podcast.md}], held_until: null, weight_history: [{from: 1983, weight: core}], dating: adequate}
+  statement: "During equity bear markets, long Treasury positions deliver better risk-adjusted returns than equity shorts."
+  hypothesis:
+    variables: {BEARP: "BEAR peak-to-trough periods", LT: "excess return long 2y and 10y Treasury (Swinkels proxy from DGS2/GS10)", SE: "excess return short EQ_US"}
+    thresholds: [{param: tenor, basis: interpreted, default: 2y, sensitivity: [5y, 10y]}]
+    H1: "Sharpe(LT | BEARP) > 0 and Sharpe(LT) >= Sharpe(SE) within BEARP, with lower max adverse excursion."
+  test: {event: BEARP, sample: "1953 -> 2026", frequency: D/M, outcome: "Sharpe and max adverse excursion by episode", holds_if: "LT Sharpe > 0 in >= 75% of BEARP and adverse excursion < SE", fails_if: "LT negative in most episodes"}
+  oos: {split: 2015-01-18, in_sample: "to 2014", out_of_sample: "2020, 2022 bears (2022: bonds fell with stocks)"}
+  data: {available: [GS10, DGS2 (1976), DGS10, TB3MS, FF_MKT_RF_D], missing: []}
+  caveats: ["Inflationary bears (1970s, 2022) reverse the stock-bond correlation.", "Full-period short return is earned only with perfect timing (look-ahead in BEARP definition): also test with real-time BEAR flag (first close 20% below peak)."]
+
+- id: C-42
+  title: Bear markets contain sharp 15-20% rallies; short rallies, not lows
+  topic: cross_asset
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-62]
+  quotes:
+  - {text: "I don't think you need to short. Just sidestep it.", source: DS/2022-09-28_delivering-alpha-kernen-transcript.md, date: 2022-09-28, reliability: NP}
+  first_public_statement: {date: 2015-11-04, source: DS/2015-11-04_nyt-dealbook-conference-sorkin.md, note: "'very hard to short stocks' (S); re-short after 15-20% rally at Sohn 2022 (summary)."}
+  timeline: {held_from: {date: 2015-11-04, basis: stated, evidence: "DealBook 2015.", source: DS/2015-11-04_nyt-dealbook-conference-sorkin.md}, changes: [{date: 2022-06-10, change: "Rally threshold 15-20% stated.", source: DS/2022-06-XX_sohn-2022-john-collison.md}], held_until: null, weight_history: [{from: 2015, weight: active}], dating: thin}
+  statement: "Within bear markets, rallies of 15% or more are frequent; shorts initiated after such rallies outperform shorts initiated at new lows."
+  hypothesis:
+    variables: {RAL: "EQ_US rally >= 15% from a trough inside a BEAR (before final trough)", S1: "12w return of short entered after RAL", S2: "12w return of short entered at a new BEAR low"}
+    thresholds: [{param: rally size, basis: stated, default: 15%, sensitivity: [10%, 20%]}]
+    H1: "Most BEARs contain >= 1 RAL; E[S1] > E[S2]."
+  test: {event: BEAR periods (real-time flag), sample: "1926 -> 2026", frequency: D, outcome: "rally counts; conditional short returns", holds_if: "RAL in >= 50% of bears and E[S1] > E[S2]", fails_if: "E[S1] <= E[S2]"}
+  oos: {split: 2022-06-10, in_sample: "to 2021", out_of_sample: "2022 bear and later"}
+  data: {available: [FF_MKT_RF_D, SHILLER_SP], missing: []}
+  caveats: ["Definition of 'inside a bear' uses the final trough (look-ahead) unless the real-time flag is used."]
+
+- id: C-43
+  title: Shorting equities is playing against the house
+  topic: cross_asset
+  testability: testable
+  importance: 1
+  reliability: S
+  rules: [R-62, R-55]
+  quotes:
+  - {text: "It's very hard to short stocks... you're basically playing against the house.", source: DS/2015-11-04_nyt-dealbook-conference-sorkin.md, date: 2015-11-04, reliability: S}
+  first_public_statement: {date: 2015-11-04, source: DS/2015-11-04_nyt-dealbook-conference-sorkin.md}
+  timeline: {held_from: {date: 2015-11-04, basis: stated, evidence: "DealBook 2015.", source: DS/2015-11-04_nyt-dealbook-conference-sorkin.md}, changes: [], held_until: null, weight_history: [{from: 2015, weight: active}], dating: thin}
+  statement: "Short index positions lose over most holding periods because of the positive equity drift."
+  hypothesis: {variables: {R: "EQ_US excess return over h"}, thresholds: [{param: h, basis: interpreted, default: 12m, sensitivity: [1m, 3m, 36m]}], H1: "P(R > 0) > 0.5 for all h, rising with h."}
+  test: {event: none, sample: "1926 -> 2026", frequency: M, outcome: "share of positive windows", holds_if: "> 55% at 12m", fails_if: "<= 50%"}
+  oos: {split: 2015-11-04, in_sample: "to 2015-10", out_of_sample: "2015-11 -> 2026"}
+  data: {available: [FF_MKT_RF_D, FF_RF_D], missing: []}
+  caveats: ["Near-certain to hold; low information value. US survivorship (best-performing market)."]
+
+- id: C-44
+  title: Gold behaves as a currency that rises while monetary stimulus is on
+  topic: cross_asset
+  testability: testable
+  importance: 3
+  reliability: P
+  rules: [R-22]
+  quotes:
+  - {text: "Some regard it as a metal, we regard it as a currency and it remains our largest currency allocation.", source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md, date: 2016-05-04, reliability: P}
+  - {text: "I sold all my gold the night of the election. All the reasons I have owned it for the last couple years, it seems to me they may be ending.", source: DS/2016-11-10_cnbc-squawk-box-post-election-sold-gold.md, date: 2016-11-10, reliability: NP}
+  first_public_statement: {date: 2012-04-15, source: DS/2012-04-XX_grants-spring-conference-jim-grant.md}
+  timeline:
+    held_from: {date: 2012-04-15, basis: stated, evidence: "Grant's 2012.", source: DS/2012-04-XX_grants-spring-conference-jim-grant.md}
+    changes:
+    - {date: 2022-06-10, change: "Gold = bear/stagflation-phase hedge, bitcoin = bull-phase hedge.", source: DS/2022-06-XX_sohn-2022-john-collison.md}
+    - {date: 2026-01-30, change: "Gold held as a geopolitical, not monetary, trade.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}
+    held_until: 2026-01-30
+    held_until_note: "Monetary rationale replaced by geopolitical rationale (stated)."
+    weight_history: [{from: 2012, weight: active}, {from: 2026, weight: "different rationale"}]
+    dating: adequate
+  statement: "Gold's excess return is higher when real policy rates are negative and central-bank balance sheets are expanding."
+  hypothesis:
+    variables: {G: "GOLD_LBMA 12m return (USD)", RR: "FF - CPI_YOY", QE: "C-05 flag / 12m change US_CB_ASSETS_M/GDP"}
+    thresholds: [{param: stimulus state, basis: interpreted, default: "RR < 0 or QE on", sensitivity: ["RR < -1%"]}]
+    H1: "E[G | stimulus] > E[G | not stimulus]."
+  test: {event: state, sample: "1971-08 -> 2026 (LBMA from 1968; post-Bretton Woods only)", frequency: M, outcome: "conditional means", holds_if: "difference > 5pp/yr, p < 0.10", fails_if: "<= 0"}
+  oos: {split: 2012-04-15, in_sample: "1971-2012", out_of_sample: "2012-04 -> 2026 (2022-2025: gold rose with positive real rates)"}
+  data: {available: [GOLD_LBMA, FEDFUNDS, CPIAUCSL, US_CB_ASSETS_M], missing: []}
+  caveats: ["1970s dominate; central-bank gold buying post-2022 is a confound."]
+
+- id: C-45
+  title: Commodities tend to fall while stocks rise (falling cost curve)
+  topic: cross_asset
+  testability: partially_testable
+  importance: 1
+  reliability: S
+  rules: []
+  quotes:
+  - {text: "Commodities tend to go down while stocks go up.", source: DS/2013-05-08_sohn-commodities-conundrum.md, date: 2013-05-08, reliability: S}
+  first_public_statement: {date: 2013-05-08, source: DS/2013-05-08_sohn-commodities-conundrum.md}
+  timeline: {held_from: {date: 2013-05-08, basis: stated, evidence: "Sohn 2013.", source: DS/2013-05-08_sohn-commodities-conundrum.md}, changes: [{date: 2021-01, change: "Long commodities as inflation hedge alongside equities.", source: DS/2021-01-XX_talks-at-gs-great-investors-pasquariello.md}], held_until: null, weight_history: [{from: 2013, weight: minor}], dating: thin}
+  statement: "Outside supply shocks, real commodity prices drift down (cost curve) while equities rise, so their long-run returns diverge."
+  hypothesis: {variables: {C: "real commodity spot index (World Bank CMO / PALLFNFINDEXM, NEW)", E: "real EQ_US"}, thresholds: [{param: horizon, basis: interpreted, default: 10y, sensitivity: [5y]}], H1: "Share of rolling 10y windows with real C < 0 and real E > 0 exceeds share with both positive."}
+  test: {event: none, sample: "1960 -> 2026", frequency: M, outcome: "window shares", holds_if: "condition met", fails_if: "not"}
+  oos: {split: 2013-05-08, in_sample: "to 2013", out_of_sample: "2013 -> 2026"}
+  data: {available: [PCOPPUSDM (1992), WTISPLC (1946)], missing: ["broad commodity index NEW (World Bank CMO, AQR CLR)"]}
+  caveats: ["Statement was contextual (end of China supercycle); generalization is interpreted."]
+
+- id: C-46
+  title: The cure for low prices is low prices (commodity mean reversion)
+  topic: cross_asset
+  testability: testable
+  importance: 1
+  reliability: NP
+  rules: []
+  quotes:
+  - {text: "cure for low prices is low prices", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md, date: 2015-04-15, reliability: NP, note: "fragment as recorded in note"}
+  first_public_statement: {date: 2015-04-15, source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}
+  timeline: {held_from: {date: 2015-04-15, basis: stated, evidence: "Oil view 2015 (wrong near term).", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}, changes: [], held_until: null, weight_history: [{from: 2015, weight: minor}], dating: thin}
+  statement: "After a large commodity price collapse, forward returns over 12-24 months exceed the unconditional average."
+  hypothesis: {variables: {D: "WTI 12m change", F: "WTI forward 12m and 24m change"}, thresholds: [{param: collapse, basis: interpreted, default: "-40% (12m)", sensitivity: ["-30%", "-50%"]}], H1: "E[F | D <= -40%] > E[F]."}
+  test: {event: collapse months, sample: "1946 -> 2026", frequency: M, outcome: "conditional means", holds_if: "> unconditional by > 10pp", fails_if: "<= unconditional"}
+  oos: {split: 2015-04-15, in_sample: "to 2015-03", out_of_sample: "2015-04 -> 2026"}
+  data: {available: [WTISPLC (1946), DCOILWTICO (1986), PCOPPUSDM], missing: []}
+  caveats: ["Spot, not futures (roll yield ignored)."]
+- id: C-47
+  title: Major currency trends last at least two years
+  topic: fx
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-65]
+  quotes:
+  - {text: "I've never seen a major currency trend last less than two years, and it's only been ten months.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md, date: 2015-04-15, reliability: NP}
+  - {text: "Currency trends tend to run for at least two or three years.", source: DS/2023-04-24_nbim-annual-investment-conference.md, date: 2023-04-24, reliability: NP}
+  first_public_statement: {date: 2015-04-15, source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}
+  timeline: {held_from: {date: 1985, basis: inferred, evidence: "'never seen' across a career with FX central from the mid-1980s (Lost Tree; Real Vision 70% of money in FX and bonds).", source: RS/2018-09-06_sokoloff-real-vision-interview.md}, changes: [{date: 2023-04-24, change: "Widened to 'two or three years'.", source: DS/2023-04-24_nbim-annual-investment-conference.md}], held_until: null, weight_history: [{from: 1985, weight: core}], dating: thin}
+  statement: "Once a major currency trend starts, it does not reverse within two years."
+  hypothesis:
+    variables: {FX: "DEXUSUK, DEXJPUS, DEXUSEU (EXGEUS pre-1999), DEXSZUS, DEXCAUS, DEXUSAL, USD_BROAD", TREND: "zig-zag swing with amplitude >= A from turning point to turning point", DUR: "months per swing"}
+    thresholds: [{param: 'major (A)', basis: interpreted, default: 20%, sensitivity: [15%, 30%]}, {param: minimum duration, basis: stated, default: 24m, sensitivity: []}]
+    H1: "Zero major swings with DUR < 24m (counterexamples); median DUR >= 24m."
+  test: {event: swings, sample: "1973-03 -> 2026", frequency: M, outcome: "counterexample count and DUR distribution", holds_if: "<= 10% of major swings shorter than 24m", fails_if: "> 25% shorter than 24m"}
+  oos: {split: 2015-04-15, in_sample: "1973 -> 2015-03", out_of_sample: "2015-04 -> 2026"}
+  data: {available: [DEXUSUK, DEXJPUS, DEXUSEU, DEXSZUS, DEXCAUS, DEXUSAL, EXGEUS, USD_BROAD], missing: []}
+  caveats: ["Zig-zag with 20% amplitude mechanically favours long swings; report sensitivity.", "His 2015 EUR use: trend paused (range 1.05-1.15) without a 20% reversal."]
+
+- id: C-48
+  title: Diverging monetary policy produces currency trends ('textbook')
+  topic: fx
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-12, R-24]
+  quotes:
+  - {text: "Diverging monetary policy (Fed tapering while ECB goes to QE and negative rates) is a 'textbook' currency opportunity.", source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md, date: 2015-04-15, reliability: NP, note: "note summary wording"}
+  first_public_statement: {date: 2015-04-15, source: DS/2015-04-15_bloomberg-tv-stephanie-ruhle.md}
+  timeline: {held_from: {date: 1989-11, basis: inferred, evidence: "DEM long on Bundesbank tightening vs others; 1992 sterling: divergent outlooks under a link.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}, changes: [{date: 2021-01, change: "Asia vs US policy -> very short USD.", source: DS/2021-01-XX_talks-at-gs-great-investors-pasquariello.md}], held_until: null, weight_history: [{from: 1989, weight: core}], dating: adequate}
+  statement: "A widening policy-rate differential in favour of a currency is followed by appreciation of that currency."
+  hypothesis:
+    variables: {DIFF: "12m change of (policy rate X - FF) using ECB_DFR, DE_POLICY_RATE, UK_BANK_RATE/GB_POLICY_RATE_BIS, JP_POLICY_RATE", FXR: "forward 12m spot change of X vs USD"}
+    thresholds: [{param: divergence, basis: interpreted, default: "|DIFF| >= 100bp", sensitivity: [50bp, 200bp]}]
+    H1: "sign(DIFF) predicts sign(FXR) with hit rate > 55% when |DIFF| >= 100bp."
+  test: {event: state, sample: "1973 -> 2026", frequency: M, outcome: "hit rate, IC", holds_if: "hit > 55%, p < 0.10 pooled", fails_if: "<= 50%"}
+  oos: {split: 2015-04-15, in_sample: "to 2015-03", out_of_sample: "2015-04 -> 2026"}
+  data: {available: [ECB_DFR, DE_POLICY_RATE, UK_BANK_RATE, GB_POLICY_RATE_BIS, JP_POLICY_RATE, FEDFUNDS, DEXUSUK, DEXJPUS, DEXUSEU, EXGEUS], missing: []}
+  caveats: ["Overlaps carry/momentum factors; known to work unevenly (2021 USD short failed)."]
+
+- id: C-49
+  title: A currency weakens when its central bank prints while others do not
+  topic: fx
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-12]
+  quotes:
+  - {text: "So, what happened when he didn't print the money but the U.S. was printing the money and we're [inaud.], the Japanese yen started to appreciate and it stayed appreciating, and it basically hollowed out the country.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP, note: "Sentence from the OCR transcript the note cites; not reproduced in the note text."}
+  first_public_statement: {date: 2015-01-18, source: RS/2015-01-18_lost-tree-club-speech.md}
+  timeline: {held_from: {date: 2013-05-08, basis: inferred, evidence: "Japan QE ~3x US -> yen-weakening, Japan-equity trades (Sohn 2013).", source: DS/2013-05-08_sohn-commodities-conundrum.md}, changes: [], held_until: null, weight_history: [{from: 2013, weight: active}], dating: adequate}
+  statement: "Relative central-bank balance-sheet expansion depreciates the expanding bank's currency."
+  hypothesis:
+    variables: {REL: "12m change CB assets/GDP X minus US (CB_ASSETS_GDP_*)", FXR: "forward 12m X spot vs USD"}
+    thresholds: [{param: window, basis: interpreted, default: 12m, sensitivity: [6m, 24m]}]
+    H1: "corr(REL, FXR) < 0 pooled."
+  test: {event: none, sample: "1999 -> 2026 (QE-relevant era); 1960 -> sensitivity", frequency: Q, outcome: "pooled IC", holds_if: "IC < -0.10, p < 0.10 in 1999 -> 2026", fails_if: "IC >= 0"}
+  oos: {split: 2015-01-18, in_sample: "1999 -> 2014", out_of_sample: "2015 -> 2026"}
+  data: {available: [CB_ASSETS_GDP_US, CB_ASSETS_GDP_XM, CB_ASSETS_GDP_JP, CB_ASSETS_GDP_GB, DEXJPUS, DEXUSEU, DEXUSUK], missing: []}
+  caveats: ["Reserve accumulation (FX intervention) expands balance sheets while defending the currency - sign reversal; restrict to QE-type expansions."]
+
+- id: C-50
+  title: Expansionary fiscal plus tight monetary policy strengthens a currency
+  topic: fx
+  testability: partially_testable
+  importance: 2
+  reliability: P
+  rules: [R-12]
+  quotes:
+  - {text: "DEM thesis: expansionary fiscal plus tight monetary policy is bullish for the currency (Soros, Alchemy of Finance).", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, date: 1991-12, reliability: P, note: "note summary wording"}
+  first_public_statement: {date: 1991-12, source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}
+  timeline: {held_from: {date: 1987, basis: inferred, evidence: "Read The Alchemy of Finance (published 1987) before joining Soros 1988 (Lost Tree).", source: RS/2015-01-18_lost-tree-club-speech.md}, changes: [{date: 1991-Q1, change: "Exited DEM when Germany talked of tax rises (fiscal premise ended).", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}], held_until: null, weight_history: [{from: 1987, weight: active}], dating: thin, dating_note: "No statement after 1991."}
+  statement: "Country-years with a widening deficit and a rising policy rate see currency appreciation."
+  hypothesis:
+    variables: {FISC: "change in general-government deficit/GDP (OECD, NEW)", MON: "12m change policy rate", FXR: "forward 12m trade-weighted or vs USD return"}
+    thresholds: [{param: fiscal expansion, basis: interpreted, default: ">= 1pp of GDP deficit widening", sensitivity: ["0.5pp", "2pp"]}, {param: tightening, basis: interpreted, default: ">= 100bp", sensitivity: ["50bp"]}]
+    H1: "E[FXR | FISC and MON] > E[FXR] across G7 panel."
+  test: {event: country-years, sample: "1973 -> 2026, G7", frequency: A, outcome: "conditional mean, panel regression", holds_if: "> 3pp, p < 0.10", fails_if: "<= 0"}
+  oos: {split: 1991-12-31, in_sample: "1973 -> 1991", out_of_sample: "1992 -> 2026"}
+  data: {available: [policy rates (BIS series), DEX* FX], missing: ["OECD fiscal balances NEW; FYFSGDA188S MISSING (US)"]}
+  caveats: ["Classic Mundell-Fleming case (US 1981-85, DE 1990); few clean episodes."]
+
+- id: C-51
+  title: Governments defending prices against fundamentals always lose
+  topic: fx
+  testability: partially_testable
+  importance: 2
+  reliability: S
+  rules: [R-28]
+  quotes:
+  - {text: "Governments defending prices against fundamentals always lose. The only variable is how much they spend before conceding.", source: DS/2026-08-24_wsj-oped-let-the-bond-market-speak.md, date: 2026-08-24, reliability: S}
+  first_public_statement: {date: 2026-08-24, source: DS/2026-08-24_wsj-oped-let-the-bond-market-speak.md}
+  timeline: {held_from: {date: 1992-08, basis: inferred, evidence: "Sterling trade thesis: linked currencies with divergent outlooks.", source: RS/2015-01-18_lost-tree-club-speech.md}, changes: [], held_until: null, weight_history: [{from: 1992, weight: active}], dating: adequate}
+  statement: "Pegs, bands, floors and yield caps defended against adverse fundamentals are eventually abandoned."
+  hypothesis:
+    variables: {EV: "pre-registered list of defended price regimes with an adverse-fundamentals flag (ERM 1992-93, MXN 1994, THB 1997, RUB 1998, BRL 1999, ARS 2001, CHF floor 2015, BoJ YCC 2016-2024, US yield peg 1942-51, HKD 1983-, DKK 1982-)", FUND: "adverse = inflation differential > 3pp or current-account deficit > 4% GDP or reserves falling > 25%/yr"}
+    thresholds: [{param: adverse-fundamentals flag, basis: interpreted, default: as above, sensitivity: ["any one criterion", "two criteria"]}]
+    H1: "Every EV with FUND = true ends in abandonment; survival rate of FUND = false regimes higher."
+  test: {event: EV list, sample: "1942 -> 2026", frequency: event, outcome: "abandonment counts", holds_if: "100% abandonment among FUND = true", fails_if: "any FUND = true regime survives >= 10y"}
+  oos: {split: 2026-08-24, in_sample: "to 2026-08", out_of_sample: "2026 Treasury buyback episode onward"}
+  data: {available: [DEX* FX, policy rates], missing: ["Event list manual; foreign CPI and reserves (IMF IFS, NEW)"]}
+  caveats: ["'Against fundamentals' is judged after the fact; partially testable.", "Survivor regimes (HKD) are the obvious counterexample test."]
+
+- id: C-52
+  title: The drivers of currencies change every 15-20 years
+  topic: fx
+  testability: partially_testable
+  importance: 1
+  reliability: NP
+  rules: [R-65]
+  quotes:
+  - {text: "Regime change every 15–20 years (e.g., currencies: current account → interest differentials → risk-on/risk-off).", source: RS/2018-09-06_sokoloff-real-vision-interview.md, date: 2018-09-06, reliability: NP, note: "note summary wording"}
+  first_public_statement: {date: 2018-09-06, source: RS/2018-09-06_sokoloff-real-vision-interview.md}
+  timeline: {held_from: {date: 2018-09-06, basis: stated, evidence: "Real Vision 2018.", source: RS/2018-09-06_sokoloff-real-vision-interview.md}, changes: [], held_until: null, weight_history: [{from: 2018, weight: minor}], dating: thin}
+  statement: "The variable that best explains G10 currency moves shifts from current accounts (to ~1990s) to interest differentials (to ~2008) to risk sentiment."
+  hypothesis:
+    variables: {X: "rolling 5y univariate R2 of 12m FX returns on current account/GDP (NEW), 2y rate differential, risk proxy (EQ_US return or VIX)"}
+    thresholds: [{param: window, basis: interpreted, default: 5y, sensitivity: [3y, 10y]}]
+    H1: "Identity of the max-R2 driver changes at most every 10-25 years and follows the stated order."
+  test: {event: none, sample: "1975 -> 2026", frequency: Q, outcome: "driver ranking over time", holds_if: "ordering matches", fails_if: "no persistent leader"}
+  oos: {split: 2018-09-06, in_sample: "to 2018", out_of_sample: "2018 -> 2026"}
+  data: {available: [DEX* FX, policy/long rates], missing: ["current account (BOP, NEW)", "VIXCLS NEW"]}
+  caveats: ["n of regimes = 3; descriptive only."]
+- id: C-53
+  title: Technical analysis is about 20% as effective as it used to be
+  topic: technicals_timing
+  testability: testable
+  importance: 4
+  reliability: NP
+  rules: [R-32, R-29, R-30]
+  quotes:
+  - {text: "I can unequivocally tell you that technical analysis is about 20% as effective today as it was then because no one was using it.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md, date: 2026-01-30, reliability: NP}
+  - {text: "Drelles was very technically oriented... However, I found that technical analysis could be very effective.", source: RS/1992-XX-XX_new-market-wizards-chapter.md, date: 1991-12, reliability: NP}
+  - {text: "And when you take away price action versus news from someone who's used price action news as their major disciplinary tool for 35 years, it's tough...", source: RS/2018-09-06_sokoloff-real-vision-interview.md, date: 2018-09-06, reliability: NP}
+  first_public_statement: {date: 2026-01-30, source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md, note: "Degradation first stated 2018-09-06 (algos)."}
+  timeline:
+    held_from: {date: 1977, basis: stated, evidence: "Technicals learned from Drelles; 'very effective'.", source: RS/1992-XX-XX_new-market-wizards-chapter.md}
+    changes:
+    - {date: 2018-09-06, change: "Algorithms cancelled price-vs-news and relative-strength signals.", source: RS/2018-09-06_sokoloff-real-vision-interview.md}
+    - {date: 2022-06-10, change: "Price vs news much weaker than 20 years earlier.", source: DS/2022-06-XX_sohn-2022-john-collison.md}
+    - {date: 2023-04-24, change: "Degraded because hedge funds, algos, quants learned the game.", source: DS/2023-04-24_nbim-annual-investment-conference.md}
+    - {date: 2026-01-30, change: "~20% of former effectiveness.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}
+    held_until: null
+    weight_history: [{from: 1977, weight: core}, {from: 2018, weight: reduced}, {from: 2026, weight: "0.2 of original (timing); chart veto retained"}]
+    dating: adequate
+  statement: "Returns to standard technical rules have decayed to roughly one fifth of their earlier level as the rules became widely used."
+  hypothesis:
+    variables: {TR: "standard rules: 12m time-series momentum, 10m SMA filter, 6m industry relative strength (French 12), on EQ_US, GS10-proxy bonds, DEX* FX, gold", SR: "rolling 10y Sharpe of each rule"}
+    thresholds: [{param: cutover year, basis: interpreted, default: 2010, sensitivity: [2005, 2015]}, {param: effectiveness ratio, basis: stated, default: 0.20, sensitivity: [0.1, 0.4]}]
+    H1: "SR(post-cutover)/SR(pre-cutover) <= 0.4 averaged across rules and assets; point estimate near 0.2."
+  test: {event: none, sample: "1926 -> 2026 (equities), 1971 -> (FX), 1953 -> (bonds)", frequency: M, outcome: "Sharpe ratios by era; ratio CI by block bootstrap", holds_if: "ratio CI upper bound < 0.6", fails_if: "ratio CI lower bound > 0.8"}
+  oos: {split: 2018-09-06, in_sample: "to 2018-08 (decay first claimed)", out_of_sample: "2018-09 -> 2026"}
+  data: {available: [FF_MKT_RF_D, FRENCH12_*, GS10, DEX* FX, GOLD_LBMA, AQR TSMOM as validation (NEW)], missing: []}
+  caveats: ["His technicals are discretionary (272 charts); standard rules are a proxy.", "Decay of published anomalies is a known literature result (McLean-Pontiff)."]
+
+- id: C-54
+  title: Daily, weekly and monthly charts predict 8-20 bars ahead
+  topic: technicals_timing
+  testability: testable
+  importance: 2
+  reliability: NP
+  rules: [R-18, R-29]
+  quotes:
+  - {text: "Daily charts predict 8–20 days, weekly 8–20 weeks, monthly 8–20 months.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, date: 2009-Q4, reliability: NP, note: "note summary wording"}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+  timeline: {held_from: {date: 2009-10-01, basis: stated, evidence: "Feig 2009.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}, changes: [], held_until: null, weight_history: [{from: 2009, weight: active}, {from: 2018, weight: reduced, note: "via C-53"}], dating: thin}
+  statement: "Momentum (rate-of-change) signals on a given bar frequency carry predictive information for about 8-20 bars of that frequency."
+  hypothesis:
+    variables: {SIG: "sign of 2nd-derivative ROC on daily/weekly/monthly bars (R-18 construction)", IC_k: "rank IC of SIG with forward k-bar return"}
+    thresholds: [{param: horizon band, basis: stated, default: "8-20 bars", sensitivity: []}]
+    H1: "For each frequency, IC_k is positive and peaks within k = 8..20."
+  test: {event: none, sample: "1926 -> 2026 (EQ_US), 1971 -> (FX)", frequency: D/W/M, outcome: "IC term structure", holds_if: "peak in band for >= 2 of 3 frequencies", fails_if: "IC <= 0 throughout"}
+  oos: {split: 2009-10-01, in_sample: "to 2009-09", out_of_sample: "2009-10 -> 2026"}
+  data: {available: [FF_MKT_RF_D, DEX* FX, GOLD_LBMA], missing: []}
+  caveats: ["Self-similarity claim; weak power at monthly frequency (8-20 months)."]
+
+- id: C-55
+  title: Price action against good news is a sell signal
+  topic: technicals_timing
+  testability: partially_testable
+  importance: 3
+  reliability: NP
+  rules: [R-30, R-51]
+  quotes:
+  - {text: "If all the news is great and the stock's not acting well, get out.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, date: 2009-Q4, reliability: NP}
+  - {text: "If I've got a thesis and it's really bullish and it's playing out and the stock's not going anywhere, makes me go back and check the thesis over and over.", source: DS/2023-04-24_nbim-annual-investment-conference.md, date: 2023-04-24, reliability: NP}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+  timeline: {held_from: {date: 1983, basis: stated, evidence: "'major disciplinary tool for 35 years' (2018).", source: RS/2018-09-06_sokoloff-real-vision-interview.md}, changes: [{date: 2018-09-06, change: "Cancelled by algos.", source: RS/2018-09-06_sokoloff-real-vision-interview.md}, {date: 2026-01-30, change: "Degraded with technicals (~20%).", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}], held_until: null, weight_history: [{from: 1983, weight: core}, {from: 2018, weight: reduced}], dating: adequate}
+  statement: "An asset that fails to rise on good news subsequently underperforms."
+  hypothesis:
+    variables: {S: "macro release surprise proxy (actual - prior) for payrolls, IP, retail sales", RX: "3-day EQ_US excess return after release", F: "forward 1-3m return"}
+    thresholds: [{param: reaction window, basis: interpreted, default: 3 trading days, sensitivity: [1, 5]}]
+    H1: "E[F | S > 0 and RX < 0] < E[F | S > 0 and RX > 0]; effect smaller after cutover year (consistent with C-53)."
+  test: {event: release days, sample: "1960 -> 2026 (release dates from ALFRED)", frequency: event, outcome: "conditional forward returns by era", holds_if: "negative difference pre-cutover, p < 0.10", fails_if: "no difference pre-cutover"}
+  oos: {split: 2009-10-01, in_sample: "to 2009-09", out_of_sample: "2009-10 -> 2026"}
+  data: {available: [INDPRO_FR, UNRATE_FR, FF_MKT_RF_D], missing: ["consensus surprises MISSING (free)", "single-stock earnings surprises MISSING"]}
+  caveats: ["Original tool is single-stock and discretionary; market-level proxy is weak."]
+
+- id: C-56
+  title: Contrarianism is overrated; the crowd is right 80% of the time
+  topic: positioning
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-31, R-37]
+  quotes:
+  - {text: "Contrarian investing is way overrated... the crowd makes money 80% of the time.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, date: 2009-Q4, reliability: NP}
+  - {text: "I think contrarianism is overrated. Soros used to say the crowd's right 80% of the time.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md, date: 2026-01-30, reliability: NP}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+  timeline: {held_from: {date: 1988, basis: inferred, evidence: "Attributed to Soros (joined 1988).", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}, changes: [{date: 2026-01-30, change: "Crowding matters for entry points, not thesis validity.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}], held_until: null, weight_history: [{from: 1988, weight: core}], dating: adequate}
+  statement: "Following speculative positioning (the crowd) is profitable most of the time; fading it is not."
+  hypothesis:
+    variables: {POS: "sign of COT non-commercial net % of OI (COT_*)", TS: "sensitivity: sign of 12m price trend", R: "forward 4w and 13w return"}
+    thresholds: [{param: hit rate, basis: stated, default: 0.80, sensitivity: []}, {param: horizon, basis: interpreted, default: 13w, sensitivity: [4w, 26w]}]
+    H1a: "Hit rate of sign(POS) for sign(R) > 0.5 (crowd better than contrarian)."
+    H1b: "Hit rate near 0.8 (literal claim)."
+  test: {event: none, sample: "1986 -> 2026", frequency: W, outcome: "pooled hit rate by market; extremes-only subset (top/bottom decile POS)", holds_if: "H1a holds and extremes subset not reversed", fails_if: "hit rate <= 0.5 or extremes show reversal"}
+  oos: {split: 2009-10-01, in_sample: "1986 -> 2009-09", out_of_sample: "2009-10 -> 2026"}
+  data: {available: [COT_* (1986 ->, release_calendar), FX/futures price series in catalogue], missing: ["continuous futures returns pre-2017 (spot proxies used)"]}
+  caveats: ["'80%' is a saying; a literal 80% hit rate is near-impossible; H1a is the operative test.", "'Crowd' undefined: COT is one proxy."]
+
+- id: C-57
+  title: 60-70% of a move occurs within 2-3 weeks of an idea surfacing
+  topic: technicals_timing
+  testability: partially_testable
+  importance: 2
+  reliability: NP
+  rules: [R-38]
+  quotes:
+  - {text: "When you hear a good idea, if you wait two or three weeks… 60 or 70% of the move will have taken place.", source: DS/2022-06-XX_sohn-2022-john-collison.md, date: 2022-06, reliability: NP}
+  - {text: "...by the time we get done analyzing I will miss 30 or 40% of the move and then I'm paralyzed...", source: RS/2023-XX-XX_nbim-investment-conference-2023.md, date: 2023-04-24, reliability: S}
+  first_public_statement: {date: 2022-06-10, source: DS/2022-06-XX_sohn-2022-john-collison.md}
+  timeline: {held_from: {date: 1992-08, basis: inferred, evidence: "Sterling starter before analysis (invest then investigate).", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}, changes: [{date: 2023-04-24, change: "30-40% missed (different number).", source: DS/2023-04-24_nbim-annual-investment-conference.md}], held_until: null, weight_history: [{from: 1992, weight: active}], dating: thin}
+  statement: "After a material catalyst, most of the eventual price adjustment happens in the first 2-3 weeks."
+  hypothesis:
+    variables: {EV: "catalyst events: FOMC policy surprises (FF futures-based surprises NEW) or largest 1% daily moves in macro assets", M15: "cumulative return days 0-15", M120: "cumulative return days 0-120 (same sign events)"}
+    thresholds: [{param: share, basis: stated, default: 0.6, sensitivity: [0.3, 0.7]}, {param: window, basis: stated, default: 15 trading days, sensitivity: [10, 20]}]
+    H1: "median M15/M120 >= 0.6 among events where M120 has the event's sign."
+  test: {event: EV list, sample: "1990 -> 2026", frequency: D, outcome: "distribution of M15/M120", holds_if: "median >= 0.6", fails_if: "median < 0.3"}
+  oos: {split: 2022-06-10, in_sample: "to 2022-05", out_of_sample: "2022-06 -> 2026"}
+  data: {available: [daily FX, DGS10, FF_MKT_RF_D], missing: ["'idea surfacing' undefined; monetary surprise series NEW"]}
+  caveats: ["Conditioning on M120 sign is look-ahead (descriptive claim only)."]
+
+- id: C-58
+  title: Markets often deny buyers the expected dip around a widely feared event
+  topic: technicals_timing
+  testability: partially_testable
+  importance: 1
+  reliability: NP
+  rules: [R-31]
+  quotes:
+  - {text: "He cited the 1991 Gulf War opening as an example of markets not giving buyers the expected dip on a feared event. He bought into the Grexit fear.", source: DS/2015-03-02_cnbc-closing-bell-kelly-evans.md, date: 2015-03-02, reliability: NP, note: "note summary wording"}
+  first_public_statement: {date: 2015-03-02, source: DS/2015-03-02_cnbc-closing-bell-kelly-evans.md}
+  timeline: {held_from: {date: 1991-01, basis: inferred, evidence: "Gulf War example.", source: DS/2015-03-02_cnbc-closing-bell-kelly-evans.md}, changes: [], held_until: null, weight_history: [{from: 1991, weight: minor}], dating: thin}
+  statement: "When a feared scheduled event arrives, equities rise more often than they fall over the following month."
+  hypothesis: {variables: {EV: "pre-registered list of widely anticipated risk events (war deadlines, referenda, debt-ceiling dates)", R: "EQ_US 20d return after event"}, thresholds: [{param: window, basis: interpreted, default: 20d, sensitivity: [5d, 60d]}], H1: "P(R > 0 | EV) > unconditional 20d hit rate."}
+  test: {event: EV list, sample: "1990 -> 2026", frequency: event, outcome: "hit rate", holds_if: "> base by 15pp", fails_if: "<= base"}
+  oos: {split: 2015-03-02, in_sample: "to 2015-02", out_of_sample: "2015-03 -> 2026"}
+  data: {available: [FF_MKT_RF_D], missing: ["event list manual"]}
+  caveats: ["Event selection bias."]
+
+- id: C-59
+  title: A long stretch of no progress with high volatility precedes a major trend change
+  topic: technicals_timing
+  testability: testable
+  importance: 1
+  reliability: P
+  rules: []
+  quotes:
+  - {text: "The lack of progress and volatility in global equity markets the past year, which often precedes a major trend change, suggests that their risk/reward is negative without substantially lower prices and/or structural reform.", source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md, date: 2016-05-04, reliability: P}
+  first_public_statement: {date: 2016-05-04, source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md}
+  timeline: {held_from: {date: 2016-05-04, basis: stated, evidence: "Sohn 2016.", source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md}, changes: [], held_until: null, weight_history: [{from: 2016, weight: minor}], dating: thin}
+  statement: "After 12 months of near-zero equity return with above-median volatility, the probability of a large move (either sign) in the next 12 months is above normal."
+  hypothesis: {variables: {FLAT: "|12m EQ_US return| < 5% and 12m realized vol > median", BIG: "|forward 12m return| > 20%"}, thresholds: [{param: flatness, basis: interpreted, default: 5%, sensitivity: [3%, 8%]}], H1: "P(BIG | FLAT) > P(BIG)."}
+  test: {event: FLAT months, sample: "1926 -> 2026", frequency: M, outcome: "conditional probability", holds_if: "> base by 10pp", fails_if: "<= base"}
+  oos: {split: 2016-05-04, in_sample: "to 2016-04", out_of_sample: "2016-05 -> 2026 (2016 case: next 12m up ~17%, below 20%)"}
+  data: {available: [FF_MKT_RF_D], missing: []}
+  caveats: ["'Major trend change' is directional in his use; the symmetric test is weaker."]
+
+- id: C-60
+  title: Valuation does not time markets; liquidity and technicals do; valuation sets how far a move goes
+  topic: valuation
+  testability: testable
+  importance: 4
+  reliability: P
+  rules: [R-13, R-01]
+  quotes:
+  - {text: "I never use valuation to time the market. I use liquidity considerations and technical analysis for timing.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md, date: 1991-12, reliability: P}
+  - {text: "So anybody who says they are not a bubble, I just don't agree with it… Because the bubble is appropriate given monetary policy.", source: DS/2014-07-16_delivering-alpha-kernen.md, date: 2014-07-16, reliability: NP}
+  first_public_statement: {date: 1991-12, source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}
+  timeline: {held_from: {date: 1981, basis: inferred, evidence: "1987: valuation sets how far once tightening is the catalyst; mid-1981 valuation plus 19% rates.", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}, changes: [{date: 2024-10-16, change: "Selling NVDA on valuation called a big mistake (reaffirms).", source: DS/2024-10-16_bloomberg-tv-sonali-basak.md}], held_until: null, weight_history: [{from: 1981, weight: "context only"}], dating: adequate}
+  statement: "At 1-12 month horizons valuation has little predictive power relative to liquidity and trend signals; conditional on a bearish catalyst, higher starting valuation means a larger decline."
+  hypothesis:
+    variables: {CAPE: "Shiller CAPE (NEW field) or market cap/GDP", LIQ: "C-02/C-04 signals", TREND: "10m SMA filter", DD: "drawdown after tightening onset (C-04)"}
+    thresholds: [{param: horizon, basis: interpreted, default: 12m, sensitivity: [3m, 6m]}]
+    H1a: "OOS R2 at 12m: CAPE < LIQ + TREND."
+    H1b: "corr(starting CAPE, DD after ONSET) > 0."
+  test: {event: "regressions; ONSET events", sample: "1881 -> 2026 (CAPE); 1955 -> (onsets)", frequency: M, outcome: "OOS R2 comparison; correlation", holds_if: "H1a and H1b", fails_if: "CAPE dominates short-horizon prediction"}
+  oos: {split: 1991-12-31, in_sample: "to 1991", out_of_sample: "1992 -> 2026"}
+  data: {available: [SHILLER_SP, M2SL, INDPRO_FR, FEDFUNDS], missing: ["Shiller earnings (CAPE) NEW", "Z.1 equity market value (NEW) for market cap/GDP"]}
+  caveats: ["Valuation known to forecast long horizons, not short; H1a likely holds by known result."]
+
+- id: C-61
+  title: High starting valuation implies a flat decade
+  topic: valuation
+  testability: testable
+  importance: 3
+  reliability: NP
+  rules: [R-13]
+  quotes:
+  - {text: "We've had a hurricane behind us for 30 or 40 years, and it's reversing… the Dow won't be much higher in ten years than it is today.", source: DS/2022-09-28_delivering-alpha-kernen-transcript.md, date: 2022-09-28, reliability: NP}
+  - {text: "If we have borrowed from the future and markets value the future, we should be selling at a discount, not a premium to historic valuations.", source: DS/2016-05-04_sohn-the-endgame.md, date: 2016-05-04, reliability: S}
+  first_public_statement: {date: 2016-05-04, source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md, note: "18x inflated vs 7x depressed earnings (1982)."}
+  timeline: {held_from: {date: 2016-05-04, basis: stated, evidence: "Sohn 2016.", source: DS/2016-05-04_sohn-the-endgame-archived-transcript.md}, changes: [{date: 2015-03-02, change: "Earlier: 'extremely high' but 'appropriately priced' relative to policy (valuation subordinate).", source: DS/2015-03-02_cnbc-closing-bell-kelly-evans.md}, {date: 2023-11-01, change: "20x vs 15x pre-QE -> flat-ish decade.", source: DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md}], held_until: null, weight_history: [{from: 2016, weight: "secular view; not trading"}], dating: adequate}
+  statement: "When market cap/GDP or P/E start near historical highs, subsequent 10-year real returns are near zero."
+  hypothesis: {variables: {V: "CAPE and market cap/GDP percentile (expanding)", R10: "forward 10y real total return"}, thresholds: [{param: high valuation, basis: interpreted, default: "top decile", sensitivity: ["top quintile"]}, {param: flat, basis: interpreted, default: "annualized real return < 2%", sensitivity: ["< 0%", "< 3%"]}], H1: "E[R10 | top decile V] < 2% p.a. and < E[R10] by > 4pp."}
+  test: {event: state, sample: "1881 -> 2016 (forward returns end 2026)", frequency: M, outcome: "conditional means (few independent decades)", holds_if: "condition met", fails_if: "top-decile R10 >= unconditional"}
+  oos: {split: 2016-05-04, in_sample: "start dates to 2006", out_of_sample: "2016-05 starts (10y complete only 2026-05) - effectively untested"}
+  data: {available: [SHILLER_SP], missing: ["Shiller earnings/dividends/CPI NEW", "Z.1 market value NEW"]}
+  caveats: ["~14 independent decades; OOS not yet observable."]
+
+- id: C-62
+  title: Change, not the present level, moves prices
+  topic: valuation
+  testability: testable
+  importance: 3
+  reliability: S
+  rules: [R-21]
+  quotes:
+  - {text: "Do not invest in the present. The present doesn't move stock prices, change does.", source: RS/2022-06-10_sohn-2022-collison-conversation.md, date: 2022-06-10, reliability: S}
+  first_public_statement: {date: 2015-01-18, source: RS/2015-01-18_lost-tree-club-speech.md, note: "'never, ever invest in the present'."}
+  timeline: {held_from: {date: 1977, basis: stated, evidence: "Drelles lesson.", source: RS/2015-01-18_lost-tree-club-speech.md}, changes: [], held_until: null, weight_history: [{from: 1977, weight: core}], dating: adequate}
+  statement: "Changes in macro conditions predict returns better than their levels."
+  hypothesis: {variables: {LVL: "levels of INDPRO yoy, UNRATE, FF, CPI_YOY", CHG: "6m changes of the same", R: "forward 6m EQ_US return"}, thresholds: [{param: change window, basis: interpreted, default: 6m, sensitivity: [3m, 12m]}], H1: "OOS R2(CHG) > OOS R2(LVL)."}
+  test: {event: none, sample: "1960 -> 2026 (real-time inputs)", frequency: M, outcome: "OOS R2", holds_if: "CHG beats LVL, Clark-West p < 0.10", fails_if: "LVL beats CHG"}
+  oos: {split: 2015-01-18, in_sample: "to 2014", out_of_sample: "2015 -> 2026"}
+  data: {available: [INDPRO_FR, UNRATE_FR, FEDFUNDS, CPIAUCSL], missing: []}
+  caveats: ["Low predictability overall; differences may be insignificant."]
+
+- id: C-63
+  title: Capacity cycle - buy cyclicals when capacity exits, sell on new-plant announcements
+  topic: cycle_fundamentals
+  testability: partially_testable
+  importance: 2
+  reliability: NP
+  rules: [R-25]
+  quotes:
+  - {text: "...the ideal time to sell these stocks is when there are lots of announcements for new plants, not when the earnings turn down.", source: RS/1992-XX-XX_new-market-wizards-chapter.md, date: 1991-12, reliability: NP}
+  - {text: "So, you always have to sort of imagine the world the way it's going to be in 18 to 24 months as opposed to now.", source: RS/2024-10-06_actionable-news-horizon-quote.md, date: 2024-10-06, reliability: S}
+  first_public_statement: {date: 1991-12, source: RS/1992-XX-XX_new-market-wizards-chapter.md}
+  timeline: {held_from: {date: 1977, basis: stated, evidence: "Drelles era at Pittsburgh National Bank.", source: RS/1992-XX-XX_new-market-wizards-chapter.md}, changes: [{date: 2024-05-07, change: "Copper: 12-year greenfield lead time (supply-side capacity logic).", source: DS/2024-05-07_cnbc-squawk-box-forward-guidance-ai-argentina.md}], held_until: null, weight_history: [{from: 1977, weight: active}], dating: adequate}
+  statement: "Chemical/materials stocks outperform after capacity contraction and underperform after capacity expansion, leading earnings by 2-3 years."
+  hypothesis: {variables: {CAP: "yoy industrial capacity, chemicals (G.17; FRED CAPG325S, id unverified, NEW)", RS: "FRENCH12_Chems minus market, forward 12-24m"}, thresholds: [{param: expansion, basis: interpreted, default: "CAP yoy top tercile", sensitivity: ["top quartile"]}], H1: "E[RS | CAP top tercile] < E[RS | CAP bottom tercile]."}
+  test: {event: state, sample: "1972 -> 2026", frequency: M, outcome: "conditional relative returns", holds_if: "spread < -3pp/yr, p < 0.10", fails_if: ">= 0"}
+  oos: {split: 1991-12-31, in_sample: "1972-1991", out_of_sample: "1992-2026"}
+  data: {available: [FRENCH12_Chems], missing: ["G.17 capacity by industry NEW", "plant-announcement data MISSING"]}
+  caveats: ["Capacity data revised; announcements (his trigger) are not in any free series."]
+
+- id: C-64
+  title: Every recession is preceded by a peak in corporate profits
+  topic: cycle_fundamentals
+  testability: testable
+  importance: 2
+  reliability: S
+  rules: []
+  quotes:
+  - {text: "He had never seen a recession that was not preceded by a peak in corporate profits.", source: DS/2019-06-03_econclub-ny-bessent.md, date: 2019-06-03, reliability: S, note: "summary wording"}
+  first_public_statement: {date: 2019-06-03, source: DS/2019-06-03_econclub-ny-bessent.md}
+  timeline: {held_from: {date: 2019-06-03, basis: stated, evidence: "ECNY 2019.", source: DS/2019-06-03_econclub-ny-bessent.md}, changes: [], held_until: null, weight_history: [{from: 2019, weight: minor}], dating: thin}
+  statement: "Aggregate corporate profits peak before every recession starts."
+  hypothesis: {variables: {CP: "after-tax corporate profits (FRED CP, NEW; vintage)", PK: "CP 4q-high peak date"}, thresholds: [{param: lead, basis: interpreted, default: "peak 1-8 quarters before NBER peak", sensitivity: ["0-12 quarters"]}], H1: "Every NBER peak 1948 -> 2020 has a CP peak within the lead window; also report false peaks."}
+  test: {event: NBER peaks, sample: "1947 -> 2026", frequency: Q, outcome: "counterexample count; false-positive rate", holds_if: "zero counterexamples", fails_if: ">= 1"}
+  oos: {split: 2019-06-03, in_sample: "to 2019", out_of_sample: "2020 recession and later"}
+  data: {available: [NBER_CYCLES, GDP], missing: ["CP (FRED) NEW"]}
+  caveats: ["Necessary-condition claims with high false-positive rates have little timing value (2019 call failed)."]
+
+- id: C-65
+  title: Unemployment and payrolls are the most misleading (lagging) macro variables
+  topic: cycle_fundamentals
+  testability: testable
+  importance: 2
+  reliability: NP
+  rules: [R-06]
+  quotes:
+  - {text: "Unemployment and payrolls are the most misleading macro variables because they are lagging.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md, date: 2026-01-30, reliability: NP, note: "note summary wording"}
+  first_public_statement: {date: 2026-01-30, source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}
+  timeline: {held_from: {date: 2026-01-30, basis: stated, evidence: "MS 2026.", source: DS/2026-02-27_morgan-stanley-hard-lessons-bouzali.md}, changes: [], held_until: null, weight_history: [{from: 2026, weight: active}], dating: thin, dating_note: "Conflicts with his use of unemployment in Taylor arguments (2015-2018)."}
+  statement: "Unemployment and payroll turning points lag the cycle and equity turning points, and carry no forward information for equities."
+  hypothesis: {variables: {U: "UNRATE_FR", P: "PAYEMS first release (NEW)", TP: "turning points"}, thresholds: [{param: lag test, basis: interpreted, default: "U trough after NBER peak", sensitivity: []}], H1: "U troughs/peaks lag NBER peaks/troughs and EQ_US turning points; IC of 6m change in U for forward 12m returns not > 0."}
+  test: {event: turning points, sample: "1948 -> 2026", frequency: M, outcome: "lag distribution; IC", holds_if: "median lag >= 0 and IC insignificant or perverse", fails_if: "U leads NBER peaks systematically"}
+  oos: {split: 2026-01-30, in_sample: "to 2025", out_of_sample: "2026 ->"}
+  data: {available: [UNRATE_FR, USREC, FF_MKT_RF_D], missing: ["PAYEMS NEW"]}
+  caveats: ["UNRATE troughs often occur slightly before NBER peaks (Sahm-type evidence); claim may fail on troughs vs peaks."]
+- id: C-66
+  title: Political cycle - buy two years before the election, sell on it
+  topic: political
+  testability: testable
+  importance: 1
+  reliability: NP
+  rules: [R-64]
+  quotes:
+  - {text: "political-cycle rule (buy two years before the election, sell on it)", source: DS/2022-09-28_delivering-alpha-kernen-transcript.md, date: 2022-09-28, reliability: NP, note: "note summary wording"}
+  first_public_statement: {date: 2022-09-28, source: DS/2022-09-28_delivering-alpha-kernen-transcript.md}
+  timeline: {held_from: {date: 2022-09-28, basis: stated, evidence: "DA 2022.", source: DS/2022-09-28_delivering-alpha-kernen-transcript.md}, changes: [], held_until: null, weight_history: [{from: 2022, weight: "display only (R-64)"}], dating: thin}
+  statement: "US equities return more in the 24 months before a presidential election than in the 24 months after."
+  hypothesis: {variables: {PRE: "EQ_US return months -24..0", POST: "months 0..+24"}, thresholds: [{param: window, basis: stated, default: 24m, sensitivity: [12m]}], H1: "mean(PRE - POST) > 0 across elections; PRE beats POST in > 60% of cycles."}
+  test: {event: elections 1928 -> 2024, sample: "1926 -> 2026", frequency: M, outcome: "paired differences", holds_if: "mean > 0 and > 60% wins", fails_if: "mean <= 0"}
+  oos: {split: 2022-09-28, in_sample: "elections 1928-2020", out_of_sample: "2024 cycle (pre-window 2022-11 -> 2024-11)"}
+  data: {available: [FF_MKT_RF_D, SHILLER_SP], missing: []}
+  caveats: ["Known 'presidential cycle' literature; n = 24."]
+
+- id: C-67
+  title: Massive deficits at full employment are historically unprecedented
+  topic: fiscal_record
+  testability: testable
+  importance: 1
+  reliability: S
+  rules: [R-63]
+  quotes:
+  - {text: "For the first time in history, we have massive deficits and full employment… God help us if we get in a recession.", source: DS/2019-06-03_econclub-ny-bessent.md, date: 2019-06-03, reliability: S}
+  first_public_statement: {date: 2019-06-03, source: DS/2019-06-03_econclub-ny-bessent.md}
+  timeline: {held_from: {date: 2017-12-12, basis: stated, evidence: "Pro-cyclical deficit expansion criticized.", source: DS/2017-12-12_cnbc-closing-bell-kelly-evans.md}, changes: [], held_until: null, weight_history: [{from: 2017, weight: "context"}], dating: adequate}
+  statement: "Before 2018-19, the US never ran deficits above ~3-4% of GDP with unemployment below its natural rate (outside war)."
+  hypothesis: {variables: {DEF: "deficit/GDP (FYFSGDA188S MISSING; MTS NEW)", GAPU: "UNRATE - NROU"}, thresholds: [{param: 'massive', basis: interpreted, default: "> 3.5% of GDP", sensitivity: ["> 3%", "> 4.5%"]}], H1: "No year 1949-2017 with DEF > threshold and GAPU < 0 (war years flagged)."}
+  test: {event: years, sample: "1949 -> 2026", frequency: A, outcome: "counterexample list", holds_if: "zero non-war counterexamples", fails_if: ">= 1"}
+  oos: {split: 2019-06-03, in_sample: "1949-2018", out_of_sample: "2019 -> (record-type claim; OOS not meaningful)"}
+  data: {available: [UNRATE, NROU], missing: ["federal deficit/GDP annual NEW (FRED FYFSGDA188S; catalogue status missing)"]}
+  caveats: ["Historical-record claim, not a regularity; included for completeness."]
+
+- id: C-68
+  title: Monetary and fiscal policy have never been this out of step with the economy (2021)
+  topic: fiscal_record
+  testability: testable
+  importance: 1
+  reliability: S
+  rules: [R-06, R-63]
+  quotes:
+  - {text: "I can't find any period in history where monetary and fiscal policy were this out of step with the economic circumstances, not one.", source: DS/2021-05-11_cnbc-squawk-box-raging-mania-dollar.md, date: 2021-05-11, reliability: S}
+  first_public_statement: {date: 2021-05-11, source: DS/2021-05-11_cnbc-squawk-box-raging-mania-dollar.md}
+  timeline: {held_from: {date: 2020-10, basis: stated, evidence: "2023-11 retrospective: 'by October 2020 the economy was booming'.", source: DS/2023-11-01_cnbc-squawk-box-yellen-debt-drunken-sailors.md}, changes: [], held_until: null, weight_history: [{from: 2021, weight: "context"}], dating: adequate}
+  statement: "In 2021 the combined monetary (Taylor gap) and fiscal (deficit at low unemployment) stance was the loosest relative to conditions on record."
+  hypothesis: {variables: {IDX: "z(TG) + z(deficit/GDP adjusted for UNRATE-NROU)"}, thresholds: [{param: index weights, basis: interpreted, default: equal, sensitivity: ["TG only", "fiscal only"]}], H1: "IDX in 2021 is the most negative (loosest) value 1954-2021."}
+  test: {event: none, sample: "1954 -> 2026", frequency: Q, outcome: "rank of 2021", holds_if: "rank 1", fails_if: "another period looser"}
+  oos: {split: 2021-05-11, in_sample: "1954-2021", out_of_sample: "record claim (n/a)"}
+  data: {available: [FEDFUNDS, CPIAUCSL, UNRATE, NROU], missing: ["deficit/GDP NEW"]}
+  caveats: ["Record claim; 1940s excluded by FF availability."]
+
+- id: C-69
+  title: Know whether you are hot or cold; size accordingly
+  topic: process_self
+  testability: untestable_free_data
+  importance: 3
+  reliability: NP
+  rules: [R-46, R-47]
+  quotes:
+  - {text: "One of my most important jobs as a money manager was to understand whether I was hot or cold.", source: RS/2018-09-06_sokoloff-real-vision-interview.md, date: 2018-09-06, reliability: NP}
+  - {text: "Don't bet big unless a) you love your thesis, and b) you're hot.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, date: 2009-Q4, reliability: NP}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+  timeline: {held_from: {date: 1981, basis: inferred, evidence: "Fund-management career rule; no dated origin.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}, changes: [{date: 2014-07-16, change: "'can't pull the trigger in the same manner' - self-reported lower aggression.", source: DS/2014-07-16_delivering-alpha-kernen.md}, {date: 2019-12-18, change: "'too conservative in my old age'.", source: DS/2019-12-18_bloomberg-schatzker-couldnt-have-been-more-wrong.md}], held_until: null, weight_history: [{from: 1981, weight: core}, {from: 2010, weight: "applied with lower base aggression"}], dating: thin}
+  statement: "A manager's recent P&L streak predicts near-term performance, so size should scale with it."
+  hypothesis: {H1: "Serial correlation of manager-level monthly returns > 0."}
+  untestable_reason: "Requires his own or manager-level daily/monthly P&L; Duquesne/Quantum return series are not public. A proxy test on engine paper P&L (R-53) tests the engine, not the claim."
+  oos: {split: 2009-10-01}
+  data: {available: [], missing: ["fund P&L MISSING"]}
+  caveats: []
+
+- id: C-70
+  title: Sizing is 70-80% of the equation
+  topic: process_self
+  testability: untestable_free_data
+  importance: 3
+  reliability: NP
+  rules: [R-40]
+  quotes:
+  - {text: "Sizing is probably 70 or 80% of the equation. It's not whether you're right or wrong, it's how much you make when you're right.", source: DS/2022-06-XX_sohn-2022-john-collison.md, date: 2022-06, reliability: NP}
+  first_public_statement: {date: 2022-06-10, source: DS/2022-06-XX_sohn-2022-john-collison.md, note: "Soros lesson itself quoted in NMW 1991 (wording unverified)."}
+  timeline: {held_from: {date: 1988, basis: inferred, evidence: "Soros lesson (joined 1988).", source: RS/1992-XX-XX_new-market-wizards-chapter.md}, changes: [], held_until: null, weight_history: [{from: 1988, weight: core}], dating: adequate}
+  statement: "Position size explains most of a discretionary manager's performance."
+  untestable_reason: "Requires position-level history of a manager; not free."
+  oos: {split: 2022-06-10}
+  data: {available: [], missing: ["position-level P&L MISSING"]}
+  caveats: []
+
+- id: C-71
+  title: Diversification is overrated; concentration reduces risk
+  topic: process_self
+  testability: untestable_free_data
+  importance: 2
+  reliability: NP
+  rules: [R-26, R-39]
+  quotes:
+  - {text: "I think diversification and all the stuff they're teaching at business school today is probably the most misguided concept everywhere.", source: RS/2015-01-18_lost-tree-club-speech.md, date: 2015-01-18, reliability: NP}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, note: "'Diversification is overrated--very overrated.'"}
+  timeline: {held_from: {date: 1981, basis: stated, evidence: "1981 bond bet shaped 'you don't need 15 stocks' (Lost Tree).", source: RS/2015-01-18_lost-tree-club-speech.md}, changes: [], held_until: null, weight_history: [{from: 1981, weight: core}], dating: adequate}
+  statement: "Concentrated portfolios of high-conviction ideas outperform diversified ones without more risk."
+  untestable_reason: "A market-level test (concentrated random portfolios) does not test conviction-weighted concentration; manager conviction data not free."
+  oos: {split: 2009-10-01}
+  data: {available: [], missing: ["manager holdings with conviction MISSING (13F partial, equity-only)"]}
+  caveats: []
+
+- id: C-72
+  title: Never use stop-losses; exit when the reason changes
+  topic: process_self
+  testability: untestable_free_data
+  importance: 2
+  reliability: NP
+  rules: [R-49, R-50]
+  quotes:
+  - {text: "I have never used a stop loss in my career.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md, date: 2009-Q4, reliability: NP}
+  - {text: "If the reason I bought a stock is no longer the case, I don't care what I paid for it.", source: RS/2024-11-06_nbim-in-good-company-podcast.md, date: 2024-11-06, reliability: NP}
+  first_public_statement: {date: 2009-10-01, source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}
+  timeline: {held_from: {date: 1977, basis: stated, evidence: "'never ... in my career'.", source: DS/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md}, changes: [], held_until: null, weight_history: [{from: 1977, weight: core}], dating: adequate}
+  statement: "Thesis-based exits outperform price-based stops."
+  untestable_reason: "Thesis invalidation is discretionary; a mechanical engine-level comparison tests the engine's premise rules, not his claim."
+  oos: {split: 2009-10-01}
+  data: {available: [], missing: []}
+  caveats: []
+
+- id: C-73
+  title: Only one or two truly exciting opportunities a year
+  topic: process_self
+  testability: untestable_free_data
+  importance: 2
+  reliability: NP
+  rules: [R-39, R-54]
+  quotes:
+  - {text: "One of the most important things to do is not to play when you don't see a fat pitch. I don't see a fat pitch.", source: DS/2023-04-24_nbim-annual-investment-conference.md, date: 2023-04-24, reliability: NP}
+  first_public_statement: {date: 2015-01-18, source: RS/2015-01-18_lost-tree-club-speech.md, note: "One or two times a year (note summary)."}
+  timeline: {held_from: {date: 1981, basis: stated, evidence: "After Q3 1981 loss adopted a rule to go 100% cash when that bearish (NMW); Jan 2000 'wait for the next fat pitch' (Lost Tree).", source: DS/1992-XX-XX_new-market-wizards-full-chapter-text.md}, changes: [], held_until: null, weight_history: [{from: 1981, weight: core}], dating: adequate}
+  statement: "High-conviction opportunities arrive about once or twice a year."
+  untestable_reason: "'Truly exciting' is his subjective label; only the engine's own fat-pitch rate can be measured (R-39 calibration target)."
+  oos: {split: 2015-01-18}
+  data: {available: [], missing: []}
+  caveats: []
+
+- id: C-74
+  title: Most of his big money came in equity bear markets, via bonds and currencies
+  topic: process_self
+  testability: untestable_free_data
+  importance: 3
+  reliability: NP
+  rules: [R-05, R-26]
+  quotes:
+  - {text: "I probably made about 70% of my money during that time in currencies and bonds...", source: RS/2018-09-06_sokoloff-real-vision-interview.md, date: 2018-09-06, reliability: NP}
+  - {text: "...my highest absolute returns were all in bear markets. I think my average return in bear markets was well over 50%.", source: RS/2018-09-06_sokoloff-real-vision-interview.md, date: 2018-09-06, reliability: NP}
+  first_public_statement: {date: 2015-01-18, source: RS/2015-01-18_lost-tree-club-speech.md}
+  timeline: {held_from: {date: 1981, basis: inferred, evidence: "30-year retrospective.", source: RS/2015-01-18_lost-tree-club-speech.md}, changes: [], held_until: null, weight_history: [{from: 1981, weight: "self-description"}], dating: adequate}
+  statement: "His fund's returns were highest during equity bear markets and came mainly from bonds and FX."
+  untestable_reason: "No free annual/monthly Duquesne or Quantum return series by asset class; the market-level analogue is C-10/C-41."
+  oos: {split: 2015-01-18}
+  data: {available: [], missing: ["fund returns MISSING"]}
+  caveats: []
+
+- id: C-75
+  title: Stock-split price pops signal a mania
+  topic: bubbles_fragility
+  testability: untestable_free_data
+  importance: 1
+  reliability: S
+  rules: [R-11]
+  quotes:
+  - {text: "Companies then go up 50%, 30%, 40% on stock splits. That brings no value, but the stocks go up.", source: DS/2020-09-09_cnbc-squawk-box-absolute-raging-mania.md, date: 2020-09-09, reliability: S}
+  first_public_statement: {date: 2020-09-09, source: DS/2020-09-09_cnbc-squawk-box-absolute-raging-mania.md}
+  timeline: {held_from: {date: 2020-09-09, basis: stated, evidence: "CNBC 2020.", source: DS/2020-09-09_cnbc-squawk-box-absolute-raging-mania.md}, changes: [], held_until: null, weight_history: [{from: 2020, weight: minor}], dating: thin}
+  statement: "Abnormal returns on stock-split announcements are large only during speculative manias and precede poor market returns."
+  hypothesis: {H1: "Mean split-announcement abnormal return in year t predicts lower EQ_US return in t+1..t+3."}
+  untestable_reason: "Requires a historical split-announcement event file with daily prices (CRSP; not free). Alpaca corporate actions from 2021 only."
+  oos: {split: 2020-09-09}
+  data: {available: [], missing: ["split announcement events pre-2021 MISSING"]}
+  caveats: []
+
+- id: C-76
+  title: Bear markets end only when the underlying problem is attacked
+  topic: policy_error
+  testability: untestable_free_data
+  importance: 1
+  reliability: S
+  rules: [R-05]
+  quotes:
+  - {text: "He expected another crisis or major test within two to four years, because bear markets end only when the problem is attacked, as Volcker did in 1982.", source: DS/2012-04-XX_grants-spring-conference-jim-grant.md, date: 2012-04, reliability: S, note: "note summary wording"}
+  first_public_statement: {date: 2012-04-15, source: DS/2012-04-XX_grants-spring-conference-jim-grant.md}
+  timeline: {held_from: {date: 2012-04-15, basis: stated, evidence: "Grant's 2012.", source: DS/2012-04-XX_grants-spring-conference-jim-grant.md}, changes: [], held_until: null, weight_history: [{from: 2012, weight: minor}], dating: thin}
+  statement: "Secular bear markets end only after policy addresses the root imbalance."
+  untestable_reason: "'Problem attacked' has no operational definition; any assignment would be post hoc."
+  oos: {split: 2012-04-15}
+  data: {available: [], missing: []}
+  caveats: []

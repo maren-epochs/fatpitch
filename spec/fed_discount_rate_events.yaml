@@ -1,0 +1,156 @@
+# Federal Reserve discount rate (FRBNY basic/adjustment-credit rate) change events, 1948-2002.
+# For R-14 "direction of the last policy-rate change" before DFEDTAR begins (1982-09-27).
+# Source: FRED series DISCOUNT, "Discount Rate Changes: Historical Dates of Changes and Rates" (DISCONTINUED),
+#   Board of Governors, Federal Reserve Bulletin; https://fred.stlouisfed.org/series/DISCOUNT ; fetched 2026-10-07.
+#   Series note: dates before 1975 are the effective date of the New York Fed change; from 1975 the effective
+#   date of the first Reserve Bank change. Rates exclude the 1980-81 surcharges (basic rate only).
+# Columns:
+#   announced  published_at used (America/New_York): end of the effective day (23:59). Conservative: in every
+#              row checked, the Board announcement fell on or before the effective date (0-2 days earlier), so
+#              the change is seen at most a few days late and never early. Exact announcement dates for the
+#              other rows are not recorded here (gap; FRASER title 9237 holds the Board press releases).
+#   effective  effective date of the new rate (period_end)
+#   rate       new discount rate, percent
+#   direction  +1 increase, -1 decrease versus the previous row (first row: vs 1.00 in force since 1946-04-25)
+#   verified   optional: announcement date and second source for spot-checked rows
+# Cross-check: calendar-day averages implied by these rows match FRED INTDSRUSM193N (IMF IFS, monthly) in all
+# 396 months 1950-01..1982-12 within 0.05 pp (max 0.048, 1976-01); non-change months match exactly.
+# First row 1948-01-12 so the level in force at 1950-01-01 (1.50, set 1948-08-13, an increase) is known.
+version: 2026-10-07.1
+source_url: https://fred.stlouisfed.org/series/DISCOUNT
+events:
+- {announced: '1948-01-12 23:59', effective: '1948-01-12', rate: 1.25, direction: +1}
+- {announced: '1948-08-13 23:59', effective: '1948-08-13', rate: 1.50, direction: +1}
+- {announced: '1950-08-21 23:59', effective: '1950-08-21', rate: 1.75, direction: +1}
+- {announced: '1953-01-16 23:59', effective: '1953-01-16', rate: 2.00, direction: +1}
+- {announced: '1954-02-05 23:59', effective: '1954-02-05', rate: 1.75, direction: -1}
+- {announced: '1954-04-16 23:59', effective: '1954-04-16', rate: 1.50, direction: -1}
+- {announced: '1955-04-15 23:59', effective: '1955-04-15', rate: 1.75, direction: +1}
+- {announced: '1955-08-05 23:59', effective: '1955-08-05', rate: 2.00, direction: +1}
+- {announced: '1955-09-09 23:59', effective: '1955-09-09', rate: 2.25, direction: +1}
+- {announced: '1955-11-18 23:59', effective: '1955-11-18', rate: 2.50, direction: +1}
+- {announced: '1956-04-13 23:59', effective: '1956-04-13', rate: 2.75, direction: +1}
+- {announced: '1956-08-24 23:59', effective: '1956-08-24', rate: 3.00, direction: +1}
+- {announced: '1957-08-23 23:59', effective: '1957-08-23', rate: 3.50, direction: +1}
+- {announced: '1957-11-15 23:59', effective: '1957-11-15', rate: 3.00, direction: -1}
+- {announced: '1958-01-24 23:59', effective: '1958-01-24', rate: 2.75, direction: -1}
+- {announced: '1958-03-07 23:59', effective: '1958-03-07', rate: 2.25, direction: -1}
+- {announced: '1958-04-18 23:59', effective: '1958-04-18', rate: 1.75, direction: -1,
+   verified: {announced_date: '1958-04-17', note: 'Board press release 1958-04-17 (NY, Phila, Chicago, St Louis, Minneapolis)', url: 'https://fraser.stlouisfed.org/title/press-releases-board-governors-federal-reserve-system-9237/board-approves-decrease-discount-rate-reserve-banks-new-york-philadelphia-chicago-st-louis-minneapolis-696912'}}
+- {announced: '1958-09-12 23:59', effective: '1958-09-12', rate: 2.00, direction: +1}
+- {announced: '1958-11-07 23:59', effective: '1958-11-07', rate: 2.50, direction: +1}
+- {announced: '1959-03-06 23:59', effective: '1959-03-06', rate: 3.00, direction: +1}
+- {announced: '1959-05-29 23:59', effective: '1959-05-29', rate: 3.50, direction: +1}
+- {announced: '1959-09-11 23:59', effective: '1959-09-11', rate: 4.00, direction: +1}
+- {announced: '1960-06-10 23:59', effective: '1960-06-10', rate: 3.50, direction: -1}
+- {announced: '1960-08-12 23:59', effective: '1960-08-12', rate: 3.00, direction: -1}
+- {announced: '1963-07-17 23:59', effective: '1963-07-17', rate: 3.50, direction: +1}
+- {announced: '1964-11-24 23:59', effective: '1964-11-24', rate: 4.00, direction: +1}
+- {announced: '1965-12-06 23:59', effective: '1965-12-06', rate: 4.50, direction: +1,
+   verified: {announced_date: '1965-12-05', note: 'FRBNY Circular 5735 (1965-12-05): 4 to 4 1/2 per cent, effective 1965-12-06', url: 'https://fraser.stlouisfed.org/files/docs/historical/ny circulars/1965_05735.pdf'}}
+- {announced: '1967-04-07 23:59', effective: '1967-04-07', rate: 4.00, direction: -1}
+- {announced: '1967-11-20 23:59', effective: '1967-11-20', rate: 4.50, direction: +1}
+- {announced: '1968-03-22 23:59', effective: '1968-03-22', rate: 5.00, direction: +1}
+- {announced: '1968-04-19 23:59', effective: '1968-04-19', rate: 5.50, direction: +1}
+- {announced: '1968-08-30 23:59', effective: '1968-08-30', rate: 5.25, direction: -1}
+- {announced: '1968-12-18 23:59', effective: '1968-12-18', rate: 5.50, direction: +1,
+   verified: {announced_date: '1968-12-17', note: 'FEDS Note 2026-05-29: announcement 1968-12-17', url: 'https://www.federalreserve.gov/econres/notes/feds-notes/federal-reserve-discount-rate-press-releases-in-the-1960s-and-1970s-through-the-lens-of-monetary-policy-accessible-20260529.htm'}}
+- {announced: '1969-04-04 23:59', effective: '1969-04-04', rate: 6.00, direction: +1}
+- {announced: '1970-11-13 23:59', effective: '1970-11-13', rate: 5.75, direction: -1}
+- {announced: '1970-12-04 23:59', effective: '1970-12-04', rate: 5.50, direction: -1}
+- {announced: '1971-01-08 23:59', effective: '1971-01-08', rate: 5.25, direction: -1}
+- {announced: '1971-01-22 23:59', effective: '1971-01-22', rate: 5.00, direction: -1}
+- {announced: '1971-02-19 23:59', effective: '1971-02-19', rate: 4.75, direction: -1}
+- {announced: '1971-07-16 23:59', effective: '1971-07-16', rate: 5.00, direction: +1}
+- {announced: '1971-11-19 23:59', effective: '1971-11-19', rate: 4.75, direction: -1}
+- {announced: '1971-12-17 23:59', effective: '1971-12-17', rate: 4.50, direction: -1}
+- {announced: '1973-01-15 23:59', effective: '1973-01-15', rate: 5.00, direction: +1}
+- {announced: '1973-02-26 23:59', effective: '1973-02-26', rate: 5.50, direction: +1}
+- {announced: '1973-05-04 23:59', effective: '1973-05-04', rate: 5.75, direction: +1}
+- {announced: '1973-05-11 23:59', effective: '1973-05-11', rate: 6.00, direction: +1}
+- {announced: '1973-06-11 23:59', effective: '1973-06-11', rate: 6.50, direction: +1}
+- {announced: '1973-07-02 23:59', effective: '1973-07-02', rate: 7.00, direction: +1}
+- {announced: '1973-08-14 23:59', effective: '1973-08-14', rate: 7.50, direction: +1}
+- {announced: '1974-04-25 23:59', effective: '1974-04-25', rate: 8.00, direction: +1}
+- {announced: '1974-12-09 23:59', effective: '1974-12-09', rate: 7.75, direction: -1}
+- {announced: '1975-01-10 23:59', effective: '1975-01-10', rate: 7.25, direction: -1}
+- {announced: '1975-02-05 23:59', effective: '1975-02-05', rate: 6.75, direction: -1}
+- {announced: '1975-03-10 23:59', effective: '1975-03-10', rate: 6.25, direction: -1}
+- {announced: '1975-05-16 23:59', effective: '1975-05-16', rate: 6.00, direction: -1}
+- {announced: '1976-01-16 23:59', effective: '1976-01-16', rate: 5.50, direction: -1}
+- {announced: '1976-11-22 23:59', effective: '1976-11-22', rate: 5.25, direction: -1}
+- {announced: '1977-08-30 23:59', effective: '1977-08-30', rate: 5.75, direction: +1}
+- {announced: '1977-10-26 23:59', effective: '1977-10-26', rate: 6.00, direction: +1}
+- {announced: '1978-01-09 23:59', effective: '1978-01-09', rate: 6.50, direction: +1}
+- {announced: '1978-05-11 23:59', effective: '1978-05-11', rate: 7.00, direction: +1}
+- {announced: '1978-07-03 23:59', effective: '1978-07-03', rate: 7.25, direction: +1}
+- {announced: '1978-08-21 23:59', effective: '1978-08-21', rate: 7.75, direction: +1}
+- {announced: '1978-09-22 23:59', effective: '1978-09-22', rate: 8.00, direction: +1}
+- {announced: '1978-10-16 23:59', effective: '1978-10-16', rate: 8.50, direction: +1}
+- {announced: '1978-11-01 23:59', effective: '1978-11-01', rate: 9.50, direction: +1}
+- {announced: '1979-07-20 23:59', effective: '1979-07-20', rate: 10.00, direction: +1}
+- {announced: '1979-08-17 23:59', effective: '1979-08-17', rate: 10.50, direction: +1}
+- {announced: '1979-09-19 23:59', effective: '1979-09-19', rate: 11.00, direction: +1}
+- {announced: '1979-10-08 23:59', effective: '1979-10-08', rate: 12.00, direction: +1,
+   verified: {announced_date: '1979-10-06', note: 'FRBNY Circular 8653 (1979-10-09): 11 to 12 percent, effective 1979-10-08', url: 'https://fraser.stlouisfed.org/files/docs/historical/ny circulars/nycirc_1979_08653.pdf'}}
+- {announced: '1980-02-15 23:59', effective: '1980-02-15', rate: 13.00, direction: +1,
+   verified: {announced_date: '1980-02-15', note: 'Board press release 1980-02-15 (NY, Cleveland, San Francisco)', url: 'https://fraser.stlouisfed.org/title/press-releases-board-governors-federal-reserve-system-9237/board-approves-increase-discount-rate-reserve-banks-new-york-cleveland-san-francisco-694919'}}
+- {announced: '1980-05-29 23:59', effective: '1980-05-29', rate: 12.00, direction: -1}
+- {announced: '1980-06-13 23:59', effective: '1980-06-13', rate: 11.00, direction: -1}
+- {announced: '1980-07-28 23:59', effective: '1980-07-28', rate: 10.00, direction: -1}
+- {announced: '1980-09-26 23:59', effective: '1980-09-26', rate: 11.00, direction: +1}
+- {announced: '1980-11-17 23:59', effective: '1980-11-17', rate: 12.00, direction: +1}
+- {announced: '1980-12-05 23:59', effective: '1980-12-05', rate: 13.00, direction: +1}
+- {announced: '1981-05-05 23:59', effective: '1981-05-05', rate: 14.00, direction: +1}
+- {announced: '1981-11-02 23:59', effective: '1981-11-02', rate: 13.00, direction: -1}
+- {announced: '1981-12-04 23:59', effective: '1981-12-04', rate: 12.00, direction: -1}
+- {announced: '1982-07-20 23:59', effective: '1982-07-20', rate: 11.50, direction: -1}
+- {announced: '1982-08-02 23:59', effective: '1982-08-02', rate: 11.00, direction: -1}
+- {announced: '1982-08-16 23:59', effective: '1982-08-16', rate: 10.50, direction: -1}
+- {announced: '1982-08-27 23:59', effective: '1982-08-27', rate: 10.00, direction: -1}
+- {announced: '1982-10-12 23:59', effective: '1982-10-12', rate: 9.50, direction: -1}
+- {announced: '1982-11-22 23:59', effective: '1982-11-22', rate: 9.00, direction: -1}
+- {announced: '1982-12-14 23:59', effective: '1982-12-14', rate: 8.50, direction: -1}
+- {announced: '1984-04-09 23:59', effective: '1984-04-09', rate: 9.00, direction: +1}
+- {announced: '1984-11-21 23:59', effective: '1984-11-21', rate: 8.50, direction: -1}
+- {announced: '1984-12-24 23:59', effective: '1984-12-24', rate: 8.00, direction: -1}
+- {announced: '1985-05-20 23:59', effective: '1985-05-20', rate: 7.50, direction: -1}
+- {announced: '1986-03-07 23:59', effective: '1986-03-07', rate: 7.00, direction: -1}
+- {announced: '1986-04-21 23:59', effective: '1986-04-21', rate: 6.50, direction: -1}
+- {announced: '1986-07-11 23:59', effective: '1986-07-11', rate: 6.00, direction: -1}
+- {announced: '1986-08-21 23:59', effective: '1986-08-21', rate: 5.50, direction: -1}
+- {announced: '1987-09-04 23:59', effective: '1987-09-04', rate: 6.00, direction: +1}
+- {announced: '1988-08-09 23:59', effective: '1988-08-09', rate: 6.50, direction: +1}
+- {announced: '1989-02-24 23:59', effective: '1989-02-24', rate: 7.00, direction: +1}
+- {announced: '1990-12-19 23:59', effective: '1990-12-19', rate: 6.50, direction: -1}
+- {announced: '1991-02-01 23:59', effective: '1991-02-01', rate: 6.00, direction: -1}
+- {announced: '1991-04-30 23:59', effective: '1991-04-30', rate: 5.50, direction: -1}
+- {announced: '1991-09-13 23:59', effective: '1991-09-13', rate: 5.00, direction: -1}
+- {announced: '1991-11-06 23:59', effective: '1991-11-06', rate: 4.50, direction: -1}
+- {announced: '1991-12-20 23:59', effective: '1991-12-20', rate: 3.50, direction: -1}
+- {announced: '1992-07-02 23:59', effective: '1992-07-02', rate: 3.00, direction: -1}
+- {announced: '1994-05-17 23:59', effective: '1994-05-17', rate: 3.50, direction: +1}
+- {announced: '1994-08-16 23:59', effective: '1994-08-16', rate: 4.00, direction: +1}
+- {announced: '1994-11-15 23:59', effective: '1994-11-15', rate: 4.75, direction: +1}
+- {announced: '1995-02-01 23:59', effective: '1995-02-01', rate: 5.25, direction: +1}
+- {announced: '1996-01-31 23:59', effective: '1996-01-31', rate: 5.00, direction: -1}
+- {announced: '1998-10-15 23:59', effective: '1998-10-15', rate: 4.75, direction: -1}
+- {announced: '1998-11-17 23:59', effective: '1998-11-17', rate: 4.50, direction: -1}
+- {announced: '1999-08-24 23:59', effective: '1999-08-24', rate: 4.75, direction: +1}
+- {announced: '1999-11-16 23:59', effective: '1999-11-16', rate: 5.00, direction: +1}
+- {announced: '2000-02-02 23:59', effective: '2000-02-02', rate: 5.25, direction: +1}
+- {announced: '2000-03-21 23:59', effective: '2000-03-21', rate: 5.50, direction: +1}
+- {announced: '2000-05-16 23:59', effective: '2000-05-16', rate: 6.00, direction: +1}
+- {announced: '2001-01-03 23:59', effective: '2001-01-03', rate: 5.75, direction: -1}
+- {announced: '2001-01-04 23:59', effective: '2001-01-04', rate: 5.50, direction: -1}
+- {announced: '2001-01-31 23:59', effective: '2001-01-31', rate: 5.00, direction: -1}
+- {announced: '2001-03-20 23:59', effective: '2001-03-20', rate: 4.50, direction: -1}
+- {announced: '2001-04-18 23:59', effective: '2001-04-18', rate: 4.00, direction: -1}
+- {announced: '2001-05-15 23:59', effective: '2001-05-15', rate: 3.50, direction: -1}
+- {announced: '2001-06-27 23:59', effective: '2001-06-27', rate: 3.25, direction: -1}
+- {announced: '2001-08-21 23:59', effective: '2001-08-21', rate: 3.00, direction: -1}
+- {announced: '2001-09-17 23:59', effective: '2001-09-17', rate: 2.50, direction: -1}
+- {announced: '2001-10-02 23:59', effective: '2001-10-02', rate: 2.00, direction: -1}
+- {announced: '2001-11-06 23:59', effective: '2001-11-06', rate: 1.50, direction: -1}
+- {announced: '2001-12-11 23:59', effective: '2001-12-11', rate: 1.25, direction: -1}
+- {announced: '2002-11-06 23:59', effective: '2002-11-06', rate: 0.75, direction: -1}

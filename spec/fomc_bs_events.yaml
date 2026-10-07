@@ -1,0 +1,75 @@
+# Fed balance-sheet programme regime (R-14 holdings component, R-17 QE state; owner decision 2026-10-07).
+# Source: spec/research_R14_balance_sheet.md section 2 (federalreserve.gov releases fetched 2026-10-07).
+# Read by fatpitch.lake (kind: spec_events) as series FOMC_BS_STATE.
+#
+# Each row is a state change:
+#   announced    release time of the statement, America/New_York (published_at; never used before it)
+#   effective    date from which the new state holds (period_end). Equal to the announcement date for
+#                programme starts and runoff starts; the stated completion date for programme ends, which the
+#                Fed published in advance (no look-ahead).
+#   state        EXPAND (net purchases or maturity extension in force: easing) | RUNOFF (announced runoff in
+#                force: tightening) | NONE (neither, incl. reinvestment-only and technical reserve-management
+#                purchases the FOMC labelled as no change of stance)
+#   time_verified  false = release time from memory; every such release precedes 16:00 ET (same-day visibility
+#                at the close is unaffected)
+# Taper and slowdown phases keep the state (rows kept as `sub` notes, no sign effect).
+# The first row records the baseline: no programme from the Federal Reserve Banks' opening (1914-11-16) until
+# QE1, so a replay date before 2008-11-25 reads NONE rather than unknown.
+version: 2026-10-07.1
+events:
+- {announced: '1914-11-16 00:00', effective: '1914-11-16', state: NONE, time_verified: true,
+   event: Baseline - no balance-sheet programme before QE1, url: 'https://www.federalreservehistory.org/essays/federal-reserve-act-signed'}
+- {announced: '2008-11-25 08:15', effective: '2008-11-25', state: EXPAND, time_verified: true,
+   event: QE1 announced (GSE debt and agency MBS), url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20081125b.htm'}
+- {announced: '2009-03-18 14:15', effective: '2009-03-18', state: EXPAND, time_verified: false, sub: expanded,
+   event: QE1 expanded incl. $300bn Treasuries, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20090318a.htm'}
+- {announced: '2009-08-12 14:15', effective: '2009-08-12', state: EXPAND, time_verified: false, sub: taper,
+   event: Treasury purchases slowed, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20090812a.htm'}
+- {announced: '2009-09-23 14:15', effective: '2009-09-23', state: EXPAND, time_verified: false, sub: taper,
+   event: MBS and agency purchases slowed, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20090923a.htm'}
+- {announced: '2010-03-16 14:15', effective: '2010-04-01', state: NONE, time_verified: false,
+   event: QE1 purchases completed by end of March, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20100316a.htm'}
+- {announced: '2010-11-03 14:15', effective: '2010-11-03', state: EXPAND, time_verified: false,
+   event: QE2 $600bn Treasuries, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20101103a.htm'}
+- {announced: '2011-06-22 12:30', effective: '2011-07-01', state: NONE, time_verified: false,
+   event: QE2 completed end of June, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20110622a.htm'}
+- {announced: '2011-09-21 14:15', effective: '2011-09-21', state: EXPAND, time_verified: false, sub: maturity_extension,
+   event: Operation Twist, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20110921a.htm'}
+- {announced: '2012-06-20 12:30', effective: '2012-06-20', state: EXPAND, time_verified: false, sub: maturity_extension,
+   event: Twist extended through end-2012, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20120620a.htm'}
+- {announced: '2012-09-13 12:30', effective: '2012-09-13', state: EXPAND, time_verified: false,
+   event: QE3 MBS $40bn/month, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20120913a.htm'}
+- {announced: '2012-12-12 12:30', effective: '2012-12-12', state: EXPAND, time_verified: false,
+   event: QE3 Treasuries $45bn/month, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20121212a.htm'}
+- {announced: '2013-12-18 14:00', effective: '2013-12-18', state: EXPAND, time_verified: false, sub: taper,
+   event: Taper announced, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20131218a.htm'}
+- {announced: '2014-10-29 14:00', effective: '2014-11-01', state: NONE, time_verified: false,
+   event: QE3 purchases concluded in October, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20141029a.htm'}
+- {announced: '2017-09-20 14:00', effective: '2017-09-20', state: RUNOFF, time_verified: true,
+   event: QT1 to start October 2017, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20170920a.htm'}
+- {announced: '2019-03-20 14:00', effective: '2019-03-20', state: RUNOFF, time_verified: true, sub: slowed,
+   event: QT slowdown and end plan, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20190320c.htm'}
+- {announced: '2019-07-31 14:00', effective: '2019-08-01', state: NONE, time_verified: true,
+   event: QT ends in August, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20190731a.htm'}
+- {announced: '2019-10-11 11:00', effective: '2019-10-11', state: NONE, time_verified: true, sub: reserve_management,
+   event: Reserve-management bill purchases (technical), url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20191011a.htm'}
+- {announced: '2020-03-15 17:00', effective: '2020-03-15', state: EXPAND, time_verified: true,
+   event: QE4, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20200315a.htm'}
+- {announced: '2020-03-23 08:00', effective: '2020-03-23', state: EXPAND, time_verified: true, sub: open_ended,
+   event: Purchases in the amounts needed, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20200323b.htm'}
+- {announced: '2021-11-03 14:00', effective: '2021-11-03', state: EXPAND, time_verified: true, sub: taper,
+   event: Taper announced, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20211103a.htm'}
+- {announced: '2021-12-15 14:00', effective: '2021-12-15', state: EXPAND, time_verified: true, sub: taper,
+   event: Taper doubled, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20211215a.htm'}
+- {announced: '2022-01-26 14:00', effective: '2022-03-10', state: NONE, time_verified: true,
+   event: Purchases end early March (final purchase day approx. 2022-03-09 unverified), url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20220126a.htm'}
+- {announced: '2022-05-04 14:00', effective: '2022-05-04', state: RUNOFF, time_verified: false,
+   event: QT2 plan, start 2022-06-01, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20220504b.htm'}
+- {announced: '2024-05-01 14:00', effective: '2024-05-01', state: RUNOFF, time_verified: true, sub: slowed,
+   event: QT slowdown, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20240501a.htm'}
+- {announced: '2025-03-19 14:00', effective: '2025-03-19', state: RUNOFF, time_verified: true, sub: slowed,
+   event: Further QT slowdown, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20250319a.htm'}
+- {announced: '2025-10-29 14:00', effective: '2025-12-01', state: NONE, time_verified: true,
+   event: QT ends 2025-12-01, url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20251029a.htm'}
+- {announced: '2025-12-10 14:00', effective: '2025-12-10', state: NONE, time_verified: true, sub: reserve_management,
+   event: Reserve-management bill purchases (technical), url: 'https://www.federalreserve.gov/newsevents/pressreleases/monetary20251210a.htm'}

@@ -1,0 +1,1738 @@
+purpose: Fed cycle check answer key (spec/scoring.md section 6d; owner decision 2026-10-07, option A). Public Fed
+  facts, not documented reads; holdout-period dates may be used.
+built_utc: '2026-10-07T07:35:04+00:00'
+rule:
+  events: '1982-09-27..2008-12-15 changes of FRED DFEDTAR; 2008-12-16.. changes of FRED DFEDTARU (the splice step
+    1.00 -> 0.25 counts as a cut); before 1982-09: turning points of monthly FEDFUNDS (extreme within +-6 months,
+    alternation, adjacent moves >= 1.0 pp); tightening = month after trough .. peak, easing = month after peak ..
+    trough'
+  cycles: consecutive same-sign changes form one cycle (first change month .. last change month); same-direction
+    cycles across the 1982-09 and 2008-12 splices are merged
+  label: easing if inside an easing cycle; else tightening if inside a tightening rate cycle or a QT period; else
+    neutral (pause)
+sources:
+  FEDFUNDS: https://fred.stlouisfed.org/series/FEDFUNDS (amber lake copy)
+  DFEDTAR: https://fred.stlouisfed.org/series/DFEDTAR (amber lake copy)
+  DFEDTARU: https://fred.stlouisfed.org/series/DFEDTARU (data/fed/DFEDTARU.csv, sha256 de9495896c92ea5c)
+  published_chronology:
+  - https://www.federalreserve.gov/monetarypolicy/openmarket.htm
+  - https://www.federalreserve.gov/monetarypolicy/openmarket_archive.htm
+cross_check_1990_on:
+  scope: target-era changes from 1990-01-01, same sign within 1 calendar day
+  n_ours: 110
+  n_published: 110
+  unmatched_ours: []
+  unmatched_published: []
+cross_check_pre_1990: 'Not cross-checked against a downloaded published table: the Board''s tables start in 1990
+  and the New York Fed historical page returned no content. The pre-1982 rule output is listed in full below for
+  review.'
+qt_periods:
+- period: 2017-10 .. 2019-07
+  start: 2017-10
+  end: 2019-07
+  basis: 'FOMC statement 2017-09-20: balance sheet normalization program initiated in October 2017; FOMC statement
+    2019-07-31: reduction of aggregate securities holdings concluded in August 2019 (runoff ends 2019-08-01, last
+    QT month July)'
+  urls:
+  - https://www.federalreserve.gov/newsevents/pressreleases/monetary20170920a.htm
+  - https://www.federalreserve.gov/newsevents/pressreleases/monetary20190731a.htm
+- period: 2022-06 .. 2025-11
+  start: 2022-06
+  end: 2025-11
+  basis: 'FOMC 2022-05-04: Plans for Reducing the Size of the Balance Sheet, runoff beginning June 1, 2022; FOMC
+    statement 2025-10-29: reduction of aggregate securities holdings concluded on December 1, 2025 (last QT month
+    November)'
+  urls:
+  - https://www.federalreserve.gov/newsevents/pressreleases/monetary20220504b.htm
+  - https://www.federalreserve.gov/newsevents/pressreleases/monetary20251029a.htm
+rate_cycles:
+- direction: easing
+  start: 1969-09
+  end: 1971-03
+  source: FEDFUNDS turning points
+  level_start: 9.19
+  level_end: 3.71
+  n_changes: 0
+  changes: []
+- direction: tightening
+  start: 1971-04
+  end: 1971-08
+  source: FEDFUNDS turning points
+  level_start: 3.71
+  level_end: 5.57
+  n_changes: 0
+  changes: []
+- direction: easing
+  start: 1971-09
+  end: 1972-02
+  source: FEDFUNDS turning points
+  level_start: 5.57
+  level_end: 3.3
+  n_changes: 0
+  changes: []
+- direction: tightening
+  start: 1972-03
+  end: 1973-09
+  source: FEDFUNDS turning points
+  level_start: 3.3
+  level_end: 10.78
+  n_changes: 0
+  changes: []
+- direction: easing
+  start: 1973-10
+  end: 1974-02
+  source: FEDFUNDS turning points
+  level_start: 10.78
+  level_end: 8.97
+  n_changes: 0
+  changes: []
+- direction: tightening
+  start: 1974-03
+  end: 1974-07
+  source: FEDFUNDS turning points
+  level_start: 8.97
+  level_end: 12.92
+  n_changes: 0
+  changes: []
+- direction: easing
+  start: 1974-08
+  end: 1975-05
+  source: FEDFUNDS turning points
+  level_start: 12.92
+  level_end: 5.22
+  n_changes: 0
+  changes: []
+- direction: tightening
+  start: 1975-06
+  end: 1975-09
+  source: FEDFUNDS turning points
+  level_start: 5.22
+  level_end: 6.24
+  n_changes: 0
+  changes: []
+- direction: easing
+  start: 1975-10
+  end: 1977-01
+  source: FEDFUNDS turning points
+  level_start: 6.24
+  level_end: 4.61
+  n_changes: 0
+  changes: []
+- direction: tightening
+  start: 1977-02
+  end: 1980-04
+  source: FEDFUNDS turning points
+  level_start: 4.61
+  level_end: 17.61
+  n_changes: 0
+  changes: []
+- direction: easing
+  start: 1980-05
+  end: 1980-07
+  source: FEDFUNDS turning points
+  level_start: 17.61
+  level_end: 9.03
+  n_changes: 0
+  changes: []
+- direction: tightening
+  start: 1980-08
+  end: 1981-06
+  source: FEDFUNDS turning points
+  level_start: 9.03
+  level_end: 19.1
+  n_changes: 0
+  changes: []
+- direction: easing
+  start: 1981-07
+  end: 1982-12
+  source: FEDFUNDS turning points+DFEDTAR
+  level_start: 19.1
+  level_end: 8.5
+  n_changes: 4
+  changes:
+  - date: '1982-10-01'
+    change_pp: -0.25
+    level: 10.0
+    series: DFEDTAR
+  - date: '1982-10-07'
+    change_pp: -0.5
+    level: 9.5
+    series: DFEDTAR
+  - date: '1982-11-19'
+    change_pp: -0.5
+    level: 9.0
+    series: DFEDTAR
+  - date: '1982-12-14'
+    change_pp: -0.5
+    level: 8.5
+    series: DFEDTAR
+- direction: tightening
+  start: 1983-03
+  end: 1984-08
+  source: DFEDTAR
+  level_start: 8.5
+  level_end: 11.5
+  n_changes: 10
+  changes:
+  - date: '1983-03-31'
+    change_pp: 0.125
+    level: 8.625
+    series: DFEDTAR
+  - date: '1983-05-25'
+    change_pp: 0.125
+    level: 8.75
+    series: DFEDTAR
+  - date: '1983-06-24'
+    change_pp: 0.25
+    level: 9.0
+    series: DFEDTAR
+  - date: '1983-07-14'
+    change_pp: 0.25
+    level: 9.25
+    series: DFEDTAR
+  - date: '1983-07-20'
+    change_pp: 0.1875
+    level: 9.4375
+    series: DFEDTAR
+  - date: '1983-08-11'
+    change_pp: 0.125
+    level: 9.5625
+    series: DFEDTAR
+  - date: '1984-03-29'
+    change_pp: 1.125
+    level: 10.5
+    series: DFEDTAR
+  - date: '1984-07-05'
+    change_pp: 0.5
+    level: 11.0
+    series: DFEDTAR
+  - date: '1984-07-19'
+    change_pp: 0.25
+    level: 11.25
+    series: DFEDTAR
+  - date: '1984-08-09'
+    change_pp: 0.25
+    level: 11.5
+    series: DFEDTAR
+- direction: easing
+  start: 1984-09
+  end: 1984-12
+  source: DFEDTAR
+  level_start: 11.5
+  level_end: 8.125
+  n_changes: 9
+  changes:
+  - date: '1984-09-20'
+    change_pp: -0.25
+    level: 11.25
+    series: DFEDTAR
+  - date: '1984-09-27'
+    change_pp: -0.25
+    level: 11.0
+    series: DFEDTAR
+  - date: '1984-10-11'
+    change_pp: -0.5
+    level: 10.5
+    series: DFEDTAR
+  - date: '1984-10-18'
+    change_pp: -0.5
+    level: 10.0
+    series: DFEDTAR
+  - date: '1984-11-08'
+    change_pp: -0.5
+    level: 9.5
+    series: DFEDTAR
+  - date: '1984-11-23'
+    change_pp: -0.5
+    level: 9.0
+    series: DFEDTAR
+  - date: '1984-12-06'
+    change_pp: -0.25
+    level: 8.75
+    series: DFEDTAR
+  - date: '1984-12-19'
+    change_pp: -0.25
+    level: 8.5
+    series: DFEDTAR
+  - date: '1984-12-24'
+    change_pp: -0.375
+    level: 8.125
+    series: DFEDTAR
+- direction: tightening
+  start: 1985-01
+  end: 1985-03
+  source: DFEDTAR
+  level_start: 8.125
+  level_end: 8.5
+  n_changes: 3
+  changes:
+  - date: '1985-01-24'
+    change_pp: 0.125
+    level: 8.25
+    series: DFEDTAR
+  - date: '1985-02-14'
+    change_pp: 0.125
+    level: 8.375
+    series: DFEDTAR
+  - date: '1985-03-28'
+    change_pp: 0.125
+    level: 8.5
+    series: DFEDTAR
+- direction: easing
+  start: 1985-04
+  end: 1985-07
+  source: DFEDTAR
+  level_start: 8.5
+  level_end: 7.6875
+  n_changes: 3
+  changes:
+  - date: '1985-04-25'
+    change_pp: -0.25
+    level: 8.25
+    series: DFEDTAR
+  - date: '1985-05-20'
+    change_pp: -0.5
+    level: 7.75
+    series: DFEDTAR
+  - date: '1985-07-11'
+    change_pp: -0.0625
+    level: 7.6875
+    series: DFEDTAR
+- direction: tightening
+  start: 1985-07
+  end: 1985-09
+  source: DFEDTAR
+  level_start: 7.6875
+  level_end: 8.0
+  n_changes: 3
+  changes:
+  - date: '1985-07-25'
+    change_pp: 0.0625
+    level: 7.75
+    series: DFEDTAR
+  - date: '1985-08-21'
+    change_pp: 0.0625
+    level: 7.8125
+    series: DFEDTAR
+  - date: '1985-09-06'
+    change_pp: 0.1875
+    level: 8.0
+    series: DFEDTAR
+- direction: easing
+  start: 1985-12
+  end: 1986-08
+  source: DFEDTAR
+  level_start: 8.0
+  level_end: 5.875
+  n_changes: 5
+  changes:
+  - date: '1985-12-18'
+    change_pp: -0.25
+    level: 7.75
+    series: DFEDTAR
+  - date: '1986-03-07'
+    change_pp: -0.5
+    level: 7.25
+    series: DFEDTAR
+  - date: '1986-04-21'
+    change_pp: -0.5625
+    level: 6.75
+    series: DFEDTAR
+  - date: '1986-07-11'
+    change_pp: -0.5
+    level: 6.375
+    series: DFEDTAR
+  - date: '1986-08-21'
+    change_pp: -0.5
+    level: 5.875
+    series: DFEDTAR
+- direction: tightening
+  start: 1987-01
+  end: 1987-09
+  source: DFEDTAR
+  level_start: 5.875
+  level_end: 7.3125
+  n_changes: 7
+  changes:
+  - date: '1987-01-05'
+    change_pp: 0.125
+    level: 6.0
+    series: DFEDTAR
+  - date: '1987-04-30'
+    change_pp: 0.5
+    level: 6.5
+    series: DFEDTAR
+  - date: '1987-05-22'
+    change_pp: 0.25
+    level: 6.75
+    series: DFEDTAR
+  - date: '1987-08-27'
+    change_pp: 0.125
+    level: 6.75
+    series: DFEDTAR
+  - date: '1987-09-03'
+    change_pp: 0.125
+    level: 6.875
+    series: DFEDTAR
+  - date: '1987-09-04'
+    change_pp: 0.375
+    level: 7.25
+    series: DFEDTAR
+  - date: '1987-09-24'
+    change_pp: 0.0625
+    level: 7.3125
+    series: DFEDTAR
+- direction: easing
+  start: 1987-11
+  end: 1988-02
+  source: DFEDTAR
+  level_start: 7.3125
+  level_end: 6.5
+  n_changes: 3
+  changes:
+  - date: '1987-11-04'
+    change_pp: -0.5
+    level: 6.8125
+    series: DFEDTAR
+  - date: '1988-01-28'
+    change_pp: -0.1875
+    level: 6.625
+    series: DFEDTAR
+  - date: '1988-02-11'
+    change_pp: -0.125
+    level: 6.5
+    series: DFEDTAR
+- direction: tightening
+  start: 1988-03
+  end: 1989-05
+  source: DFEDTAR
+  level_start: 6.5
+  level_end: 9.8125
+  n_changes: 16
+  changes:
+  - date: '1988-03-30'
+    change_pp: 0.25
+    level: 6.75
+    series: DFEDTAR
+  - date: '1988-05-09'
+    change_pp: 0.25
+    level: 7.0
+    series: DFEDTAR
+  - date: '1988-05-25'
+    change_pp: 0.25
+    level: 7.25
+    series: DFEDTAR
+  - date: '1988-06-22'
+    change_pp: 0.1875
+    level: 7.4375
+    series: DFEDTAR
+  - date: '1988-07-01'
+    change_pp: 0.0625
+    level: 7.5
+    series: DFEDTAR
+  - date: '1988-07-19'
+    change_pp: 0.1875
+    level: 7.6875
+    series: DFEDTAR
+  - date: '1988-08-08'
+    change_pp: 0.0625
+    level: 7.75
+    series: DFEDTAR
+  - date: '1988-08-09'
+    change_pp: 0.375
+    level: 8.125
+    series: DFEDTAR
+  - date: '1988-11-17'
+    change_pp: 0.1875
+    level: 8.3125
+    series: DFEDTAR
+  - date: '1988-11-22'
+    change_pp: 0.0625
+    level: 8.375
+    series: DFEDTAR
+  - date: '1988-12-15'
+    change_pp: 0.3125
+    level: 8.6875
+    series: DFEDTAR
+  - date: '1989-01-05'
+    change_pp: 0.3125
+    level: 9.0
+    series: DFEDTAR
+  - date: '1989-02-09'
+    change_pp: 0.125
+    level: 9.125
+    series: DFEDTAR
+  - date: '1989-02-14'
+    change_pp: 0.1875
+    level: 9.3125
+    series: DFEDTAR
+  - date: '1989-02-24'
+    change_pp: 0.4375
+    level: 9.75
+    series: DFEDTAR
+  - date: '1989-05-17'
+    change_pp: 0.0625
+    level: 9.8125
+    series: DFEDTAR
+- direction: easing
+  start: 1989-06
+  end: 1992-09
+  source: DFEDTAR
+  level_start: 9.8125
+  level_end: 3.0
+  n_changes: 24
+  changes:
+  - date: '1989-06-06'
+    change_pp: -0.25
+    level: 9.5625
+    series: DFEDTAR
+  - date: '1989-07-07'
+    change_pp: -0.25
+    level: 9.3125
+    series: DFEDTAR
+  - date: '1989-07-27'
+    change_pp: -0.25
+    level: 9.0625
+    series: DFEDTAR
+  - date: '1989-10-19'
+    change_pp: -0.3125
+    level: 8.75
+    series: DFEDTAR
+  - date: '1989-11-06'
+    change_pp: -0.25
+    level: 8.5
+    series: DFEDTAR
+  - date: '1989-12-20'
+    change_pp: -0.25
+    level: 8.25
+    series: DFEDTAR
+  - date: '1990-07-13'
+    change_pp: -0.25
+    level: 8.0
+    series: DFEDTAR
+  - date: '1990-10-29'
+    change_pp: -0.25
+    level: 7.75
+    series: DFEDTAR
+  - date: '1990-11-14'
+    change_pp: -0.25
+    level: 7.5
+    series: DFEDTAR
+  - date: '1990-12-07'
+    change_pp: -0.25
+    level: 7.25
+    series: DFEDTAR
+  - date: '1990-12-19'
+    change_pp: -0.25
+    level: 7.0
+    series: DFEDTAR
+  - date: '1991-01-09'
+    change_pp: -0.25
+    level: 6.75
+    series: DFEDTAR
+  - date: '1991-02-01'
+    change_pp: -0.5
+    level: 6.25
+    series: DFEDTAR
+  - date: '1991-03-08'
+    change_pp: -0.25
+    level: 6.0
+    series: DFEDTAR
+  - date: '1991-04-30'
+    change_pp: -0.25
+    level: 5.75
+    series: DFEDTAR
+  - date: '1991-08-06'
+    change_pp: -0.25
+    level: 5.5
+    series: DFEDTAR
+  - date: '1991-09-13'
+    change_pp: -0.25
+    level: 5.25
+    series: DFEDTAR
+  - date: '1991-10-31'
+    change_pp: -0.25
+    level: 5.0
+    series: DFEDTAR
+  - date: '1991-11-06'
+    change_pp: -0.25
+    level: 4.75
+    series: DFEDTAR
+  - date: '1991-12-06'
+    change_pp: -0.25
+    level: 4.5
+    series: DFEDTAR
+  - date: '1991-12-20'
+    change_pp: -0.5
+    level: 4.0
+    series: DFEDTAR
+  - date: '1992-04-09'
+    change_pp: -0.25
+    level: 3.75
+    series: DFEDTAR
+  - date: '1992-07-02'
+    change_pp: -0.5
+    level: 3.25
+    series: DFEDTAR
+  - date: '1992-09-04'
+    change_pp: -0.25
+    level: 3.0
+    series: DFEDTAR
+- direction: tightening
+  start: 1994-02
+  end: 1995-02
+  source: DFEDTAR
+  level_start: 3.0
+  level_end: 6.0
+  n_changes: 7
+  changes:
+  - date: '1994-02-04'
+    change_pp: 0.25
+    level: 3.25
+    series: DFEDTAR
+  - date: '1994-03-22'
+    change_pp: 0.25
+    level: 3.5
+    series: DFEDTAR
+  - date: '1994-04-18'
+    change_pp: 0.25
+    level: 3.75
+    series: DFEDTAR
+  - date: '1994-05-17'
+    change_pp: 0.5
+    level: 4.25
+    series: DFEDTAR
+  - date: '1994-08-16'
+    change_pp: 0.5
+    level: 4.75
+    series: DFEDTAR
+  - date: '1994-11-15'
+    change_pp: 0.75
+    level: 5.5
+    series: DFEDTAR
+  - date: '1995-02-01'
+    change_pp: 0.5
+    level: 6.0
+    series: DFEDTAR
+- direction: easing
+  start: 1995-07
+  end: 1996-01
+  source: DFEDTAR
+  level_start: 6.0
+  level_end: 5.25
+  n_changes: 3
+  changes:
+  - date: '1995-07-06'
+    change_pp: -0.25
+    level: 5.75
+    series: DFEDTAR
+  - date: '1995-12-19'
+    change_pp: -0.25
+    level: 5.5
+    series: DFEDTAR
+  - date: '1996-01-31'
+    change_pp: -0.25
+    level: 5.25
+    series: DFEDTAR
+- direction: tightening
+  start: 1997-03
+  end: 1997-03
+  source: DFEDTAR
+  level_start: 5.25
+  level_end: 5.5
+  n_changes: 1
+  changes:
+  - date: '1997-03-25'
+    change_pp: 0.25
+    level: 5.5
+    series: DFEDTAR
+- direction: easing
+  start: 1998-09
+  end: 1998-11
+  source: DFEDTAR
+  level_start: 5.5
+  level_end: 4.75
+  n_changes: 3
+  changes:
+  - date: '1998-09-29'
+    change_pp: -0.25
+    level: 5.25
+    series: DFEDTAR
+  - date: '1998-10-15'
+    change_pp: -0.25
+    level: 5.0
+    series: DFEDTAR
+  - date: '1998-11-17'
+    change_pp: -0.25
+    level: 4.75
+    series: DFEDTAR
+- direction: tightening
+  start: 1999-06
+  end: 2000-05
+  source: DFEDTAR
+  level_start: 4.75
+  level_end: 6.5
+  n_changes: 6
+  changes:
+  - date: '1999-06-30'
+    change_pp: 0.25
+    level: 5.0
+    series: DFEDTAR
+  - date: '1999-08-24'
+    change_pp: 0.25
+    level: 5.25
+    series: DFEDTAR
+  - date: '1999-11-16'
+    change_pp: 0.25
+    level: 5.5
+    series: DFEDTAR
+  - date: '2000-02-02'
+    change_pp: 0.25
+    level: 5.75
+    series: DFEDTAR
+  - date: '2000-03-21'
+    change_pp: 0.25
+    level: 6.0
+    series: DFEDTAR
+  - date: '2000-05-16'
+    change_pp: 0.5
+    level: 6.5
+    series: DFEDTAR
+- direction: easing
+  start: 2001-01
+  end: 2003-06
+  source: DFEDTAR
+  level_start: 6.5
+  level_end: 1.0
+  n_changes: 13
+  changes:
+  - date: '2001-01-03'
+    change_pp: -0.5
+    level: 6.0
+    series: DFEDTAR
+  - date: '2001-01-31'
+    change_pp: -0.5
+    level: 5.5
+    series: DFEDTAR
+  - date: '2001-03-20'
+    change_pp: -0.5
+    level: 5.0
+    series: DFEDTAR
+  - date: '2001-04-18'
+    change_pp: -0.5
+    level: 4.5
+    series: DFEDTAR
+  - date: '2001-05-15'
+    change_pp: -0.5
+    level: 4.0
+    series: DFEDTAR
+  - date: '2001-06-27'
+    change_pp: -0.25
+    level: 3.75
+    series: DFEDTAR
+  - date: '2001-08-21'
+    change_pp: -0.25
+    level: 3.5
+    series: DFEDTAR
+  - date: '2001-09-17'
+    change_pp: -0.5
+    level: 3.0
+    series: DFEDTAR
+  - date: '2001-10-02'
+    change_pp: -0.5
+    level: 2.5
+    series: DFEDTAR
+  - date: '2001-11-06'
+    change_pp: -0.5
+    level: 2.0
+    series: DFEDTAR
+  - date: '2001-12-11'
+    change_pp: -0.25
+    level: 1.75
+    series: DFEDTAR
+  - date: '2002-11-06'
+    change_pp: -0.5
+    level: 1.25
+    series: DFEDTAR
+  - date: '2003-06-25'
+    change_pp: -0.25
+    level: 1.0
+    series: DFEDTAR
+- direction: tightening
+  start: 2004-06
+  end: 2006-06
+  source: DFEDTAR
+  level_start: 1.0
+  level_end: 5.25
+  n_changes: 17
+  changes:
+  - date: '2004-06-30'
+    change_pp: 0.25
+    level: 1.25
+    series: DFEDTAR
+  - date: '2004-08-10'
+    change_pp: 0.25
+    level: 1.5
+    series: DFEDTAR
+  - date: '2004-09-21'
+    change_pp: 0.25
+    level: 1.75
+    series: DFEDTAR
+  - date: '2004-11-10'
+    change_pp: 0.25
+    level: 2.0
+    series: DFEDTAR
+  - date: '2004-12-14'
+    change_pp: 0.25
+    level: 2.25
+    series: DFEDTAR
+  - date: '2005-02-02'
+    change_pp: 0.25
+    level: 2.5
+    series: DFEDTAR
+  - date: '2005-03-22'
+    change_pp: 0.25
+    level: 2.75
+    series: DFEDTAR
+  - date: '2005-05-03'
+    change_pp: 0.25
+    level: 3.0
+    series: DFEDTAR
+  - date: '2005-06-30'
+    change_pp: 0.25
+    level: 3.25
+    series: DFEDTAR
+  - date: '2005-08-09'
+    change_pp: 0.25
+    level: 3.5
+    series: DFEDTAR
+  - date: '2005-09-20'
+    change_pp: 0.25
+    level: 3.75
+    series: DFEDTAR
+  - date: '2005-11-01'
+    change_pp: 0.25
+    level: 4.0
+    series: DFEDTAR
+  - date: '2005-12-13'
+    change_pp: 0.25
+    level: 4.25
+    series: DFEDTAR
+  - date: '2006-01-31'
+    change_pp: 0.25
+    level: 4.5
+    series: DFEDTAR
+  - date: '2006-03-28'
+    change_pp: 0.25
+    level: 4.75
+    series: DFEDTAR
+  - date: '2006-05-10'
+    change_pp: 0.25
+    level: 5.0
+    series: DFEDTAR
+  - date: '2006-06-29'
+    change_pp: 0.25
+    level: 5.25
+    series: DFEDTAR
+- direction: easing
+  start: 2007-09
+  end: 2008-12
+  source: DFEDTAR+DFEDTARU
+  level_start: 5.25
+  level_end: 0.25
+  n_changes: 10
+  changes:
+  - date: '2007-09-18'
+    change_pp: -0.5
+    level: 4.75
+    series: DFEDTAR
+  - date: '2007-10-31'
+    change_pp: -0.25
+    level: 4.5
+    series: DFEDTAR
+  - date: '2007-12-11'
+    change_pp: -0.25
+    level: 4.25
+    series: DFEDTAR
+  - date: '2008-01-22'
+    change_pp: -0.75
+    level: 3.5
+    series: DFEDTAR
+  - date: '2008-01-30'
+    change_pp: -0.5
+    level: 3.0
+    series: DFEDTAR
+  - date: '2008-03-18'
+    change_pp: -0.75
+    level: 2.25
+    series: DFEDTAR
+  - date: '2008-04-30'
+    change_pp: -0.25
+    level: 2.0
+    series: DFEDTAR
+  - date: '2008-10-08'
+    change_pp: -0.5
+    level: 1.5
+    series: DFEDTAR
+  - date: '2008-10-29'
+    change_pp: -0.5
+    level: 1.0
+    series: DFEDTAR
+  - date: '2008-12-16'
+    change_pp: -0.75
+    level: 0.25
+    series: DFEDTARU
+- direction: tightening
+  start: 2015-12
+  end: 2018-12
+  source: DFEDTARU
+  level_start: 0.25
+  level_end: 2.5
+  n_changes: 9
+  changes:
+  - date: '2015-12-16'
+    change_pp: 0.25
+    level: 0.5
+    series: DFEDTARU
+  - date: '2016-12-14'
+    change_pp: 0.25
+    level: 0.75
+    series: DFEDTARU
+  - date: '2017-03-16'
+    change_pp: 0.25
+    level: 1.0
+    series: DFEDTARU
+  - date: '2017-06-15'
+    change_pp: 0.25
+    level: 1.25
+    series: DFEDTARU
+  - date: '2017-12-14'
+    change_pp: 0.25
+    level: 1.5
+    series: DFEDTARU
+  - date: '2018-03-22'
+    change_pp: 0.25
+    level: 1.75
+    series: DFEDTARU
+  - date: '2018-06-14'
+    change_pp: 0.25
+    level: 2.0
+    series: DFEDTARU
+  - date: '2018-09-27'
+    change_pp: 0.25
+    level: 2.25
+    series: DFEDTARU
+  - date: '2018-12-20'
+    change_pp: 0.25
+    level: 2.5
+    series: DFEDTARU
+- direction: easing
+  start: 2019-08
+  end: 2020-03
+  source: DFEDTARU
+  level_start: 2.5
+  level_end: 0.25
+  n_changes: 5
+  changes:
+  - date: '2019-08-01'
+    change_pp: -0.25
+    level: 2.25
+    series: DFEDTARU
+  - date: '2019-09-19'
+    change_pp: -0.25
+    level: 2.0
+    series: DFEDTARU
+  - date: '2019-10-31'
+    change_pp: -0.25
+    level: 1.75
+    series: DFEDTARU
+  - date: '2020-03-04'
+    change_pp: -0.5
+    level: 1.25
+    series: DFEDTARU
+  - date: '2020-03-16'
+    change_pp: -1.0
+    level: 0.25
+    series: DFEDTARU
+- direction: tightening
+  start: 2022-03
+  end: 2023-07
+  source: DFEDTARU
+  level_start: 0.25
+  level_end: 5.5
+  n_changes: 11
+  changes:
+  - date: '2022-03-17'
+    change_pp: 0.25
+    level: 0.5
+    series: DFEDTARU
+  - date: '2022-05-05'
+    change_pp: 0.5
+    level: 1.0
+    series: DFEDTARU
+  - date: '2022-06-16'
+    change_pp: 0.75
+    level: 1.75
+    series: DFEDTARU
+  - date: '2022-07-28'
+    change_pp: 0.75
+    level: 2.5
+    series: DFEDTARU
+  - date: '2022-09-22'
+    change_pp: 0.75
+    level: 3.25
+    series: DFEDTARU
+  - date: '2022-11-03'
+    change_pp: 0.75
+    level: 4.0
+    series: DFEDTARU
+  - date: '2022-12-15'
+    change_pp: 0.5
+    level: 4.5
+    series: DFEDTARU
+  - date: '2023-02-02'
+    change_pp: 0.25
+    level: 4.75
+    series: DFEDTARU
+  - date: '2023-03-23'
+    change_pp: 0.25
+    level: 5.0
+    series: DFEDTARU
+  - date: '2023-05-04'
+    change_pp: 0.25
+    level: 5.25
+    series: DFEDTARU
+  - date: '2023-07-27'
+    change_pp: 0.25
+    level: 5.5
+    series: DFEDTARU
+- direction: easing
+  start: 2024-09
+  end: 2025-12
+  source: DFEDTARU
+  level_start: 5.5
+  level_end: 3.75
+  n_changes: 6
+  changes:
+  - date: '2024-09-19'
+    change_pp: -0.5
+    level: 5.0
+    series: DFEDTARU
+  - date: '2024-11-08'
+    change_pp: -0.25
+    level: 4.75
+    series: DFEDTARU
+  - date: '2024-12-19'
+    change_pp: -0.25
+    level: 4.5
+    series: DFEDTARU
+  - date: '2025-09-18'
+    change_pp: -0.25
+    level: 4.25
+    series: DFEDTARU
+  - date: '2025-10-30'
+    change_pp: -0.25
+    level: 4.0
+    series: DFEDTARU
+  - date: '2025-12-11'
+    change_pp: -0.25
+    level: 3.75
+    series: DFEDTARU
+- direction: tightening
+  start: 2026-09
+  end: 2026-09
+  source: DFEDTARU
+  level_start: 3.75
+  level_end: 4.0
+  n_changes: 1
+  changes:
+  - date: '2026-09-17'
+    change_pp: 0.25
+    level: 4.0
+    series: DFEDTARU
+monthly_labels:
+  1970-01: easing
+  1970-02: easing
+  1970-03: easing
+  1970-04: easing
+  1970-05: easing
+  1970-06: easing
+  1970-07: easing
+  1970-08: easing
+  1970-09: easing
+  1970-10: easing
+  1970-11: easing
+  1970-12: easing
+  1971-01: easing
+  1971-02: easing
+  1971-03: easing
+  1971-04: tightening
+  1971-05: tightening
+  1971-06: tightening
+  1971-07: tightening
+  1971-08: tightening
+  1971-09: easing
+  1971-10: easing
+  1971-11: easing
+  1971-12: easing
+  1972-01: easing
+  1972-02: easing
+  1972-03: tightening
+  1972-04: tightening
+  1972-05: tightening
+  1972-06: tightening
+  1972-07: tightening
+  1972-08: tightening
+  1972-09: tightening
+  1972-10: tightening
+  1972-11: tightening
+  1972-12: tightening
+  1973-01: tightening
+  1973-02: tightening
+  1973-03: tightening
+  1973-04: tightening
+  1973-05: tightening
+  1973-06: tightening
+  1973-07: tightening
+  1973-08: tightening
+  1973-09: tightening
+  1973-10: easing
+  1973-11: easing
+  1973-12: easing
+  1974-01: easing
+  1974-02: easing
+  1974-03: tightening
+  1974-04: tightening
+  1974-05: tightening
+  1974-06: tightening
+  1974-07: tightening
+  1974-08: easing
+  1974-09: easing
+  1974-10: easing
+  1974-11: easing
+  1974-12: easing
+  1975-01: easing
+  1975-02: easing
+  1975-03: easing
+  1975-04: easing
+  1975-05: easing
+  1975-06: tightening
+  1975-07: tightening
+  1975-08: tightening
+  1975-09: tightening
+  1975-10: easing
+  1975-11: easing
+  1975-12: easing
+  1976-01: easing
+  1976-02: easing
+  1976-03: easing
+  1976-04: easing
+  1976-05: easing
+  1976-06: easing
+  1976-07: easing
+  1976-08: easing
+  1976-09: easing
+  1976-10: easing
+  1976-11: easing
+  1976-12: easing
+  1977-01: easing
+  1977-02: tightening
+  1977-03: tightening
+  1977-04: tightening
+  1977-05: tightening
+  1977-06: tightening
+  1977-07: tightening
+  1977-08: tightening
+  1977-09: tightening
+  1977-10: tightening
+  1977-11: tightening
+  1977-12: tightening
+  1978-01: tightening
+  1978-02: tightening
+  1978-03: tightening
+  1978-04: tightening
+  1978-05: tightening
+  1978-06: tightening
+  1978-07: tightening
+  1978-08: tightening
+  1978-09: tightening
+  1978-10: tightening
+  1978-11: tightening
+  1978-12: tightening
+  1979-01: tightening
+  1979-02: tightening
+  1979-03: tightening
+  1979-04: tightening
+  1979-05: tightening
+  1979-06: tightening
+  1979-07: tightening
+  1979-08: tightening
+  1979-09: tightening
+  1979-10: tightening
+  1979-11: tightening
+  1979-12: tightening
+  1980-01: tightening
+  1980-02: tightening
+  1980-03: tightening
+  1980-04: tightening
+  1980-05: easing
+  1980-06: easing
+  1980-07: easing
+  1980-08: tightening
+  1980-09: tightening
+  1980-10: tightening
+  1980-11: tightening
+  1980-12: tightening
+  1981-01: tightening
+  1981-02: tightening
+  1981-03: tightening
+  1981-04: tightening
+  1981-05: tightening
+  1981-06: tightening
+  1981-07: easing
+  1981-08: easing
+  1981-09: easing
+  1981-10: easing
+  1981-11: easing
+  1981-12: easing
+  1982-01: easing
+  1982-02: easing
+  1982-03: easing
+  1982-04: easing
+  1982-05: easing
+  1982-06: easing
+  1982-07: easing
+  1982-08: easing
+  1982-09: easing
+  1982-10: easing
+  1982-11: easing
+  1982-12: easing
+  1983-01: neutral
+  1983-02: neutral
+  1983-03: tightening
+  1983-04: tightening
+  1983-05: tightening
+  1983-06: tightening
+  1983-07: tightening
+  1983-08: tightening
+  1983-09: tightening
+  1983-10: tightening
+  1983-11: tightening
+  1983-12: tightening
+  1984-01: tightening
+  1984-02: tightening
+  1984-03: tightening
+  1984-04: tightening
+  1984-05: tightening
+  1984-06: tightening
+  1984-07: tightening
+  1984-08: tightening
+  1984-09: easing
+  1984-10: easing
+  1984-11: easing
+  1984-12: easing
+  1985-01: tightening
+  1985-02: tightening
+  1985-03: tightening
+  1985-04: easing
+  1985-05: easing
+  1985-06: easing
+  1985-07: easing
+  1985-08: tightening
+  1985-09: tightening
+  1985-10: neutral
+  1985-11: neutral
+  1985-12: easing
+  1986-01: easing
+  1986-02: easing
+  1986-03: easing
+  1986-04: easing
+  1986-05: easing
+  1986-06: easing
+  1986-07: easing
+  1986-08: easing
+  1986-09: neutral
+  1986-10: neutral
+  1986-11: neutral
+  1986-12: neutral
+  1987-01: tightening
+  1987-02: tightening
+  1987-03: tightening
+  1987-04: tightening
+  1987-05: tightening
+  1987-06: tightening
+  1987-07: tightening
+  1987-08: tightening
+  1987-09: tightening
+  1987-10: neutral
+  1987-11: easing
+  1987-12: easing
+  1988-01: easing
+  1988-02: easing
+  1988-03: tightening
+  1988-04: tightening
+  1988-05: tightening
+  1988-06: tightening
+  1988-07: tightening
+  1988-08: tightening
+  1988-09: tightening
+  1988-10: tightening
+  1988-11: tightening
+  1988-12: tightening
+  1989-01: tightening
+  1989-02: tightening
+  1989-03: tightening
+  1989-04: tightening
+  1989-05: tightening
+  1989-06: easing
+  1989-07: easing
+  1989-08: easing
+  1989-09: easing
+  1989-10: easing
+  1989-11: easing
+  1989-12: easing
+  1990-01: easing
+  1990-02: easing
+  1990-03: easing
+  1990-04: easing
+  1990-05: easing
+  1990-06: easing
+  1990-07: easing
+  1990-08: easing
+  1990-09: easing
+  1990-10: easing
+  1990-11: easing
+  1990-12: easing
+  1991-01: easing
+  1991-02: easing
+  1991-03: easing
+  1991-04: easing
+  1991-05: easing
+  1991-06: easing
+  1991-07: easing
+  1991-08: easing
+  1991-09: easing
+  1991-10: easing
+  1991-11: easing
+  1991-12: easing
+  1992-01: easing
+  1992-02: easing
+  1992-03: easing
+  1992-04: easing
+  1992-05: easing
+  1992-06: easing
+  1992-07: easing
+  1992-08: easing
+  1992-09: easing
+  1992-10: neutral
+  1992-11: neutral
+  1992-12: neutral
+  1993-01: neutral
+  1993-02: neutral
+  1993-03: neutral
+  1993-04: neutral
+  1993-05: neutral
+  1993-06: neutral
+  1993-07: neutral
+  1993-08: neutral
+  1993-09: neutral
+  1993-10: neutral
+  1993-11: neutral
+  1993-12: neutral
+  1994-01: neutral
+  1994-02: tightening
+  1994-03: tightening
+  1994-04: tightening
+  1994-05: tightening
+  1994-06: tightening
+  1994-07: tightening
+  1994-08: tightening
+  1994-09: tightening
+  1994-10: tightening
+  1994-11: tightening
+  1994-12: tightening
+  1995-01: tightening
+  1995-02: tightening
+  1995-03: neutral
+  1995-04: neutral
+  1995-05: neutral
+  1995-06: neutral
+  1995-07: easing
+  1995-08: easing
+  1995-09: easing
+  1995-10: easing
+  1995-11: easing
+  1995-12: easing
+  1996-01: easing
+  1996-02: neutral
+  1996-03: neutral
+  1996-04: neutral
+  1996-05: neutral
+  1996-06: neutral
+  1996-07: neutral
+  1996-08: neutral
+  1996-09: neutral
+  1996-10: neutral
+  1996-11: neutral
+  1996-12: neutral
+  1997-01: neutral
+  1997-02: neutral
+  1997-03: tightening
+  1997-04: neutral
+  1997-05: neutral
+  1997-06: neutral
+  1997-07: neutral
+  1997-08: neutral
+  1997-09: neutral
+  1997-10: neutral
+  1997-11: neutral
+  1997-12: neutral
+  1998-01: neutral
+  1998-02: neutral
+  1998-03: neutral
+  1998-04: neutral
+  1998-05: neutral
+  1998-06: neutral
+  1998-07: neutral
+  1998-08: neutral
+  1998-09: easing
+  1998-10: easing
+  1998-11: easing
+  1998-12: neutral
+  1999-01: neutral
+  1999-02: neutral
+  1999-03: neutral
+  1999-04: neutral
+  1999-05: neutral
+  1999-06: tightening
+  1999-07: tightening
+  1999-08: tightening
+  1999-09: tightening
+  1999-10: tightening
+  1999-11: tightening
+  1999-12: tightening
+  2000-01: tightening
+  2000-02: tightening
+  2000-03: tightening
+  2000-04: tightening
+  2000-05: tightening
+  2000-06: neutral
+  2000-07: neutral
+  2000-08: neutral
+  2000-09: neutral
+  2000-10: neutral
+  2000-11: neutral
+  2000-12: neutral
+  2001-01: easing
+  2001-02: easing
+  2001-03: easing
+  2001-04: easing
+  2001-05: easing
+  2001-06: easing
+  2001-07: easing
+  2001-08: easing
+  2001-09: easing
+  2001-10: easing
+  2001-11: easing
+  2001-12: easing
+  2002-01: easing
+  2002-02: easing
+  2002-03: easing
+  2002-04: easing
+  2002-05: easing
+  2002-06: easing
+  2002-07: easing
+  2002-08: easing
+  2002-09: easing
+  2002-10: easing
+  2002-11: easing
+  2002-12: easing
+  2003-01: easing
+  2003-02: easing
+  2003-03: easing
+  2003-04: easing
+  2003-05: easing
+  2003-06: easing
+  2003-07: neutral
+  2003-08: neutral
+  2003-09: neutral
+  2003-10: neutral
+  2003-11: neutral
+  2003-12: neutral
+  2004-01: neutral
+  2004-02: neutral
+  2004-03: neutral
+  2004-04: neutral
+  2004-05: neutral
+  2004-06: tightening
+  2004-07: tightening
+  2004-08: tightening
+  2004-09: tightening
+  2004-10: tightening
+  2004-11: tightening
+  2004-12: tightening
+  2005-01: tightening
+  2005-02: tightening
+  2005-03: tightening
+  2005-04: tightening
+  2005-05: tightening
+  2005-06: tightening
+  2005-07: tightening
+  2005-08: tightening
+  2005-09: tightening
+  2005-10: tightening
+  2005-11: tightening
+  2005-12: tightening
+  2006-01: tightening
+  2006-02: tightening
+  2006-03: tightening
+  2006-04: tightening
+  2006-05: tightening
+  2006-06: tightening
+  2006-07: neutral
+  2006-08: neutral
+  2006-09: neutral
+  2006-10: neutral
+  2006-11: neutral
+  2006-12: neutral
+  2007-01: neutral
+  2007-02: neutral
+  2007-03: neutral
+  2007-04: neutral
+  2007-05: neutral
+  2007-06: neutral
+  2007-07: neutral
+  2007-08: neutral
+  2007-09: easing
+  2007-10: easing
+  2007-11: easing
+  2007-12: easing
+  2008-01: easing
+  2008-02: easing
+  2008-03: easing
+  2008-04: easing
+  2008-05: easing
+  2008-06: easing
+  2008-07: easing
+  2008-08: easing
+  2008-09: easing
+  2008-10: easing
+  2008-11: easing
+  2008-12: easing
+  2009-01: neutral
+  2009-02: neutral
+  2009-03: neutral
+  2009-04: neutral
+  2009-05: neutral
+  2009-06: neutral
+  2009-07: neutral
+  2009-08: neutral
+  2009-09: neutral
+  2009-10: neutral
+  2009-11: neutral
+  2009-12: neutral
+  2010-01: neutral
+  2010-02: neutral
+  2010-03: neutral
+  2010-04: neutral
+  2010-05: neutral
+  2010-06: neutral
+  2010-07: neutral
+  2010-08: neutral
+  2010-09: neutral
+  2010-10: neutral
+  2010-11: neutral
+  2010-12: neutral
+  2011-01: neutral
+  2011-02: neutral
+  2011-03: neutral
+  2011-04: neutral
+  2011-05: neutral
+  2011-06: neutral
+  2011-07: neutral
+  2011-08: neutral
+  2011-09: neutral
+  2011-10: neutral
+  2011-11: neutral
+  2011-12: neutral
+  2012-01: neutral
+  2012-02: neutral
+  2012-03: neutral
+  2012-04: neutral
+  2012-05: neutral
+  2012-06: neutral
+  2012-07: neutral
+  2012-08: neutral
+  2012-09: neutral
+  2012-10: neutral
+  2012-11: neutral
+  2012-12: neutral
+  2013-01: neutral
+  2013-02: neutral
+  2013-03: neutral
+  2013-04: neutral
+  2013-05: neutral
+  2013-06: neutral
+  2013-07: neutral
+  2013-08: neutral
+  2013-09: neutral
+  2013-10: neutral
+  2013-11: neutral
+  2013-12: neutral
+  2014-01: neutral
+  2014-02: neutral
+  2014-03: neutral
+  2014-04: neutral
+  2014-05: neutral
+  2014-06: neutral
+  2014-07: neutral
+  2014-08: neutral
+  2014-09: neutral
+  2014-10: neutral
+  2014-11: neutral
+  2014-12: neutral
+  2015-01: neutral
+  2015-02: neutral
+  2015-03: neutral
+  2015-04: neutral
+  2015-05: neutral
+  2015-06: neutral
+  2015-07: neutral
+  2015-08: neutral
+  2015-09: neutral
+  2015-10: neutral
+  2015-11: neutral
+  2015-12: tightening
+  2016-01: tightening
+  2016-02: tightening
+  2016-03: tightening
+  2016-04: tightening
+  2016-05: tightening
+  2016-06: tightening
+  2016-07: tightening
+  2016-08: tightening
+  2016-09: tightening
+  2016-10: tightening
+  2016-11: tightening
+  2016-12: tightening
+  2017-01: tightening
+  2017-02: tightening
+  2017-03: tightening
+  2017-04: tightening
+  2017-05: tightening
+  2017-06: tightening
+  2017-07: tightening
+  2017-08: tightening
+  2017-09: tightening
+  2017-10: tightening
+  2017-11: tightening
+  2017-12: tightening
+  2018-01: tightening
+  2018-02: tightening
+  2018-03: tightening
+  2018-04: tightening
+  2018-05: tightening
+  2018-06: tightening
+  2018-07: tightening
+  2018-08: tightening
+  2018-09: tightening
+  2018-10: tightening
+  2018-11: tightening
+  2018-12: tightening
+  2019-01: tightening
+  2019-02: tightening
+  2019-03: tightening
+  2019-04: tightening
+  2019-05: tightening
+  2019-06: tightening
+  2019-07: tightening
+  2019-08: easing
+  2019-09: easing
+  2019-10: easing
+  2019-11: easing
+  2019-12: easing
+  2020-01: easing
+  2020-02: easing
+  2020-03: easing
+  2020-04: neutral
+  2020-05: neutral
+  2020-06: neutral
+  2020-07: neutral
+  2020-08: neutral
+  2020-09: neutral
+  2020-10: neutral
+  2020-11: neutral
+  2020-12: neutral
+  2021-01: neutral
+  2021-02: neutral
+  2021-03: neutral
+  2021-04: neutral
+  2021-05: neutral
+  2021-06: neutral
+  2021-07: neutral
+  2021-08: neutral
+  2021-09: neutral
+  2021-10: neutral
+  2021-11: neutral
+  2021-12: neutral
+  2022-01: neutral
+  2022-02: neutral
+  2022-03: tightening
+  2022-04: tightening
+  2022-05: tightening
+  2022-06: tightening
+  2022-07: tightening
+  2022-08: tightening
+  2022-09: tightening
+  2022-10: tightening
+  2022-11: tightening
+  2022-12: tightening
+  2023-01: tightening
+  2023-02: tightening
+  2023-03: tightening
+  2023-04: tightening
+  2023-05: tightening
+  2023-06: tightening
+  2023-07: tightening
+  2023-08: tightening
+  2023-09: tightening
+  2023-10: tightening
+  2023-11: tightening
+  2023-12: tightening
+  2024-01: tightening
+  2024-02: tightening
+  2024-03: tightening
+  2024-04: tightening
+  2024-05: tightening
+  2024-06: tightening
+  2024-07: tightening
+  2024-08: tightening
+  2024-09: easing
+  2024-10: easing
+  2024-11: easing
+  2024-12: easing
+  2025-01: easing
+  2025-02: easing
+  2025-03: easing
+  2025-04: easing
+  2025-05: easing
+  2025-06: easing
+  2025-07: easing
+  2025-08: easing
+  2025-09: easing
+  2025-10: easing
+  2025-11: easing
+  2025-12: easing
+  2026-01: neutral
+  2026-02: neutral
+  2026-03: neutral
+  2026-04: neutral
+  2026-05: neutral
+  2026-06: neutral
+  2026-07: neutral
+  2026-08: neutral
+  2026-09: tightening
+label_counts:
+  easing: 214
+  neutral: 211
+  tightening: 256
