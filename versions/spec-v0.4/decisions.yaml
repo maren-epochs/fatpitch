@@ -1,0 +1,2215 @@
+# Decision log (rulebook 'Decisions' section; tools/build_rulebook.py).
+# One entry per owner or derived design decision. expected_result is the prediction recorded at decision time
+# (for entries dated 2026-10-07 session 3, written before any staged result was read); measured_result is added
+# afterwards and never replaces the prediction. Entries before 2026-10-07 session 3 were compiled from the spec,
+# CHANGELOG and memory files; where a source records no prediction the entry says 'not stated at the time'.
+version: 2026-10-07.1
+decisions:
+- id: DEL-01
+  date: '2026-10-06'
+  area: delivery
+  question: Should the fat-pitch filter be a standalone product or a tab inside the existing amber terminal?
+  options:
+  - label: A
+    summary: A finished-product tab inside amber, using its data layer, database, scheduler and interface
+  - label: B
+    summary: Standalone application (reference doc section 8, task 6)
+  chosen: A
+  decided_by: owner
+  how_decided: 'Amber already has compiled access to almost every asset class, a data lake and a terminal, so a
+    module avoids rebuilding them. The reference document had left module versus standalone open (section 8, task
+    6); the owner settled it. The same day the owner ruled out a hosted dashboard (no Vercel): local amber tab only,
+    with remote viewing possible later on request.'
+  evidence:
+  - PLAN.md
+  - druckenmiller_fatpitch_reference_1.md
+  - memory/fatpitch-project-plan.md
+  expected_result: Delivery work reduces to one function (FP) in amber; no separate hosting.
+  measured_result: null
+  status: in force
+- id: PROC-01
+  date: '2026-10-06'
+  area: process
+  question: How should the work be split, and where should the evaluation engine live?
+  options:
+  - label: A
+    summary: Three lifts (Evaluation, Data, Delivery); Evaluation as a separate fatpitch package that amber imports
+      through one thin store module
+  - label: B
+    summary: Evaluation code inside amber itself (implied alternative in PLAN section 0 rationale)
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: The owner set the three-lift structure with Evaluation as the priority. A separate package was chosen
+    because fidelity testing needs its own case corpus, pre-registration and versioning, independent of amber's
+    release cadence. The review (finding 23) added that the nightly job must import a pinned tagged build, not the
+    research working tree, so a half-edited package cannot break amber's nightly run; every run row stores the package
+    version and the parameter-registry hash. fatpitch never imports amber.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - CLAUDE.md
+  - memory/fatpitch-project-plan.md
+  expected_result: Amber depends on fatpitch, not the reverse; the fidelity suite runs with no amber import.
+  measured_result: null
+  status: in force
+- id: DATA-01
+  date: '2026-10-06'
+  area: data
+  question: May the project pay for any data?
+  options:
+  - label: A
+    summary: Free data only; find a free substitute or mark the input as a gap
+  chosen: A
+  decided_by: owner
+  how_decided: 'The owner stated that no data subscriptions will be paid for. Only this option is recorded. Consequences
+    written into PLAN D.5: Alpaca SIP equities, SIC codes mapped to 11 sectors plus sector-ETF holdings, and earnings
+    surprise (SUE) from SEC facts instead of paid consensus revisions. Inputs with no free source return unknown.'
+  evidence:
+  - PLAN.md
+  - memory/no-paid-data.md
+  - CLAUDE.md
+  expected_result: Some rules cannot run over parts of history and output unknown there (stated as gaps in process.md
+    10.3).
+  measured_result: 'spec/data_coverage.md (2026-10-07): 0 of 11 era-B research cases have every step-1 input point-in-time;
+    French-49 industries, the deficit/GDP series, core CPI, a historical FOMC calendar and daily S&P 500 are missing
+    from the lake.'
+  status: in force
+- id: DATA-02
+  date: '2026-10-06'
+  area: data
+  question: Which existing projects should supply data, and how much manual work may be handed to the owner?
+  options:
+  - label: A
+    summary: Data from amber, wifey and CBP; automate every acquisition step; manual owner steps only after every
+      automated route fails
+  chosen: A
+  decided_by: owner
+  how_decided: The owner named amber, wifey and CBP as the sources and asked that no chores be handed back. Manual
+    fallbacks had been proposed too early; the rule now requires scraping current links, retries and archive mirrors
+    before any owner task, and an A-D question if an action is genuinely blocked. Only this option is recorded.
+  evidence:
+  - memory/related-project-locations.md
+  - memory/no-manual-owner-work.md
+  - PLAN.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: DATA-03
+  date: '2026-10-06'
+  area: data
+  question: Should daily futures and FX bars pulled from Interactive Brokers be stored locally?
+  options:
+  - label: A
+    summary: No storage; re-pull each run, log parameters and a hash (first decision)
+  - label: B
+    summary: Keep IBKR out of decisions; use stored free sources, IBKR only for display and cross-checks (review
+      recommendation)
+  - label: C
+    summary: A plus a persisted trace of every derived input
+  - label: D
+    summary: Store IBKR bars for v1 roots locally under the curve exception, non-redistributable
+  chosen: D
+  decided_by: owner
+  how_decided: The owner first chose A. The review (finding 29) showed that A makes every live futures decision
+    non-replayable and runs two price paths (stored free data for replay, IBKR for live), so the validated engine
+    would differ from the shipped one. The review recommended B; the owner reversed to D, which also gives one stored
+    price path, about 5 MB, flagged non-redistributable and never sent to AI.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - memory/ibkr-gateway-access.md
+  expected_result: Live and replayed futures decisions use the same stored bars; decisions reproducible from stored
+    inputs.
+  measured_result: null
+  status: in force
+- id: DEL-02
+  date: '2026-10-06'
+  area: delivery
+  question: How should the IB Gateway stay logged in without daily owner action?
+  options:
+  - label: A
+    summary: Gateway built-in daily auto-restart plus a Startup-folder shortcut; owner approves 2FA weekly
+  chosen: A
+  decided_by: owner
+  how_decided: Option A was chosen (the alternatives offered are not recorded in the sources). Later the same day
+    the owner allowed the paper-trading password to be held in Windows Credential Manager so an unattended paper
+    login script can run; paper login needs no 2FA. Live-account credentials are not covered.
+  evidence:
+  - PLAN.md
+  - memory/ibkr-gateway-access.md
+  expected_result: Unattended nightly access to IBKR paper data.
+  measured_result: null
+  status: in force
+- id: DATA-04
+  date: '2026-10-06'
+  area: data
+  question: What should measure market excess (fragility), and with which free series?
+  options:
+  - label: A
+    summary: 'As first decided: CAPE, BAA-10Y level, margin debt, HY ETF trend, plus an EDGAR unprofitable-IPO share
+      from 2009'
+  - label: B
+    summary: Ritter unprofitable-IPO share 1980 on (stated), SIFMA HY share, Z.1 corporate debt and net equity issuance,
+      HY OAS, margin debt; CAPE display only
+  - label: C
+    summary: B now, plus the EDGAR quarterly IPO share later, validated against Ritter
+  - label: D
+    summary: A plus manual quarterly entry of B-rated and covenant-lite shares
+  chosen: C
+  decided_by: owner-on-recommendation
+  how_decided: The review (finding 24) showed the first proxy set measured valuation and credit stress rather than
+    the issuance-quality gauges he named, and covered only 2013-15. B restores 1999-2000 and 2006-07 coverage at
+    near-zero build cost; C adds quarterly frequency later. CAPE was rejected as an input on fidelity grounds (valuation
+    is context only in the sources). The overlay never sets direction; it lowers tier or size.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  expected_result: Fragility cases in 1999-2000, 2006-07 and 2013-15 become scorable.
+  measured_result: 'spec/data_coverage.md: the fragility rule (R-11) runs on 3 of 6 components before 1997 and 6
+    of 6 from 1999; HY OAS, SIFMA share and margin debt start 1996-97.'
+  status: in force
+- id: DATA-05
+  date: '2026-10-06'
+  area: data
+  question: How should optional free API keys (BLS, CFTC, FMP) be handled?
+  options:
+  - label: A
+    summary: Owner sets them up later; code uses them when present and runs keyless until then
+  chosen: A
+  decided_by: owner
+  how_decided: Only this option is recorded. Keys are queued in amber's owner queue; no code path depends on them.
+  evidence:
+  - PLAN.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: DATA-06
+  date: '2026-10-06'
+  area: data
+  question: Should the article's alternative data (prediction markets, crop satellite data, labour filings) be collected?
+  options:
+  - label: A
+    summary: Collect in amber for display and data only, at weight 0 in the fat-pitch engine
+  chosen: A
+  decided_by: owner
+  how_decided: Only this option is recorded (PLAN D-20). The series have no support in his own statements, so they
+    are kept out of the engine's decisions. The later article-track decision (TRACK-01) gives article-origin inputs
+    a separate version where they carry weight.
+  evidence:
+  - PLAN.md
+  - library/research/data_practices.md
+  expected_result: No effect on the Druckenmiller-faithful engine.
+  measured_result: null
+  status: in force
+- id: PROC-02
+  date: '2026-10-06'
+  area: process
+  question: Where does price action belong in the model?
+  options:
+  - label: A
+    summary: Late confirmation step after the thesis (plan v0.3)
+  - label: B
+    summary: 'Three roles: a leading input (market internals, step 1b), a hard entry veto (step 4) and an exit trigger
+      (price versus news, step 6)'
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: 'The review (findings 1, 7, 8) cited Feig 2009: a good thesis with a bad chart is not traded, a stock
+    that fails on good news is sold, and momentum bottoms 12-18 months before fundamentals. A confirmation-only
+    stage lost the exit and leading roles. Starter positions follow thesis plus chart; further evidence and a near
+    catalyst raise size rather than gate admission ("invest then investigate"); premise breaks can reverse a position
+    within a day. His later view that technicals are about 20% as effective lowers timing weight, not the veto.
+    Adopted in PLAN Appendix A.'
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - library/discovered_sources/2009-XX-XX_citi-fxlm-fireside-jeff-feig.md
+  expected_result: Reversal cases scored on premise-break detection rather than on regime change.
+  measured_result: null
+  status: in force
+- id: PROC-03
+  date: '2026-10-06'
+  area: process
+  question: How should filters that come from the Automated Alpha article rather than from Druckenmiller be treated?
+  options:
+  - label: A
+    summary: Keep as ordinary gates (plan v0.3 stage 4)
+  - label: B
+    summary: Third tag interpreted-from-article, default weight 0, enabled only if a library citation appears
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: The review (finding 2) found that the forensics, ROIC, insider/13F smart-money and contrarian COT
+    gates appear in no primary source, and that contrarian positioning contradicts his stated view (the crowd is
+    right about 80% of the time). Every parameter and rule is now tagged stated, interpreted or interpreted-from-article.
+    Superseded in part by TRACK-01, which runs the article rules at full weight in a separate version.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - spec/process.md
+  expected_result: The Druckenmiller-faithful engine is unaffected by article gates (weight 0).
+  measured_result: null
+  status: in force (extended by TRACK-01)
+- id: PROC-04
+  date: '2026-10-06'
+  area: process
+  question: Should the engine output a position size?
+  options:
+  - label: A
+    summary: Conviction tier only (plan v0.3)
+  - label: B
+    summary: size_band = tier x class cap x liquidity cap x hot/cold multiplier, caps stated from Feig 2009
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: Sizing is the part of the process he quantifies (exit cost 1-2% of the fund, gross at most 4:1, class
+    caps, size up when hot, small when cold) and calls 70-80% of the game; the plan produced no size at all (review
+    finding 3). Documented sizes become optional case targets.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - spec/process.md
+  expected_result: Size-band agreement reported per case at E6; no gate in v1.
+  measured_result: null
+  status: in force
+- id: PROC-05
+  date: '2026-10-06'
+  area: process
+  question: How should the 12-24 month forward view of policy be measured so that history can be replayed?
+  options:
+  - label: A
+    summary: Fed funds and SOFR futures path (plan v0.3); free history only from 2018-21
+  - label: B
+    summary: Curve-based path (2-year yield minus fed funds 1976 on, 1-year minus fed funds 1962 on) plus trend
+      in inputs; futures only as a live refinement that reduces to the curve measure
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: With free data the futures path cannot be replayed before 2018-21, so the 1970-on replay would test
+    a different engine from the one shipped (review finding 4). He also projects with charts and fundamentals, not
+    futures strips.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  expected_result: Replay and live run the same forward-view code; the report states which variant scored each case.
+  measured_result: null
+  status: in force
+- id: PROC-06
+  date: '2026-10-06'
+  area: process
+  question: How should liquidity be measured before 2002, when Fed balance-sheet data are thin?
+  options:
+  - label: A
+    summary: Search for a pre-2002 proxy selected by fit to Fed assets minus TGA minus reverse repo (plan v0.3,
+      D-17)
+  - label: B
+    summary: 'A family of rules scored where each exists: (i) M2 growth minus industrial-production growth 1959
+      on (stated, era-B measure); (ii) Fed assets - TGA - RRP 2002 on; (iii) Fed purchases minus net Treasury issuance'
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: The only long-history liquidity rule he states (Feig 2009) is money growth against industrial production.
+    Choosing a proxy by fit to a 2020s construction he did not use would make era B a test of a different rule (review
+    finding 6). Overlap fit between rules became a diagnostic, not a selection criterion. Cases decided on other
+    drivers (1981 real rates, 1992 ERM) score on the stage that applies.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - spec/process.md
+  expected_result: Era-B results reported with their sensitivity to each rule variant.
+  measured_result: 'spec/data_coverage.md: the M2-IP rule is computable point-in-time at all 11 research era-B case
+    dates; the primary TGA series starts 2002-12, so rule (ii) uses a quarterly proxy (grade C) before then.'
+  status: in force
+- id: PROC-07
+  date: '2026-10-06'
+  area: process
+  question: Should the regime be US-only and a five-level label?
+  options:
+  - label: A
+    summary: US-only, five-level label from the article (plan v0.3)
+  - label: B
+    summary: 'Regime vector per region (US, EA, JP, UK): policy direction, liquidity impulse and change, policy-error
+      sign, veto flags, fragility; five levels for display only'
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: Several documented bets are relative (1992 ERM, 2013 yen, 2015 long Japan/Europe where QE was starting,
+    2016 short Bunds and gilts); a US-only regime cannot generate them (review finding 12). The five-level taxonomy
+    is the article's; the sources speak of direction and change (finding 26).
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  expected_result: Region-relative theses and FX or bond expressions become possible.
+  measured_result: null
+  status: in force
+- id: PROC-08
+  date: '2026-10-06'
+  area: process
+  question: What rule prevents the engine from using information before it was public?
+  options:
+  - label: A
+    summary: Source.snapshot(asof) returns value, period_end, published_at, vintage_id; filter published_at <= asof,
+      never period_end; asof tz-aware New York; property test at E0
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: 'Review findings 14, 15 and 22: H.4.1 balance-sheet data are dated Wednesday but published Thursday
+    afternoon (a one-day leak if joined on observation date), and output-gap inputs are heavily revised. Fixes adopted:
+    publication timestamps from the FRED release calendar, H.4.1 shifted to Thursday 16:30 ET, an unemployment-gap
+    Taylor variant on ALFRED vintages, rows without published_at excluded. No alternative is recorded.'
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - CLAUDE.md
+  - spec/process.md
+  expected_result: No row with published_at after asof is ever returned (tested property).
+  measured_result: 'spec/data_coverage.md: point-in-time snapshot of 67 step-1 inputs takes 9.5 ms (target under
+    50 ms).'
+  status: in force
+- id: PROC-09
+  date: '2026-10-06'
+  area: process
+  question: How is the model protected from being written to fit outcomes the designer already knows?
+  options:
+  - label: A
+    summary: Author the transition-to-thesis table before reading the case notes and freeze it; register spec, table
+      and corpus hash before any case is scored; strip outcome columns from anything the engine or calibrator reads
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: The review (finding 14) noted the table is the model and library notes carry outcome columns. The
+    25-row table was written before case reading and not edited afterwards; rule ids R-01..R-55 were fixed at that
+    point. Changes after scoring are design changes that need re-registration and a new report.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - spec/transition_table.yaml
+  - spec/cases_seed.md
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force (registration itself deferred, see VER-03)
+- id: CORPUS-01
+  date: '2026-10-06'
+  area: corpus
+  question: How should cases where he broke his own rules, and cases driven by unforeseeable events, be scored?
+  options:
+  - label: A
+    summary: Score every case as agreement with his action
+  - label: B
+    summary: truth_type process (target = the stated rule output; matching his action is a miss) or action; mechanizable
+      yes/no tag with no-cases reported as the ceiling
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: The 2000 tech purchase and the 1999 internet short were process violations by his own account; scoring
+    them as agreement would reward infidelity (review finding 9). Political catalysts (1992, 2016) cannot be generated
+    from data and would lower fidelity without measuring the engine; they are tagged and reported separately. Mistakes
+    and failed calls stay in the corpus to avoid hindsight selection.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - spec/cases_seed.md
+  - spec/scoring.md
+  expected_result: A fidelity ceiling reported from mechanizable no cases.
+  measured_result: 'spec/HOLDOUT.md v5: 7 process and 73 action cases; 70 mechanizable yes, 2 partial, 8 no.'
+  status: in force
+- id: EVAL-01
+  date: '2026-10-06'
+  area: evaluation
+  question: How should a case be scored and what trivial baselines must the engine beat?
+  options:
+  - label: A
+    summary: Agreement targets with no baselines (plan v0.3)
+  - label: B
+    summary: Pre-registered per-case rule (regime 1 / 0.5 / 0, thesis, top-3 expression, action), four nulls scored
+      identically (always risk-on, Fed direction, 12-month trend, persistence), episode-first aggregation
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: The review (findings 5, 10, 16) showed that about 30 cases cluster in about 10 episodes, that wide
+    windows give high random hit rates, and that without a null no target could show the engine beats "always long
+    while the Fed eases". Episodes, not cases, are the effective unit. Fat-pitch frequency was removed as a metric
+    because it was also the calibration target (circular); it is scored only on held-out years. E.5 performance
+    is descriptive only in v1.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - spec/scoring.md
+  expected_result: Fidelity reported against the best null rather than as raw agreement.
+  measured_result: 'Unlogged null run 2026-10-06 (spec/scoring.md section 7): era-A thesis recall, full corpus,
+    trend 0.461, always risk-on 0.301, Fed direction 0.211, persistence 0.164.'
+  status: in force
+- id: EVAL-02
+  date: '2026-10-06'
+  area: evaluation
+  question: How should the Duquesne 13F filings be used as evidence?
+  options:
+  - label: A
+    summary: Per-quarter sector rank correlation over all quarters (plan v0.3)
+  - label: B
+    summary: 'Equity-expression test only: sign of quarter-over-quarter weight change versus the engine tilt change,
+      against a no-change persistence baseline; filed date as information date'
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: 13F is long-only US equity with a 45-day lag and says nothing about his FX and rates bets; rank correlation
+    over 11 sectors is uninformative and pooled quarters overstate significance (review finding 11). He trades change,
+    not level.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - spec/scoring.md
+  expected_result: Reported, not gated.
+  measured_result: null
+  status: in force
+- id: PARAM-01
+  date: '2026-10-06'
+  area: parameters
+  question: How many chosen numbers may be tuned, and how are they tuned?
+  options:
+  - label: A
+    summary: Chronological 60/40 split (plan v0.3)
+  - label: B
+    summary: Stated numbers fixed; at most 8 interpreted tunables, chosen by leave-one-episode-out fidelity, shown
+      across a +/-20% range; held-out scoring once
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: A chronological split puts all pre-2002 monthly cases in training and all daily cases in test, confounding
+    era with split (review finding 10). With about 10 episodes, more than a handful of fitted thresholds would overfit;
+    a fixed numeric cap was required.
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - spec/registry.yaml
+  expected_result: not stated at the time
+  measured_result: 'spec/numbers_review.md: 71 chosen numbers, 8 tunable (cap full; none added by later decisions).'
+  status: in force
+- id: PROC-10
+  date: '2026-10-06'
+  area: process
+  question: In which order should the per-class veto stage be built?
+  options:
+  - label: A
+    summary: Commodities first (data convenience, plan v0.3)
+  - label: B
+    summary: Rates/FX, then commodities, then equities, then crypto
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: His documented large bets are in bonds and currencies (1981, 1992, 2000, 2013, 2016, 2022), with
+    equities rarely above 100% net long; fidelity tests therefore live in rates and FX (review section A).
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: DEL-03
+  date: '2026-10-06'
+  area: delivery
+  question: How should the output avoid reading as Druckenmiller's own view?
+  options:
+  - label: A
+    summary: Name "Fat pitch - process model" (FP / FATP), disclaimer, templated rule text with citation and tag,
+      never first person, tag mix on every pitch, no performance text before the paper period ends
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: 'Review findings 21, 27 and section G: generated thesis text can read as a quotation and MCP exposure
+    repeats it. Templated text ("rule R-xx (tag, source) fired because ...") plus provenance on every row was adopted.
+    Both mnemonics were checked free in amber.'
+  evidence:
+  - PLAN.md
+  - PLAN_REVIEW.md
+  - CLAUDE.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: PROC-11
+  date: '2026-10-06'
+  area: process
+  question: Which claims in the reference document need correcting before the spec is written?
+  options:
+  - label: A
+    summary: Apply 13 corrections to reference sections 2 and 7 from library evidence, keep a byte copy of the original
+  chosen: A
+  decided_by: derived
+  how_decided: 'Mechanical E1 task from PLAN E.2. Each claim was checked against library notes: "93% invested" unverified
+    (over 90% verified), Soros under-30% hit rate unsupported, sizing 70-80% is his own Sohn 2022 statement, the
+    "summarizer error" note on the inflation rule was wrong, sterling sizes differ across tellings, horizon widened
+    to 18 months-3 years, technicals still used for exits.'
+  evidence:
+  - spec/reference_corrections.md
+  - druckenmiller_fatpitch_reference_1.md
+  - spec/process.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: PROC-12
+  date: '2026-10-06'
+  area: process
+  question: When may a parameter be tagged stated rather than interpreted?
+  options:
+  - label: A
+    summary: Only when the number appears as his own statement in a primary or near-primary note; mapping his words
+      to a weight or threshold is interpreted
+  chosen: A
+  decided_by: derived
+  how_decided: 'Applied from the tag convention in process.md section 0. Three entries were retagged stated to interpreted:
+    chart.timing_weight 0.2 (his "20% as effective" used as a weight is a mapping), rates.ngdp_anchor_gap_pp 0 (one-sided
+    use of his anchor is a mapping), liq.qe_end_setback_m 6 (source is a secondary attendee write-up).'
+  evidence:
+  - spec/numbers_review.md
+  - spec/process.md
+  - spec/registry.yaml
+  expected_result: not stated at the time
+  measured_result: 'spec/numbers_review.md: 4 direct, 8 anchored, 26 convention, 33 no-evidence chosen numbers.'
+  status: in force
+- id: PROC-15
+  date: '2026-10-06'
+  area: process
+  question: How should decisions be put to the owner?
+  options:
+  - label: A
+    summary: Lettered A-D options with a recommendation and a one-line trade-off, one plain-language question at
+      a time; only decisions that need the owner; technical methodology adopted on recommendation and reported
+  chosen: A
+  decided_by: owner
+  how_decided: 'Set 2026-10-06 after a batch of three jargon-heavy questions could not be answered; reinforced the
+    same day to cover every input request. Corrected 2026-10-07 after a statistics-heavy explanation of pre-registration
+    was not understood: explain the problem and the fix in everyday words first. This is why many entries above
+    are owner-on-recommendation.'
+  evidence:
+  - memory/decision-format.md
+  - CLAUDE.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D1
+  date: '2026-10-06'
+  area: parameters
+  question: How much faster must M2 grow than industrial production to count as "a lot faster"?
+  options:
+  - label: A
+    summary: 3.5 points, tunable [1, 7] (research option A)
+  - label: B
+    summary: Keep 2.0, tunable [0, 6]
+  - label: C
+    summary: 5.0 fixed
+  - label: D
+    summary: 'Relative threshold: above its trailing 120-month median (spec change)'
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: He gives no number. The normal gap between M2 and IP growth is about 3.4 points (real-time and revised
+    median), so "a lot faster" was read as above the historical norm; 3.5 is the smallest round value above it.
+    The range [1, 7] spans the 27th to 77th percentiles; differences under about 1 point are inside revision noise.
+    No engine output or case agreement was checked. The research also found that M2 has no definitional break in
+    May 2020, so the R-02 data note was corrected and 2020-03..2021-12 flagged as base-effect outliers. Window stays
+    12 months.
+  evidence:
+  - spec/research_D1_D3_D7.md
+  - spec/numbers_review.md
+  - spec/registry.yaml
+  - spec/process.md
+  expected_result: Positive liquidity impulse in roughly half of months (53% above 3, 44% above 4, real-time 1980-2026).
+  measured_result: null
+  status: in force
+- id: D2
+  date: '2026-10-06'
+  area: parameters
+  question: How many independent kinds of evidence are needed to move from a starter position to a fat pitch?
+  options:
+  - label: A
+    summary: Keep 3, tunable [2, 4]
+  - label: B
+    summary: 2 fixed
+  - label: C
+    summary: 4 fixed
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: The count is not stated in any source; the existing tunable range lets calibration choose within
+    a pre-set band.
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D3
+  date: '2026-10-06'
+  area: parameters
+  question: Over how many months must rates, oil and the dollar all rise to trigger the cross-asset warning?
+  options:
+  - label: A
+    summary: 6 months, tunable [3, 12] (research option A)
+  - label: B
+    summary: Keep 3, tunable [3, 12]
+  - label: C
+    summary: 12 fixed
+  - label: D
+    summary: 3, tunable [1, 12]
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: His only dated account is the summer-2000 break of about four months; the literature leans to 12
+    months. 6 months is the nearest standard window to his account and halves daily on/off switching compared with
+    3. A non-tunable magnitude floor (each move above 0.25 standard deviations) was added as a reported variant
+    only, because his wording ("screaming upward") describes large moves; the main rule stays direction-only.
+  evidence:
+  - spec/research_D1_D3_D7.md
+  - spec/numbers_review.md
+  - spec/registry.yaml
+  expected_result: About 7 on/off changes per year instead of 11; the sign condition alone fires about 15% of the
+    time at any window.
+  measured_result: null
+  status: in force
+- id: D4
+  date: '2026-10-06'
+  area: parameters
+  question: How many months before a decline does high fragility mark it as post-bubble?
+  options:
+  - label: A
+    summary: Keep 12
+  - label: B
+    summary: '6'
+  - label: C
+    summary: '24'
+  - label: D
+    summary: 12, reported across [6, 24]
+  chosen: D
+  decided_by: owner
+  how_decided: 12 months matches the annual cadence of the slowest fragility input (Ritter IPO data); the owner
+    added a reported range [6, 24]; not tunable.
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D5
+  date: '2026-10-06'
+  area: parameters
+  question: Over how many months is the change in monthly momentum read for the chart test?
+  options:
+  - label: A
+    summary: Keep 3
+  - label: B
+    summary: '1'
+  - label: C
+    summary: '6'
+  chosen: C
+  decided_by: owner
+  how_decided: The recommendation was A (3 months, one quarter). The owner chose 6 with a reported range [3, 12],
+    with 12 reported and 3 highlighted in sensitivity tables. No window is stated in the sources.
+  evidence:
+  - spec/numbers_review.md
+  - CHANGELOG.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D6
+  date: '2026-10-06'
+  area: parameters
+  question: For how many months does CPI above 4.5%/5% stay "recent" for the no-soft-landing flags?
+  options:
+  - label: A
+    summary: Keep 24, report [12, 36]
+  - label: B
+    summary: '12'
+  - label: C
+    summary: '36'
+  - label: D
+    summary: 0 (only while CPI is above the threshold)
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: No window is stated; the existing range was kept.
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D7
+  date: '2026-10-06'
+  area: parameters
+  question: What counts as a breadth thrust, and from which free data?
+  options:
+  - label: A
+    summary: Classic Zweig on NYSE advances/declines (1965-2020), S&P 500 members with frequency-matched thresholds
+      from 2021-09, industry proxy in the 2020-21 gap
+  - label: B
+    summary: Industry definition everywhere (share of industries above trend 20% to 80%)
+  - label: C
+    summary: Share of S&P 500 above 50-day average only
+  - label: D
+    summary: Dow 30 reconstructed
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: His language is exchange-level ("record volume and record breadth"), which favours NYSE advance/decline
+    over industry proxies. The free Unicorn archive covers 1965-03 to 2020-02; Zweig thresholds do not port to S&P
+    members, so frequency-matched 0.40/0.646 were set (provisional, 4 years of data). No free survivorship-free
+    breadth exists for 2020-02-11..2021-09-21; the industry definition fills it, flagged. Paid or login sources
+    were rejected. The numbers-review recommendation had been option D (report both definitions).
+  evidence:
+  - spec/research_D1_D3_D7.md
+  - spec/numbers_review.md
+  - spec/data_coverage.md
+  expected_result: not stated at the time
+  measured_result: 'Research data check: 11 NYSE Zweig thrusts 1965-2020, including the widely reported 1982, 1984,
+    2009, 2015 and 2019 signals; one S&P-member thrust (2022-10-25) at matched thresholds. The 2020-06-08 statement
+    cited by the rule falls in the data gap.'
+  status: in force
+- id: D8
+  date: '2026-10-06'
+  area: parameters
+  question: How many readings must a liquidity sign change persist before it counts?
+  options:
+  - label: A
+    summary: Keep 2
+  - label: B
+    summary: 1 (no confirmation)
+  - label: C
+    summary: '3'
+  - label: D
+    summary: 2, reported across [1, 3]
+  chosen: D
+  decided_by: owner-on-recommendation
+  how_decided: Touches every liquidity transition; reporting the range exposes sensitivity at no fitting cost. Recorded
+    as "A - 2, reported [1, 3]".
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D9
+  date: '2026-10-06'
+  area: parameters
+  question: Over how many months is the fed funds change read to set Fed direction?
+  options:
+  - label: A
+    summary: Keep 6, report [3, 12]
+  - label: B
+    summary: '3'
+  - label: C
+    summary: '12'
+  - label: D
+    summary: Direction of the most recent target change (rule change)
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: 6 months flips at the first hike in most cycles; D changes rule mechanics and needs a spec edit.
+  evidence:
+  - spec/numbers_review.md
+  expected_result: Direction flips at the first hike in most cycles.
+  measured_result: null
+  status: in force
+- id: D10
+  date: '2026-10-06'
+  area: parameters
+  question: What size multiplier applies when the scorecard is down on the year ("cold")?
+  options:
+  - label: A
+    summary: Keep 0.33 (= starter size)
+  - label: B
+    summary: '0.5'
+  - label: C
+    summary: 0 (no new risk when cold)
+  - label: D
+    summary: 0.33, reported across [0, 0.5]
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: '"Not earned the right to play big" implies small, not zero; one third matches his stated starter
+    size.'
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D11
+  date: '2026-10-06'
+  area: parameters
+  question: What size multiplier applies when neither hot nor cold?
+  options:
+  - label: A
+    summary: Keep 0.66
+  - label: B
+    summary: '0.5'
+  - label: C
+    summary: 1.0 (only being cold cuts size)
+  - label: D
+    summary: 0.66, size-band agreement reported across [0.5, 1.0]
+  - label: E
+    summary: 0.75, reported across [0.5, 1.0] (set by the owner; not among the options offered)
+  chosen: E
+  decided_by: owner
+  how_decided: Recommendation was D. The owner set 0.75, a value outside the listed options, keeping the reported
+    range. No source gives a magnitude; the multiplier applies most of the time and sets size-band agreement.
+  evidence:
+  - spec/numbers_review.md
+  - CHANGELOG.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D12
+  date: '2026-10-06'
+  area: parameters
+  question: How many days ahead does a scheduled event count as a near catalyst?
+  options:
+  - label: A
+    summary: Keep 20
+  - label: B
+    summary: '10'
+  - label: C
+    summary: '40'
+  - label: D
+    summary: 20, reported across [10, 40]
+  chosen: D
+  decided_by: owner-on-recommendation
+  how_decided: No source window; high impact on the fat-pitch tier. Recorded as "A - 20, reported [10, 40]".
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D13
+  date: '2026-10-06'
+  area: parameters
+  question: How many weeks does the weekly trend line in the chart veto use?
+  options:
+  - label: A
+    summary: Keep 40, tunable [20, 52]
+  - label: B
+    summary: Widen range to [10, 52] (covers the Feig 8-20 week horizon)
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: Feig's 8-20 weeks is a forecast horizon, not a look-back, so it does not justify a shorter range.
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D14
+  date: '2026-10-06'
+  area: parameters
+  question: Which fragility percentile counts as high?
+  options:
+  - label: A
+    summary: Keep 80, tunable [70, 90]
+  - label: B
+    summary: 90 fixed
+  - label: C
+    summary: Fix 80 (frees one tunable slot)
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: Already tunable; no source level.
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D15
+  date: '2026-10-06'
+  area: parameters
+  question: What neutral real rate goes into the Taylor-rule benchmark?
+  options:
+  - label: A
+    summary: Keep 2.0 fixed
+  - label: B
+    summary: Real-time Laubach-Williams r* (vintaged)
+  - label: C
+    summary: 2.0 fixed; report fidelity with Laubach-Williams as sensitivity
+  chosen: C
+  decided_by: owner-on-recommendation
+  how_decided: 'He cites the traditional rule, but r* shifts the policy-error sign one-for-one, and a sensitivity
+    costs nothing. Recorded as "A/C": 2.0 fixed with a non-numeric sensitivity switch.'
+  evidence:
+  - spec/numbers_review.md
+  - spec/registry.yaml
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: D16
+  date: '2026-10-06'
+  area: parameters
+  question: How much weight do bond and credit signals keep while QE runs?
+  options:
+  - label: A
+    summary: Keep 0.5, report [0, 0.5]
+  - label: B
+    summary: 0 (literal "destroyed")
+  - label: C
+    summary: '0.25'
+  - label: D
+    summary: 1.0 (no impairment)
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: His wording points below 0.5 but the spec text says "halved"; reporting [0, 0.5] covers the literal
+    reading.
+  evidence:
+  - spec/numbers_review.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force (the test for "QE running" was revised 2026-10-07; see spec/decisions_today.yaml R17-01)
+- id: D17
+  date: '2026-10-06'
+  area: parameters
+  question: How far must the 2-year yield sit below or above fed funds to count as cuts or hikes priced?
+  options:
+  - label: A
+    summary: Keep 50, tunable [25, 100]
+  - label: B
+    summary: Keep 50, tunable [25, 50]
+  - label: C
+    summary: Fix 50 (frees one tunable slot)
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: His 2019 statements bracket the threshold between 8 and 53 basis points; values above 53 contradict
+    his reading of the 1.85% 2-year.
+  evidence:
+  - spec/numbers_review.md
+  - CHANGELOG.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: G1
+  date: '2026-10-06'
+  area: parameters
+  question: At what positioning level does a futures trade count as crowded (crowding can only delay entry)?
+  options:
+  - label: A
+    summary: Leave undefined
+  - label: B
+    summary: 90th percentile of COT net speculative position over 3 years
+  - label: C
+    summary: 80th percentile
+  chosen: B
+  decided_by: owner
+  how_decided: Rule R-31 had no threshold. The recommendation was A; the owner chose B with a reported range [80,
+    95]. Crowding delays entry only and never creates a contrarian thesis.
+  evidence:
+  - spec/numbers_review.md
+  - spec/registry.yaml
+  - spec/process.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: EVAL-03
+  date: '2026-10-06'
+  area: evaluation
+  question: What form should the two go/no-go gates take?
+  options:
+  - label: A
+    summary: Engine at least best null + 15 points with a date-permutation test (review finding 16)
+  - label: B
+    summary: Case-by-case paired sign-flip test against one pre-chosen best null (p < 0.10) plus an absolute floor
+      (Gate 1 regime on era-A turning points, floor 0.80; Gate 2 thesis recall on era-A cases, floor 0.50)
+  chosen: B
+  decided_by: owner
+  how_decided: The +15-point margin was retired as a gate and kept as a reported number. A paired comparison uses
+    the case-level differences directly; the floor prevents passing on a weak null.
+  evidence:
+  - spec/scoring.md
+  - CHANGELOG.md
+  - PLAN.md
+  expected_result: not stated at the time
+  measured_result: 'spec/regime_evaluation_options.md section 1 (2026-10-07): for the regime gate, 92.6% of research
+    era-A reads are easing, so a constant forecast scores 0.926 and a perfect engine can beat it by at most 7.4
+    points; paired tests against it reach p 0.25 at best. Gate 2 kept this form.'
+  status: Gate 1 part superseded by GATE-01, then GATE-02; Gate 2 part in force
+- id: EVAL-04
+  date: '2026-10-06'
+  area: evaluation
+  question: Which cases count as turning points?
+  options:
+  - label: A
+    summary: 'Derived by code from targets and dates only: (a) regime target differs from the previous one, (b)
+      action is reverse or exit, (c) entry after standby in the same asset class; 18-month lookback bounds (c);
+      (a) skips cases without a regime target'
+  chosen: A
+  decided_by: owner
+  how_decided: The owner set the 18-month lookback and confirmed both interpretations. Turning points are never
+    a hand-edited field and never use market data or outcomes.
+  evidence:
+  - spec/scoring.md
+  expected_result: not stated at the time
+  measured_result: '68-case corpus: 17 turning points, 12 era-A with a regime target in 8 episodes. Later found
+    (2026-10-07) that 0 of the 2 research Gate 1 cases were true regime changes; turning points no longer define
+    the Gate 1 set.'
+  status: in force for breakdowns only (no longer defines Gate 1)
+- id: EVAL-05
+  date: '2026-10-06'
+  area: evaluation
+  question: Which null is the "best null" each gate must beat?
+  options:
+  - label: A
+    summary: Choose from a null-only run before any engine run and never re-select
+  chosen: A
+  decided_by: derived
+  how_decided: 'Mechanical: the null with the highest score on each gate component in the unlogged null run was
+    fixed (null_trend_12m for both). Re-checked on the research split after the corpus expansion; unchanged.'
+  evidence:
+  - spec/scoring.md
+  - spec/PREREG.md
+  expected_result: not stated at the time
+  measured_result: 'Era-A turning-point regime: trend 0.812, always risk-on 0.562. Era-A thesis: trend 0.461 (full
+    corpus), 0.607 (research). Open item recorded in PREREG.md: the run covered episodes later moved into the holdout;
+    whether to re-make the choice before registration is left to the owner.'
+  status: in force for Gate 2; Gate 1 references replaced by GATE-02
+- id: VER-03
+  date: '2026-10-06'
+  area: versions
+  question: When should the spec, registry, thesis table and corpus be registered (locked)?
+  options:
+  - label: A
+    summary: Hold registration until the owner has reviewed the rulebook
+  - label: B
+    summary: Register now, before any further work
+  chosen: A
+  decided_by: owner
+  how_decided: The owner's priority is that rules and filters are correct, and the project is in research mode with
+    many filter changes expected. Spec files remain freely editable; lock-in is not framed as the next step until
+    the owner signals research is done.
+  evidence:
+  - spec/PREREG.md
+  - memory/fatpitch-project-plan.md
+  expected_result: Nothing in prereg/ until review; every scoring run after registration goes through record_run.
+  measured_result: As of 2026-10-07 nothing is registered; prereg/ files do not exist (spec/PREREG.md).
+  status: in force
+- id: VER-04
+  date: '2026-10-06'
+  area: versions
+  question: Should pipeline checks that run only the nulls be logged as scoring trials?
+  options:
+  - label: A
+    summary: Run outside record_run as unlogged pipeline checks (nulls only, no engine)
+  chosen: A
+  decided_by: owner
+  how_decided: Only this option is recorded. The runs involve no engine and are disclosed in PREREG.md.
+  evidence:
+  - spec/PREREG.md
+  - spec/scoring.md
+  expected_result: not stated at the time
+  measured_result: Three unlogged runs on 2026-10-06 (07:56Z, 08:06Z full corpus; 20:17Z research split). Later
+    re-seals moved EP02, EP03, EP10, EP17 and EP19, which those runs covered, into the holdout at various versions
+    (disclosed).
+  status: in force
+- id: VER-01
+  date: '2026-10-06'
+  area: versions
+  question: How should spec versions be kept and compared?
+  options:
+  - label: A
+    summary: Local git tags plus exported snapshot folders, only for important changes; versions compared on research
+      cases; trial count kept for a multiple-testing correction
+  chosen: A
+  decided_by: owner
+  how_decided: The owner wants to compare filter variants as decisions accumulate, with many versions expected.
+    Minor edits ride along to the next version. How many versions face the sealed holdout was left for later. The
+    runner (fatpitch.versions) scores research only, logs every engine run to an append-only trials.jsonl, and shows
+    Holm and Bonferroni adjustments over all logged trials.
+  evidence:
+  - CHANGELOG.md
+  - memory/spec-versioning.md
+  - results/versions/LEADERBOARD.md
+  expected_result: Many versions; every engine run counted as a trial.
+  measured_result: 'Committed LEADERBOARD.md (2026-10-07): 2 engine trials, both the E0 stub (Gate 2 recall 0.000).'
+  status: in force
+- id: HOLD-01
+  date: '2026-10-06'
+  area: holdout
+  question: How should part of the corpus be kept unseen until the final test?
+  options:
+  - label: A
+    summary: Seal about one third of episodes (never split an episode), seeded stratified draw, research runs only
+      on the rest, open once at the end with an append-only unseal log and a tamper hash check on every load
+  chosen: A
+  decided_by: derived
+  how_decided: 'The sources do not name who set the design; it implements PLAN E.6 (held-out scoring once) and review
+    finding 10 (episodes as units). Rationale recorded: every engine run that informs a rule change uses a case
+    up as test evidence. Strata: half of the Gate 1 episodes, one of the two 13F episodes, at least one era-B episode,
+    then fill. Seed 20261006.'
+  evidence:
+  - spec/HOLDOUT.md
+  - spec/scoring.md
+  expected_result: Final Gate 1 and Gate 2 tests run once on unseen episodes.
+  measured_result: 'Version 1 (2026-10-06): 6 of 19 episodes, 19 of 56 cases held out. Holdout never opened to date
+    (no unseal log).'
+  status: in force
+- id: CORPUS-02
+  date: '2026-10-06'
+  area: corpus
+  question: Should the case corpus be expanded before any scoring?
+  options:
+  - label: A
+    summary: Expand now from every library note, then re-seal the holdout with the same method so both sets grow
+  chosen: A
+  decided_by: owner
+  how_decided: The Gate 1 sample was small (the review had targeted at least 8 Gate 1 cases on each side). Twelve
+    cases (X-01..X-12) were mined from library notes, not from holdout files; done once before any engine scoring.
+    Rejected candidates are listed with reasons in the generator. X-12 (2026 op-ed) was labelled easing, not tightening
+    as the candidate list proposed, because the label is his read of the stance, not his prescription.
+  evidence:
+  - spec/HOLDOUT.md
+  - spec/cases_seed.md
+  - tools/build_cases_v2.py
+  expected_result: At least 8 Gate 1 cases in each split.
+  measured_result: 68 cases, 20 episodes; Gate 1 cases rose to 12 (net +1 from the expansion) but holdout Gate 1
+    fell from 7 to 6 cases, so the 8-per-split target was not reached.
+  status: in force
+- id: HOLD-02
+  date: '2026-10-06'
+  area: holdout
+  question: When may the holdout be redrawn after cases are added or corrected?
+  options:
+  - label: A
+    summary: Redraw with the same method and seed, writing version n+1 with every earlier version kept, only while
+      the holdout has never been opened
+  chosen: A
+  decided_by: derived
+  how_decided: 'Mechanical consequence of the tamper check: a new or edited case in a holdout episode breaks the
+    hash by design. The reseal tool refuses once an unseal log exists, so the split cannot be redrawn after the
+    holdout is opened. Each re-seal records preconditions (no unseal, no engine scored, nothing registered) and
+    exposures.'
+  evidence:
+  - spec/HOLDOUT.md
+  - spec/PREREG.md
+  expected_result: not stated at the time
+  measured_result: 'Versions 1 to 5 (2026-10-06 19:59Z to 2026-10-07 07:24Z): 6/19, 7/20, 7/20, 7/20, 8/23 episodes
+    held out; v5 holds 32 of 80 cases. Each redraw moved episodes (v3 swapped four, v5 three in and two out); the
+    holdout was never opened.'
+  status: in force
+- id: CORPUS-03
+  date: '2026-10-06'
+  area: corpus
+  question: What does a case's regime label mean?
+  options:
+  - label: A
+    summary: The policy stance as he read it at the information date (easing, neutral, tightening), not his prescription
+      and not the later outcome; label follows the thesis region; when the source has no read for that region, his
+      stated US read
+  chosen: A
+  decided_by: derived
+  how_decided: Stated as the rule in the 2015-03 label review and the full audit; the sources do not name who set
+    it. Policy judged "too loose" is coded easing even while the Fed hikes (2003, 2005, 2017, 2021, 2026 precedents).
+    Process cases carry the stated rule's output instead.
+  evidence:
+  - spec/label_review_2015-03.md
+  - spec/label_audit_2026-10-06.md
+  - spec/corpus_v0.2_changes.md
+  expected_result: not stated at the time
+  measured_result: His reads diverge from Fed action in places (2004-06 hikes read as easing); recorded later as
+    a known tension with the Fed cycle check (GATE-07).
+  status: in force
+- id: CORPUS-04
+  date: '2026-10-06'
+  area: corpus
+  question: Are the existing case labels consistent with the labelling rule?
+  options:
+  - label: A
+    summary: Blind audit of all 68 cases against their notes and primary transcripts; edit research files where
+      the rule is clear; propose, not apply, holdout changes and date changes
+  chosen: A
+  decided_by: derived
+  how_decided: Applied the rule in CORPUS-03 without reading scoring, holdout, gate or turning-point material. The
+    2015-03-02 case was labelled neutral although the thesis-region read (BoJ and ECB QE, "very, very expansive")
+    is easing; the likely cause was averaging a US and a JP/EA read, which the rule does not allow.
+  evidence:
+  - spec/label_audit_2026-10-06.md
+  - spec/label_review_2015-03.md
+  expected_result: not stated at the time
+  measured_result: '68 checked: 1 label change (2015-03-02 neutral to easing), 6 notes-only edits, 1 research date
+    proposal, 1 holdout proposal (C33), 2 optional label additions; C15, C44, C17, C34 flagged low confidence.'
+  status: in force
+- id: CORPUS-05
+  date: '2026-10-06'
+  area: corpus
+  question: The December 2018 op-ed states no position; should its case keep the Treasury-long thesis?
+  options:
+  - label: A
+    summary: Drop the thesis and expression; keep a regime-only case (tightening)
+  - label: B
+    summary: Keep the thesis by citing a source for the position
+  chosen: A
+  decided_by: owner
+  how_decided: No source dated on or before the 2018-12-17 close states a position; the only earlier rates comment
+    (Grant's, October 2018) points the other way. The Treasury long first appears in the 2018-12-18 Bloomberg interview,
+    one trading day later; coding it as its own case was left open (taken up in CORPUS-11).
+  evidence:
+  - spec/corpus_v0.2_changes.md
+  - spec/label_audit_2026-10-06.md
+  expected_result: not stated at the time
+  measured_result: Edited a holdout file, which broke the v2 tamper check by design and triggered re-seal v3.
+  status: in force
+- id: CORPUS-06
+  date: '2026-10-06'
+  area: corpus
+  question: Should the 2006 exit case keep a tightening label resting on a television host's framing?
+  options:
+  - label: A
+    summary: Keep tightening (low confidence)
+  - label: B
+    summary: Set to null (no regime target); keep the exit target
+  chosen: B
+  decided_by: owner
+  how_decided: None of the three texts (Delivering Alpha 2014, Lost Tree, Sohn 2022) states his read of 2006 policy;
+    the label came from the host's 2014 line. Under the rule, no direct statement means null. The audit had left
+    the choice to the owner.
+  evidence:
+  - spec/corpus_v0.2_changes.md
+  - spec/label_audit_2026-10-06.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: CORPUS-07
+  date: '2026-10-06'
+  area: corpus
+  question: How should the March 2022 short-front-end case be labelled, when his retrospective read was still-loose
+    policy?
+  options:
+  - label: A
+    summary: 'Keep tightening (matches the rule mechanics: hike imminent)'
+  - label: B
+    summary: 'Easing (his read: QE still running, no hike yet)'
+  chosen: B
+  decided_by: owner
+  how_decided: 'Sohn 2022 transcript: the Fed was "still buying bonds in March of 22". The old label matched the
+    rule''s mechanics, not his read; the audit flagged it. Medium confidence; no contemporaneous statement exists.'
+  evidence:
+  - spec/corpus_v0.2_changes.md
+  - spec/label_audit_2026-10-06.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: CORPUS-08
+  date: '2026-10-06'
+  area: corpus
+  question: Should two unlabelled cases (2005 riding policy; 2026 AI trim and FX short) receive easing labels?
+  options:
+  - label: A
+    summary: Add easing to both
+  - label: B
+    summary: Leave null
+  chosen: A
+  decided_by: owner
+  how_decided: '2005: three texts state policy was too loose ("overly aggressive" policy; Sohn 2005 talk on the
+    housing bubble), content dated to 2005. 2026: rates "at best too low", the only stated policy read is the Fed''s,
+    and the corpus uses the US read when the thesis region has none. Confidence medium and medium-low.'
+  evidence:
+  - spec/corpus_v0.2_changes.md
+  - spec/label_audit_2026-10-06.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: CORPUS-09
+  date: '2026-10-06'
+  area: corpus
+  question: When should the 1999 internet-short case be dated, given sources that say February and March?
+  options:
+  - label: A
+    summary: Mid-March 1999 (latest date the short certainly existed)
+  - label: B
+    summary: '1999-03-31'
+  - label: C
+    summary: Late February 1999 (Lost Tree "about February")
+  chosen: C
+  decided_by: owner
+  how_decided: The old date (1999-12-31) fell when he was already long tech. Lost Tree says "about February"; Feig
+    and Sohn 2022 say March. The owner chose February; the case moved to 1999-02-26.
+  evidence:
+  - spec/corpus_v0.2_changes.md
+  - spec/label_audit_2026-10-06.md
+  expected_result: not stated at the time
+  measured_result: null
+  status: in force
+- id: CORPUS-10
+  date: '2026-10-06'
+  area: corpus
+  question: Which newly found sources should become cases, and which only upgrade existing ones?
+  options:
+  - label: A
+    summary: Upgrade citations (Sohn 2016 full text, Talks at GS 2021) of the same events; add three new cases (WSJ
+      2014-06-19, TIE/USC 2023-05-01, Grant's 2024-10-02)
+  chosen: A
+  decided_by: owner
+  how_decided: From the turning-point source search. A source describing an event already in the corpus enriches
+    that case rather than adding a duplicate, so three cases were added instead of five. The Goldman 2021 case was
+    re-dated to 2021-02-05 (last close before first publication) and gained an easing read. Single-name holdings
+    are not coded.
+  evidence:
+  - spec/corpus_v0.2_changes.md
+  - library/research/turning_point_sources.md
+  expected_result: More era-A turning points for Gate 1.
+  measured_result: The search found 0 confirmed new era-A regime turning points (1 conditional, content inaccessible);
+    no public dated statement exists around the 2019 cuts or the 2021-22 taper and hike. Corpus 71 cases, 20 episodes;
+    holdout v3.
+  status: in force
+- id: HOLD-03
+  date: '2026-10-07'
+  area: holdout
+  question: After the v3 re-seal left fewer than 5 holdout Gate 1 cases, what should change?
+  options:
+  - label: A
+    summary: Change the threshold
+  - label: B
+    summary: Add Gate 1 cases from new sources
+  - label: C
+    summary: Accept a smaller holdout Gate 1
+  - label: D
+    summary: 'Change labels to reach it (rejected: outcome-driven)'
+  chosen: A
+  decided_by: derived
+  how_decided: The options were posed in corpus_v0.2_changes.md section 7; the sources do not record who chose.
+    The test threshold was lowered to at least 4 holdout Gate 1 cases in the timing-gate commit (6c9b912). Changing
+    labels was rejected because it would be driven by outcomes. The question lapsed when GATE-02 replaced turning-point
+    Gate 1 sets.
+  evidence:
+  - spec/corpus_v0.2_changes.md
+  - spec/HOLDOUT.md
+  expected_result: not stated at the time
+  measured_result: 'Tests: 170 passed, 1 failed before the change; holdout power assertion passes on version 5.'
+  status: superseded by GATE-02
+- id: GATE-01
+  date: '2026-10-07'
+  area: evaluation
+  question: Should Gate 1 measure how early the engine turns to his regime view instead of plain agreement?
+  options:
+  - label: A
+    summary: 'Timing gate: lead of the model flip to the target regime against a comparator null on era-A turning-point
+      cases, sign-flip p < 0.10, on-target floor 0.75'
+  chosen: A
+  decided_by: owner
+  how_decided: 'Agreement could not separate the engine from the base rate. The comparator was chosen by the same
+    metric in an unlogged null-only run on the v3 research split: always-easing, with the stated consequence that
+    easing cases could not be won. Written before any engine existed (E0 stub only).'
+  evidence:
+  - spec/scoring.md
+  - memory/fatpitch-project-plan.md
+  expected_result: 'Recorded at the time: easing-target cases cannot be won against an always-easing comparator.'
+  measured_result: 'spec/regime_evaluation_options.md section 1: research headroom 0; a holdout pass needed all
+    4 cases non-easing and won (p floor 0.0625); with 3 holdout episodes the episode-level floor was 0.125, so the
+    gate could not pass at episode level under any result; 0 of 2 research Gate 1 cases were real regime changes.'
+  status: retired 2026-10-07 (replaced by GATE-02)
+- id: CORPUS-11
+  date: '2026-10-07'
+  area: corpus
+  question: Should the Treasury long first stated in the 2018-12-18 Bloomberg interview be its own case?
+  options:
+  - label: A
+    summary: Add it as a separate case (C33 stays regime-only)
+  - label: B
+    summary: Leave it out (previously listed as rejected)
+  chosen: A
+  decided_by: owner
+  how_decided: The position is real but belongs to a later information date than the op-ed. Coded as tightening,
+    Treasury long, short financials in the expression only (no sector region exists; an equity short thesis would
+    misstate a sector short), action hold because no dated entry is stated. As-of is the 2018-12-18 close.
+  evidence:
+  - spec/corpus_v0.2_changes.md
+  - spec/cases_seed.md
+  expected_result: not stated at the time
+  measured_result: 72 cases; case lands in holdout episode EP14, re-seal v4 with episodes unchanged.
+  status: in force
+- id: GATE-02
+  date: '2026-10-07'
+  area: evaluation
+  question: How should the regime stage be judged when nearly all of his reads are "easing"?
+  options:
+  - label: A
+    summary: No regime gate; written regime report; thesis recall (Gate 2) as the single go/no-go
+  - label: B
+    summary: Engine outputs daily probabilities of easing/neutral/tightening; ranked probability score skill against
+      leave-one-episode-out climatology and the 12-month trend null, exact episode sign-flip p < 0.10 on research;
+      holdout scored once at the end with a Bayes factor
+  - label: C
+    summary: Chance-corrected classification gate (kappa, balanced accuracy versus the trend null)
+  - label: D
+    summary: Repaired timing gate (trend comparator, true regime changes only, pooled at the end)
+  chosen: B
+  decided_by: owner-on-recommendation
+  how_decided: 'Research era-A reads were 25 easing and 2 tightening, both tightening cases in one episode, so any
+    agreement or timing test was beaten or gamed by the base rate. Option B is the only one that is not gamed by
+    the 92.6% base rate, uses all regime cases instead of two, can reach p < 0.10 on research without opening the
+    holdout, and matches the forecast-verification convention (skill against climatology). C rests on one minority
+    episode; D has at most 8 cases. Pre-registered constants: floor 0.01, class order easing < neutral < tightening,
+    deterministic nulls at 0.9/0.05/0.05 (owner default), missing forecast = worst score, add-one smoothed climatology.
+    Diagnostics (bracketed daily agreement, interval-censored turn matching, kappa, balanced accuracy, AUC) are
+    reported with chance levels, not gated. Gate 2 stays the hard go/no-go.'
+  evidence:
+  - spec/regime_evaluation_options.md
+  - spec/scoring.md
+  - PLAN.md
+  - memory/fatpitch-project-plan.md
+  expected_result: An engine better in about 7 of 8 research episodes with similar margins reaches p of about 0.05-0.10;
+    holdout with about 5 episodes needs 5/5 or 4/5 with a small loss.
+  measured_result: 'Nulls on the combined set (scoring.md 6c, 28 cases): always-easing RPS 0.176, climatology 0.183,
+    trend 0.246. Committed leaderboard after the v0.3 corpus (32 cases, 13 episodes): climatology 0.246, always-easing
+    0.268, trend 0.288; no null passes. First engine run (trial 3, c6fefbd, recorded in spec/decisions_today.yaml):
+    RPS 0.249, fail.'
+  status: in force
+- id: GATE-03
+  date: '2026-10-07'
+  area: evaluation
+  question: Should a forecast that always says "easing" be one of the references the engine must beat?
+  options:
+  - label: A
+    summary: References climatology and trend only (first draft of option B)
+  - label: B
+    summary: Add always-easing (0.9/0.05/0.05) as a third reference; the engine must beat every reference
+  chosen: B
+  decided_by: owner
+  how_decided: 'Under the two-reference draft the constant always-easing forecast had skill +0.125 against climatology
+    and +0.630 against the trend null and won 6 of 9 research episodes against trend (p 0.164); one more winning
+    episode would have let a constant pass Gate 1 from the base rate alone. Closed before any engine emitted probabilities.
+    In plain words: a lazy engine that always says easing would look good but be useless.'
+  evidence:
+  - spec/scoring.md
+  - memory/decision-format.md
+  expected_result: 'Recorded at the time: the constant easing forecast is the strongest reference and is expected
+    to bind for an engine.'
+  measured_result: null
+  status: in force
+- id: GATE-04
+  date: '2026-10-07'
+  area: evaluation
+  question: Should pre-2002 cases join the regime test to add tightening examples?
+  options:
+  - label: C
+    summary: Era-B research cases with a regime target join the Gate 1 set; era A and era B also reported separately
+  chosen: C
+  decided_by: owner
+  how_decided: Research era A had 25 easing and 2 tightening reads, both in the 2022 episode; the owner stated that
+    tightening will matter at some point. Adding era B adds tightening examples (1981 at the time). Decided before
+    any engine emitted probabilities. The other options offered are not recorded in the sources.
+  evidence:
+  - spec/scoring.md
+  - CHANGELOG.md
+  - memory/fatpitch-project-plan.md
+  expected_result: +1 case, +1 episode, +1 tightening case on research (28 cases, 10 episodes).
+  measured_result: After CORPUS-12 the set grew to 32 cases, 13 episodes, 6 tightening in 4 episodes (committed
+    LEADERBOARD.md); era B alone gives p of at least 0.5 with one episode.
+  status: in force
+- id: GATE-05
+  date: '2026-10-07'
+  area: evaluation
+  question: Must the engine show it can call tightening, not just ride the easing majority?
+  options:
+  - label: A
+    summary: 'Hard requirement: on all tightening-target research cases the engine mean RPS must be below always-easing''s;
+      low power flagged under 3 cases'
+  chosen: A
+  decided_by: owner
+  how_decided: An engine that cannot call tightening fails Gate 1 regardless of its other scores. Added on top of
+    the every-reference rule, before any engine emitted probabilities.
+  evidence:
+  - spec/scoring.md
+  - CHANGELOG.md
+  - memory/fatpitch-project-plan.md
+  expected_result: 'Recorded: always-easing is the weakest reference on the tightening subset (RPS 0.856), which
+    the requirement exploits.'
+  measured_result: 'Committed leaderboard: always-easing tightening RPS 0.856 on 6 cases; trend and Fed-direction
+    nulls 0.148.'
+  status: in force
+- id: CORPUS-12
+  date: '2026-10-07'
+  area: corpus
+  question: Which newly found tightening reads should become cases?
+  options:
+  - label: A
+    summary: Add all six plausible tightening reads and the two easing by-products (1981, 1987, 1989 BoJ, 1991,
+      2018-05, 2018-10, 2018-11, 2023-06)
+  chosen: A
+  decided_by: owner
+  how_decided: The search found no source using neutral language about the stance and few tightening reads. The
+    owner overrode two earlier rejections (Grant's 2018-10 as "same view as C32"; Bloomberg Invest 2023-06 as "same
+    as X-09"). The 1989 Nikkei short carries no regime target because the label is a US read and the source states
+    only a BoJ read. The 1981 read is implied (rates at 19%), accepted by the owner. All targets decided from sources
+    before the re-seal; four exposures disclosed.
+  evidence:
+  - spec/corpus_v0.3_changes.md
+  - library/research/tightening_sources.md
+  - spec/cases_seed.md
+  expected_result: More tightening examples in the regime test; the three 2018 items add count but little independent
+    information.
+  measured_result: 80 cases, 23 episodes; research regime targets tightening 6 (was 2-3), easing 26; holdout v5
+    moved EP07 and EP17 to research and EP03, EP15, EP23 into the holdout.
+  status: in force
+- id: DATA-07
+  date: '2026-10-07'
+  area: data
+  question: How should each input be served point-in-time from amber's lake, and what counts as usable?
+  options:
+  - label: A
+    summary: Catalogue every input id with location, frequency, point-in-time method and vintage source by era (ALFRED,
+      Philadelphia Fed real-time data, else latest values under an explicit policy); graded fallbacks; D-graded
+      proxies returned but unusable; freshness bound per frequency
+  chosen: A
+  decided_by: derived
+  how_decided: 'Implements PROC-08 with the bitemporal and proxy-grade practices in data_practices.md. Fallback
+    grades were computed on the lake overlap with the 4.2 thresholds. Mechanical guards: unemployment from first
+    release; NROU older than 2 years makes R-06 unknown; French-12 served as a substitute for the missing French-49
+    with grade D and usable false (no overlap to validate).'
+  evidence:
+  - spec/data_catalogue.yaml
+  - spec/data_coverage.md
+  - library/research/data_practices.md
+  expected_result: Snapshot under 50 ms.
+  measured_result: 9.5 ms per snapshot; 0 of 11 research era-B cases have every step-1 input; industry rules (R-15,
+    R-16, R-59) unknown in every era-B case.
+  status: in force
+- id: GATE-06
+  date: '2026-10-07'
+  area: evaluation
+  question: Should the engine also be tested against the Fed's own record of tightening and easing, separate from
+    his reads?
+  options:
+  - label: A
+    summary: 'Required Fed cycle check: monthly 1970 on, labels from the Fed history; skill against climatology,
+      trend and always-easing; tightening detected within 3 months of the first hike in at least 75% of cycles;
+      false alarms in easing months at most 20%'
+  chosen: A
+  decided_by: owner
+  how_decided: 'His reads often differ from Fed action (2004-06 still too loose; March 2022 still buying bonds),
+    so the documented reads alone cannot show the engine recognises real tightening. The labels are public Fed facts,
+    so holdout-period months are scored. Chronology rules are mechanical: target-rate changes from 1982 with runs
+    under 0.25 point dropped (1980s 1/16-1/8 point technical moves, which otherwise produce 44 cycles), pre-1982
+    turning points of fed funds, QT periods count as tightening, easing dominates. Overall regime pass = Gate 1
+    AND this check. Decided before any engine emitted probabilities.'
+  evidence:
+  - spec/scoring.md
+  - spec/fed_cycles.yaml
+  - memory/fatpitch-project-plan.md
+  expected_result: 'Recorded at the time: the Fed-direction null passes, as expected for a rule close to the label
+    definition, and fails Gate 1.'
+  measured_result: Chronology 681 months (easing 214, neutral 211, tightening 256), 17 evaluable tightening cycles;
+    1990-on changes match the Board's tables 110 of 110. Under the three-reference rule the Fed-direction null passed.
+  status: in force (extended by GATE-07)
+- id: GATE-07
+  date: '2026-10-07'
+  area: evaluation
+  question: Must the engine read Fed tightening better than simply reading rate changes?
+  options:
+  - label: A
+    summary: Add the Fed-direction null as a fourth reference and require at least as many detected cycles, at least
+      as early (median lead), as that null
+  chosen: A
+  decided_by: owner
+  how_decided: 'Under the three-reference version a rule that only reads rate changes passed the check. The owner
+    required the engine to do better than that. A known tension was recorded and left unchanged: an engine faithful
+    to his reads (2004-06 read as easing while the Fed hiked) may score worse here, so Gate 1 and this check can
+    pull in opposite directions.'
+  evidence:
+  - spec/scoring.md
+  - results/versions/LEADERBOARD.md
+  expected_result: Engine must detect at least 14 of 17 cycles with median lead at least 0 months (the null's values
+    at the time).
+  measured_result: 'Fed-direction null: 14 of 17 detected, median lead 0, false alarms 0.18; trend null 13 of 17,
+    lead +3, false alarms 0.32.'
+  status: in force
+- id: PROC-13
+  date: '2026-10-07'
+  area: process
+  question: How should the engine turn its rule outputs into daily regime probabilities?
+  options:
+  - label: A
+    summary: Count evidence families with unit weight (R-14 Fed direction; the era-appropriate liquidity rule),
+      each adding mass to the class it points to, from a base mass; floored and renormalised; unknown families add
+      nothing; no fitted calibration
+  chosen: A
+  decided_by: derived
+  how_decided: 'Required by the probability output adopted in GATE-02 (R-66, phase E3), written before any engine
+    output was scored. No source states such a mapping, so a transparent count was chosen. Excluded with reasons:
+    level measures (Taylor gap, financial conditions; "change, not level"), rules that take policy direction as
+    an input (circular), veto flags, fragility (never sets direction), duration evidence and equity internals. All
+    three constants non-tunable because the cap of 8 is full. Rules are weighted by the process timeline (held or
+    not held by era; unknown era counts as held).'
+  evidence:
+  - spec/process.md
+  - spec/registry.yaml
+  - spec/claims/process_timeline.yaml
+  expected_result: 'Recorded: probabilities are coarse by design (few families, no fitted calibration); calibration
+    out of scope until E7.'
+  measured_result: Before scoring, the base mass of 1.0 was found to cap probabilities at 0.6 and make Gate 1 unpassable;
+    that revision is recorded in spec/decisions_today.yaml (R66-01).
+  status: in force (base mass revised 2026-10-07, R66-01)
+- id: PROC-14
+  date: '2026-10-07'
+  area: process
+  question: Should the process be fixed, or change over time the way his views changed?
+  options:
+  - label: A
+    summary: 'Time-varying: each rule active only from when he held it (process timeline), plus a second test layer
+      that turns each general claim he made into a falsifiable hypothesis tested out of sample after he first said
+      it'
+  chosen: A
+  decided_by: owner
+  how_decided: 'The owner''s aim is to recreate his way of thinking over time and test it backwards. Two layers
+    result: fidelity (does the engine reach his dated calls) and claim tests (76 claims, each with a pre-registered
+    test and an out-of-sample split at its first public statement). Claims were formalised without reading cases
+    or scores. Where the start date of a belief has no evidence, replay should score both ways.'
+  evidence:
+  - spec/claims/README.md
+  - spec/claims/claims.yaml
+  - spec/claims/process_timeline.yaml
+  - memory/fatpitch-project-plan.md
+  expected_result: 'Recorded: many claims were first stated in 2022-26, so out-of-sample windows of four years or
+    less are anecdotal.'
+  measured_result: '76 claims: 51 testable, 17 partly testable, 8 untestable with free data. Known evidence from
+    notes: the net liquidity claim failed in its first month (2020-05 to 06); the 2022-24 disinflation without a
+    dated recession counters two inflation claims; the 2022 inversion was followed by no recession.'
+  status: in force
+- id: TRACK-01
+  date: '2026-10-07'
+  area: tracks
+  question: Should every filter in the Automated Alpha article be built, and how should it sit next to the Druckenmiller
+    rules?
+  options:
+  - label: A
+    summary: 'Pre-decision recommendation per element: adopt, weight-0 variant, or exclude where it conflicts with
+      his stated process'
+  - label: B
+    summary: 'Build every article element as an interpreted-from-article rule; three comparable versions on the
+      leaderboard: Druckenmiller-faithful, article-faithful, hybrid'
+  chosen: B
+  decided_by: owner
+  how_decided: The owner asked that all filters in the article be included. Elements that contradict his stated
+    process (price stops, fixed profit targets, contrarian positioning, quality gates, nightly re-weighting on profits)
+    run only in the article track; in the hybrid, the R-xx rule governs on overlap and those elements are disabled.
+    Article numbers are used as published and fixed; paywalled internals are interpreted constructions fixed before
+    scoring and never tuned on cases. Each version has its own registry and registration.
+  evidence:
+  - spec/article_coverage.md
+  - library/research/article_provenance.md
+  - memory/fatpitch-project-plan.md
+  expected_result: 'Recorded: the article-faithful version has no rates/FX and no single-name history before 2021-09,
+    so its pre-2021 output is limited; coverage is reported beside every score.'
+  measured_result: '167 article elements: 17 covered by a Druckenmiller rule, 16 already weight-0 rules, 50 partly
+    covered, 84 missing; 16 to the faithful track, 17 article-plus-candidate, 126 article-only, 8 article-only by
+    conflict.'
+  status: in force
+- id: R66-01
+  date: '2026-10-07'
+  area: evaluation
+  question: How should the two policy votes be turned into easing / on-hold / tightening odds so that a correct
+    call can beat a forecaster that always says "easing"?
+  options:
+  - label: A
+    summary: 'Weak starting point: each outcome starts at 0.1 instead of 1; agreement gives 0.91, one vote 0.85,
+      a split 0.48/0.48'
+  - label: B
+    summary: 'Near-certain calls: 0.98 on the voted outcome; scoring becomes a plain hit rate'
+  - label: C
+    summary: 'Size-weighted votes: larger rate moves count more; needs several uncited size constants'
+  - label: D
+    summary: 'Keep as written: starting point 1, ceiling 0.6'
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: The scoring rule (ranked probability score) was checked against the mapping as written. With a starting
+    point of 1 the largest attainable probability was 0.6, so a forecast with every direction right still scored
+    0.10 per date against about 0.00 for always-easing in an era that reads easing 93% of the time. Gate 1 was unpassable
+    by construction. The first recommendation (approve as written) had not been checked against the scoring rule
+    and was withdrawn. Option A keeps the vote count and only weakens the prior; no case outcome was read to choose
+    0.1.
+  evidence:
+  - spec/process.md
+  - spec/registry.yaml
+  - src/fatpitch/cases/regime.py
+  - tests/test_rules_regime.py
+  expected_result: The direction called at each date is unchanged (the vote count and tie rule are the same), so
+    the Fed-cycle check detection counts and false alarms stay the same. Only the probabilities sharpen. Gate 1
+    RPS moves toward 0 on dates where the call is right and toward 1 where it is wrong; because stage 1 still carries
+    the faulty holdings signal, the net Gate 1 effect at this stage may be neutral or negative. The point of the
+    change is that a good rule can now pass at all.
+  measured_result: 'Stage 1 (8bb7d11, trial 4). Calls unchanged as predicted - Fed cycles detected 4/17 and false
+    alarms 7.5% both identical to the baseline. Gate 1 RPS worsened 0.249 -> 0.273 (era A 0.266 -> 0.303): sharper
+    odds amplified the faulty holdings signal, the ''neutral or negative'' case predicted. The Fed-cycle check criterion
+    (a) flipped from pass to fail (skill vs fed-direction -0.036). Gate 1 still fails.'
+  status: in force
+- id: R14-01
+  date: '2026-10-07'
+  area: process
+  question: How should the Fed's bond holdings count toward the direction of Fed policy?
+  options:
+  - label: A
+    summary: 'Announced programmes: a buying programme in force = easing (taper included), runoff = tightening,
+      otherwise nothing'
+  - label: B
+    summary: Programmes plus a size test on runoff (1% of GDP a year); one uncited constant
+  - label: C
+    summary: Measured flow of Fed assets against GDP with thresholds; three uncited constants
+  - label: D
+    summary: Minimal repair of the week-to-week arithmetic; still reads the 2008 cuts as neutral
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: A research pass read every library statement on QE, tapering and QT (30 dated statements) and built
+    a table of Fed releases from federalreserve.gov. He describes stimulus as on or off, says to stay long until
+    the Fed tightens and to watch the end of QE, calls QT tightening, and never calls a US taper tightening. The
+    old arithmetic read 2004-06 hikes and 2008 cuts as neutral and 116 of 174 dates in the 2010s as tightening.
+    A matches the statements with no new constants; the owner asked for something "more nuanced that is correct"
+    after the first options.
+  evidence:
+  - spec/research_R14_balance_sheet.md
+  - spec/fomc_bs_events.yaml
+  - spec/process.md
+  expected_result: R-14 reads 2004-06 as tightening, 2008 cuts as easing and 2009-2014 as easing (spot-checked on
+    the lake before any scored run). Fewer false tightening dates in 2010-2019, so the Fed-cycle check false-alarm
+    share should fall and Gate 1 should improve on the easing-heavy research cases. Disclosed overlap - the runoff
+    windows come from the same FOMC statements as the QT windows of the Fed-cycle answer key, so agreement there
+    is by construction.
+  measured_result: Stage 2 (82bbdf9, trial 5). Gate 1 RPS 0.273 -> 0.232; episodes won vs climatology 6 -> 7 of
+    13; 2008 crisis episode 0.137 -> 0.005 and 2012-13 QE episode 0.038 -> 0.005. Fed cycles detected 4 -> 6 of
+    17 (1977 and 2004 cycles now found, 2004 one month after the first hike). Against the prediction, false alarms
+    rose 7.5% -> 9.3% of easing months and the 2010s decade skill fell (+0.017 -> -0.082); the 2015 hiking cycle
+    is still not detected at any stage (unexplained; open item). Gate 1 still fails (binding p 0.454).
+  status: in force
+- id: R14-02
+  date: '2026-10-07'
+  area: process
+  question: When the rate move and the bond-holdings signal point in opposite directions, which one decides?
+  options:
+  - label: A
+    summary: The rate move wins; holdings decide only when rates are unchanged
+  - label: B
+    summary: Keep adding the two signals; disagreement reads neutral
+  - label: C
+    summary: Keep adding, but a slowed runoff counts zero
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: The only long disagreement under the programme table is 2024-09 to 2025-11, when the Fed cut while
+    still shrinking its holdings slowly. Adding the signals reads neutral; he read that period as easing (2024-10
+    statements). The Fed itself calls the policy rate its primary tool (2022-01-26 principles). The research recommended
+    deferring this change to avoid two simultaneous changes; staged measurement (VER-02) removes that concern.
+  evidence:
+  - spec/research_R14_balance_sheet.md
+  - spec/process.md
+  expected_result: Changes only dates where rate and programme disagree - 2024-09-18 to 2025-11-30 (neutral to easing)
+    and 2019-07-31. Small effect on research cases; possibly none if no research case falls in that window.
+  measured_result: 'Stage 3 (c7f1623, trial 6). Larger than predicted: the 2024 cut episode improved 0.723 -> 0.562
+    and the 2020s decade skill rose +0.051 -> +0.262. Gate 1 RPS 0.232 -> 0.220, binding p 0.403 (7 of 13 episodes
+    won; needs < 0.10). Fed-cycle detection unchanged at 6/17.'
+  status: in force
+- id: R17-01
+  date: '2026-10-07'
+  area: process
+  question: Should the bond-market signal's "QE is on" test use the same programme table?
+  options:
+  - label: A
+    summary: Yes, switch together; one definition of QE across rules
+  - label: B
+    summary: No, leave the holdings-to-GDP test in R-17
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: R-17 down-weights the bond-market signal while QE is on. Its test (holdings rising faster than GDP)
+    is the definition just shown to fire in ordinary pre-2008 years. Keeping two definitions would let R-14 and
+    R-17 disagree on the same date.
+  evidence:
+  - spec/process.md
+  - src/fatpitch/rules/step1.py
+  expected_result: Affects only the market-internals evidence (step 1b), which no gate scores yet. Gate 1 and the
+    Fed-cycle check should be unchanged at this stage.
+  measured_result: Stage 4 (3fe11c8, trial 7). As predicted, Gate 1, the tightening rule and the Fed-cycle check
+    are identical to stage 3.
+  status: in force
+- id: VER-02
+  date: '2026-10-07'
+  area: versions
+  question: How should the four changes be measured so each one's effect is visible?
+  options:
+  - label: A
+    summary: 'Staged: one change per run, each compared with the step before (4 runs plus the baseline)'
+  - label: B
+    summary: Each change alone against the baseline, plus one run with all four (5 runs)
+  - label: C
+    summary: One run with all four changes
+  chosen: A
+  decided_by: owner
+  how_decided: The owner pointed out that four changes in one run would make results unattributable. The version
+    runner accepts any commit, so each change was committed separately (8bb7d11, 82bbdf9, c7f1623, 3fe11c8) on top
+    of the baseline c6fefbd. Each run adds one trial to the trial log, which raises the bar for the final multiple-testing
+    correction.
+  evidence:
+  - results/versions/trials.jsonl
+  - src/fatpitch/versions/gitops.py
+  expected_result: Five trials logged; the effect of each change read as the difference between consecutive stages.
+  measured_result: 'Five trials logged (3-7). Baseline Gate 1 RPS 0.249 -> 0.273 -> 0.232 -> 0.220 -> 0.220. All
+    stages fail Gate 1 (best binding p 0.403 vs LOEO climatology) and the Fed-cycle check (6/17 cycles detected
+    vs 14/17 for the realised-direction reference). All stages meet the tightening requirement (skill vs always-easing
+    on the 6 tightening cases about +0.73). Main remaining loss: era-A easing episodes the engine does not read
+    as easing (2003, 2014-15, 2024, 2025-26).'
+  status: in force
+- id: R67-01
+  date: '2026-10-07'
+  area: process
+  question: How should the engine anticipate a Fed turn before the first move?
+  options:
+  - label: A
+    summary: Bill market first (2 x (6-month minus 3-month bill), 25bp band), inflation momentum confirms or cancels
+      and fills in when the market is flat
+  - label: B
+    summary: Inflation momentum only
+  - label: C
+    summary: Bill market only
+  - label: D
+    summary: Reuse the 2-year minus fed funds spread
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: The owner asked for anticipation ("futures markets for fed rates are very predictive", then "inflation
+    reads") as a new kind of rule and test. Free fed funds futures history starts only around 2024, so the bill
+    forward (1959 onward, one unbroken series) stands in for the market's priced path. Inflation momentum cancels
+    the bill market's known false hike signal in flights to safety (2007).
+  evidence:
+  - spec/research_market_implied_fed.md
+  - spec/process.md
+  expected_result: Not implemented yet, so no effect on current runs. From public history (not measured) - hike
+    readings 1-3 months ahead of 1994, 2004, 2015 and 2022 first hikes; cut readings 1-2 months ahead of 2001 and
+    2019; the 2007 false hike reading removed by the inflation guard; inflation alone would give long early runs
+    (2012-2015, 2021).
+  measured_result: null
+  status: in force (not implemented)
+- id: R67-02
+  date: '2026-10-07'
+  area: tracks
+  question: Should the anticipation rule count as part of Druckenmiller's process?
+  options:
+  - label: A
+    summary: 'Split by evidence: inflation part in the faithful track, market part in the hybrid track'
+  - label: B
+    summary: Both parts in the faithful track, tagged interpreted
+  - label: C
+    summary: Both parts in the hybrid track only
+  chosen: C
+  decided_by: owner
+  how_decided: The library holds no statement of him using market pricing to forecast the Fed; he usually traded
+    against that pricing (2-year trades in 2000, 2018-19, 2021 and 2023). Split by evidence was recommended; the
+    owner chose to keep the faithful track to the rules as they stand and test anticipation only as an improvement.
+  evidence:
+  - spec/research_market_implied_fed.md
+  expected_result: The Druckenmiller-faithful leaderboard row is unaffected by R-67; anticipation appears only in
+    the hybrid version once that track is built.
+  measured_result: null
+  status: in force
+- id: R67-03
+  date: '2026-10-07'
+  area: evaluation
+  question: What does the anticipation rule do before it has proved itself, and what counts as proof?
+  options:
+  - label: A
+    summary: Warning flag first; becomes a vote in the odds only after passing a new lead-time test with thresholds
+      fixed now
+  - label: B
+    summary: Vote in the odds at once
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: Adding an untested signal to the odds would mix it into Gate 1 results. The new test (scoring.md
+    6e) checks each Fed turn from 1970 for the right direction before the first move, the lead in months, and false
+    alarms per year, against a naive 2-year rule. Thresholds were fixed before any computation - hit rate at least
+    0.6, lead at least 1 month, no worse than the naive rule, at most 3 false-alarm months a year, no era with zero
+    hits.
+  evidence:
+  - spec/scoring.md
+  - spec/research_market_implied_fed.md
+  expected_result: Gate 1 and the Fed-cycle check unaffected until R-67 passes. The research expects post-1994 turns
+    to be anticipated more reliably than 1970s turns; the per-era rule (no era with zero hits) is the likeliest
+    criterion to fail.
+  measured_result: null
+  status: in force
+- id: R14-04
+  date: '2026-10-07'
+  area: process
+  question: How should the policy-direction rule remember where the Fed is in its cycle between rate moves?
+  options:
+  - label: A
+    summary: Hold the direction of the last rate move until a move in the opposite direction (cycle state)
+  - label: B
+    summary: Lengthen the look-back window from 6 to 12 months
+  - label: C
+    summary: Keep the 6-month window
+  chosen: A
+  decided_by: derived
+  how_decided: 'The owner judged the 6-month window ''not a very smart filter'' and delegated the improvement. A
+    vote-by-vote print of the engine on the real lake (Fed history only, no case answers) showed the window forgets
+    the cycle 6 months after the last move: 2003-05 and 2003-12 to 2004-06 read neutral at 1% rates before any hike,
+    2014-11 to 2015-11 neutral at zero rates, 2025-06 to 2025-08 tightening in a cutting cycle. His rule is ''stay
+    long until the Fed tightens'' (DS/2014-07-16) and ''the minute they start tightening'' (DS/2021-05-11): a state
+    that changes only on the first opposite move. B still resets at long holds (2014-15). Before 1982-09 the policy-rate
+    record is the Fed discount rate (discrete Board actions); the fed funds monthly average is too noisy to define
+    a last move. The balance-sheet programme keeps the QE-end setback flag but no longer decides direction, because
+    a rate state exists at every date after 1950. Anticipating a turn before the first move stays in the hybrid
+    track (R67-02).'
+  evidence:
+  - spec/process.md
+  - src/fatpitch/rules/step1.py
+  - library/discovered_sources/2014-07-16_delivering-alpha-kernen.md
+  expected_result: Written before the run. The 2003-04, 2014-15 and 2025 summer easing periods read easing, so Gate
+    1 improves on episodes EP08, EP12 and EP21. The first hike of each cycle flips the state at once, so Fed-cycle
+    detection should rise toward the realised-direction reference (14/17) at lag 0 to +1 for cycles after 1982;
+    pre-1982 cycles depend on discount-rate timing and may lag. Long holds after the last hike (2006-07, 2019 H1,
+    2023-24) now read tightening, so 2024 H1 (EP20) stays wrong and the false-alarm share may rise where the answer
+    key labels holds as neutral or easing. Ties between families become rarer because R-14 no longer flips to neutral.
+  measured_result: 'Stage 6 (a2a5fc8, trial 9). As predicted, the 2003-04, 2014-15 and 2025 easing episodes improved
+    (EP08 0.354 -> 0.288, EP12 0.330 -> 0.137, EP21 0.427 -> 0.213) and 2024 H1 stayed wrong (EP20 0.562). Gate
+    1 RPS 0.220 -> 0.184, binding p 0.403 -> 0.266 (7 of 13 episodes beat climatology; needs p < 0.10): still fails.
+    Fed-cycle check passes (14/17, lead 0); false alarms fell 17.3% -> 13.6%, against the prediction that they might
+    rise. Diagnostic agreement with his daily reads 0.747 -> 0.897 (chance 0.709).'
+  status: in force
+- id: SCORE-01
+  date: '2026-10-07'
+  area: evaluation
+  question: When the engine's odds tie between two outcomes, which call should the Fed-cycle scorer count?
+  options:
+  - label: A
+    summary: 'The engine''s stated direction (R-66 tie rule: the class R-14 points to)'
+  - label: B
+    summary: The first class in the list (easing), as numpy argmax returns
+  - label: C
+    summary: 'Neither: a tied month neither detects a cycle nor counts as a false alarm'
+  chosen: A
+  decided_by: derived
+  how_decided: The owner asked for a review and a decision. R-66 defines the call for a tie and the Decision record
+    carries it (policy_direction; decision.py accepts any tied class and rejects others). The scorer's first-class
+    rule is an indexing artefact that always favours easing and was never specified. Mechanical fix citing process.md
+    R-66 ('policy_direction = argmax P; ties go to the R-14 output'). Applies to every version; reference nulls
+    never tie.
+  evidence:
+  - src/fatpitch/cases/fedcycles.py
+  - src/fatpitch/cases/regime.py
+  - src/fatpitch/decision.py
+  - spec/process.md
+  expected_result: Written before the run. The 2015 hiking cycle (tied 0.48/0.48 from 2015-12 with R-14 tightening)
+    becomes detected at lag 0. Tied easing-label months where R-14 says tightening count as false alarms, so the
+    false-alarm share may rise slightly. Fed-cycle RPS and Gate 1 are unaffected (they use the probabilities).
+  measured_result: 'Stage 5 (3fe11c8 rescored, trial 8). Larger than predicted: Fed cycles detected 6/17 -> 14/17
+    (median lead 0 months) and the Fed-cycle check now passes all four criteria; the prediction named only the 2015
+    cycle. R-14 and the liquidity family disagree often, and every such tied month had been scored as easing. False
+    alarms rose 9.3% -> 17.3% of easing months, more than the ''slight'' rise predicted. Gate 1 unchanged (0.220),
+    as predicted.'
+  status: in force
+- id: R67-04
+  date: '2026-10-07'
+  area: process
+  question: R-67 failed its lead-time test. What next?
+  options:
+  - label: A
+    summary: Redesign, then retest with constants fixed before the retest
+  - label: B
+    summary: Keep as a warning flag only
+  - label: C
+    summary: Adopt the 2-year minus fed funds rule
+  - label: D
+    summary: Drop anticipation for now
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: 'First 6e run (3e60443): tightening hit 0.61 vs 0.78 for the naive 2-year rule, easing hit 0.17 vs
+    0.61. Redesign is reasoned from the rule''s construction, not tuned turn by turn; the retest uses the same Fed
+    history and is reported as exploratory with its trial count.'
+  evidence: &id001
+  - spec/research_inflation_measures.md
+  expected_result: Not stated yet; written into the redesign file before the retest.
+  measured_result: null
+  status: in force
+- id: INFL-01
+  date: '2026-10-07'
+  area: process
+  question: Which inflation measures should R-67's inflation check read?
+  options:
+  - label: A
+    summary: Headline CPI throughout, core CPI as a variant
+  - label: B
+    summary: Core CPI only
+  - label: C
+    summary: Core CPI throughout via unadjusted core
+  - label: Other
+    summary: 'Owner: use CPI headline, CPI core, PCE headline and PCE core'
+  chosen: Other
+  decided_by: owner
+  how_decided: 'The owner answered ''use cpe, headline, core, and pce'', read as all four of CPI headline, CPI core,
+    PCE headline and PCE core (assumption: ''cpe'' means CPI). The current chain switched from headline to core
+    CPI in 1996 and used unadjusted CPI before 1972, distorting 6-month changes. How the four combine is part of
+    the R-67 redesign.'
+  evidence: *id001
+  expected_result: Not stated yet; part of the R-67 redesign.
+  measured_result: null
+  status: in force
+- id: INFL-02
+  date: '2026-10-07'
+  area: parameters
+  question: The 2% target is defined on PCE but compared with CPI (about 0.45 points higher). How should that be
+    handled?
+  options:
+  - label: A
+    summary: Keep 2% on CPI and report the bias
+  - label: B
+    summary: Use 2.5% for CPI
+  - label: C
+    summary: Core PCE from 2012, CPI before
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: No source gives a CPI-equivalent target; switching measure in 2012 breaks the series and PCE history
+    is revised. The bias (about 0.7 points toward 'too loose' in R-06) is reported instead.
+  evidence: *id001
+  expected_result: No scored output changes; the fidelity report shows the CPI-PCE wedge.
+  measured_result: null
+  status: in force
+- id: R68-01
+  date: '2026-10-07'
+  area: process
+  question: Should the Fed's own projections be acquired to measure 'inflation relative to what policymakers think'?
+  options:
+  - label: A
+    summary: Acquire and display as context
+  - label: B
+    summary: Acquire and build a rule
+  - label: C
+    summary: Not now
+  chosen: B
+  decided_by: owner
+  how_decided: 'His statement (DS/2021-01, NP, verbatim): ''my overriding theme is inflation relative to what policymakers
+    think''. Recommended option was display only; the owner chose to build a rule (R-68) from FOMC SEP medians,
+    2007-10 onward.'
+  evidence: *id001
+  expected_result: Not stated yet; written into the R-68 design before any run.
+  measured_result: null
+  status: in force
+- id: INFL-03
+  date: '2026-10-07'
+  area: process
+  question: Which inflation measure should the vetoes R-07, R-08 and R-09 use, and should R-06 carry a core-CPI
+    check?
+  options:
+  - label: A
+    summary: Headline CPI yoy for the vetoes; core CPI check in R-06 report-only from 1996-12
+  - label: B
+    summary: Core CPI yoy
+  - label: C
+    summary: PCE yoy
+  chosen: A
+  decided_by: derived
+  how_decided: 'Applied as recommended without objection: the CPI is the only index he names and every number he
+    gives (4.5%, 5%, 8%, 9.1%, 12%) is headline CPI yoy. The R-06 core check was in the spec but not in the code;
+    core vintages start 1996-12, not 1957 as the spec said.'
+  evidence: *id001
+  expected_result: No scored output changes.
+  measured_result: null
+  status: in force
+- id: LAB-01
+  date: '2026-10-07'
+  area: process
+  question: Should payrolls, claims or the Sahm rule enter any rule?
+  options:
+  - label: A
+    summary: No labour inputs beyond unemployment vs its natural rate in R-06
+  - label: B
+    summary: Sahm rule as a display flag
+  - label: C
+    summary: Claims as a recession-prior input
+  chosen: A
+  decided_by: derived
+  how_decided: 'Applied as recommended without objection: he called payrolls and unemployment ''the most misleading
+    macro variables because they are lagging'' (DS/2026-02-27, NP). First-release payrolls move 50-110k per month
+    by the latest vintage. Five ''full employment'' citations are added to R-63 at the next spec revision.'
+  evidence: *id001
+  expected_result: No scored output changes.
+  measured_result: null
+  status: in force
+- id: R67-05
+  date: '2026-10-07'
+  area: process
+  question: Which R-67 v2 design should be retested?
+  options:
+  - label: A
+    summary: 'V2-B: 2-year spread first, bill forward next; inflation fills hike calls, a stress leg from existing
+      rules fills cut calls'
+  - label: B
+    summary: 'V2-A: minimal fix, no easing-side additions'
+  - label: C
+    summary: 'V2-D: bill forward first, as before'
+  - label: D
+    summary: 'V2-C: V2-B plus R-68 from 2007-11'
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: 'The redesign traced the D3 failure to its construction: a one-quarter horizon, flight-to-quality
+    distortion of the bill forward, an inflation guard that rarely fires, a discount-yield pricing error (understating
+    moves by 4-64bp at 4-15% rates), and neutral readings counting as misses. V2-B puts the 2-year path first, which
+    the file notes comes close to the ''adopt the 2-year rule'' option the owner did not pick; the added legs are
+    the test of whether anything beyond the 2-year rule helps. Protocol: one design, one run, predictions written
+    first, reported as exploratory (same Fed history as the first test).'
+  evidence: &id002
+  - spec/research_R67_v2_R68.md
+  expected_result: 'Written before the retest. Because the 2-year leg comes first, tightening and easing hit rates
+    should be at least the naive 2-year rule''s (0.78 and 0.61) unless the inflation guard removes hits, which needs
+    broad disinflation at a hike and should be rare. Median leads at least the naive''s (1.5 and 1.0 months). False
+    alarms rise above the naive''s (2.03 and 0.36 per year) from the bill and fill-in legs, by under 1 per year
+    in each direction. Likeliest failing criteria: the per-era rule (no era with zero hits) for easing in 1982-1993,
+    and the false-alarm margin on easing. If it passes, most of the result is the 2-year rule; the report shows
+    how many turns each leg decided.'
+  measured_result: 'Retest (86a8bbe, results/anticipation/20261007T222616Z; exploratory, same Fed history as the
+    first test). FAIL overall on one criterion. Hikes: hit 0.83 (15/18) vs naive 2-year 0.78, median lead 1.0 vs
+    1.5 months (criterion 2 fails on lead), false alarms 2.61 vs 2.03 per year (within the +1.0 margin), every era
+    with hits. Cuts: hit 0.61 (11/18), lead 1.0, false alarms 0.39 vs 0.36 - all four criteria pass, but identical
+    to the naive 2-year rule, so the stress leg added nothing measurable. Prediction right on hit rates and on false
+    alarms rising by under 1 per year; wrong on the failing criterion (predicted the 1982-1993 cut era or the cut
+    false-alarm margin; actual failure was the hike lead). Per the retest protocol no third design follows; R-67
+    stays a warning flag.'
+  status: in force
+- id: INFL-04
+  date: '2026-10-07'
+  area: process
+  question: How should the four inflation measures combine in R-67?
+  options:
+  - label: A
+    summary: Strict majority of the known measures
+  - label: B
+    summary: Median reading
+  - label: C
+    summary: All must agree
+  - label: D
+    summary: Any two agree
+  - label: Other
+    summary: 'Owner: split out each signal, weight them, then take a cumulative reading'
+  chosen: Other
+  decided_by: owner
+  how_decided: 'Owner answer: ''split out each signal weight them and then take a cumulative insight from there''.
+    Read as: each measure (CPI, core CPI, PCE, core PCE) keeps its own momentum reading, reported separately; the
+    composite is a weighted average of the known readings (at least 2) compared with the same band. Weights are
+    precision weights - the inverse variance of each measure''s month-to-month change in its momentum reading over
+    the trailing 120 months as of the date (at least 36 months), so steadier measures count more. Uses no outcome
+    data and no hand-picked weights; the 120-month window is a fixed definition (one full policy cycle). Applies
+    to the inflation leg only; the market, inflation and stress legs keep the V2-B order. Pre-run note (from data
+    availability at implementation, before any scoring): before 1996-12 only one measure is usable on the lake (headline
+    CPI; pre-1996 unadjusted core CPI rows are revised values and unusable, PCE vintages start 2000-08), so the
+    composite is absent before 1997 rather than CPI-only as the prediction assumed; the V2-B inflation guard and
+    inflation fill-in therefore act only from 1997. The prediction is left as written.'
+  evidence: *id002
+  expected_result: Written before the retest. Core measures are steadier than headline, so they get more weight,
+    damping energy shocks as the majority rule would have, but continuously. Before 2000-08 only the CPI measures
+    exist, so the composite is CPI-only there.
+  measured_result: Retest as R67-05. The composite is absent before 1997 (one usable measure), so it can only have
+    acted on the 1999, 2004, 2015 and 2022 hike cycles and the 2001, 2007, 2019 and 2020 cut cycles; per-turn deciding
+    components are in results/anticipation/20261007T222616Z/turns.csv.
+  status: in force
+- id: R68-02
+  date: '2026-10-07'
+  area: tracks
+  question: Where should R-68 (inflation versus the Fed's own projection) go?
+  options:
+  - label: A
+    summary: Faithful track, 'too loose' side only
+  - label: B
+    summary: Hybrid track only
+  - label: C
+    summary: Faithful, both sides
+  - label: D
+    summary: A vote in the regime odds
+  chosen: B
+  decided_by: owner
+  how_decided: Recommended was the faithful track on the 'too loose' side, since the theme is his verbatim (DS/2021-01).
+    The owner chose hybrid only. R-68 = core PCE 6-month annualised minus the median SEP core PCE projection for
+    the current year (central-tendency midpoint before medians began 2015-09), band 0.5 points held 2 month ends;
+    from 2007-11 only; reported in the hybrid track, not an R-67 input (V2-C was not chosen).
+  evidence: *id002
+  expected_result: 'No faithful-track output changes. Expected from public history: reads ''Fed behind'' through
+    2021 and much of 2022, and ''ahead'' in parts of 2012-2016 when inflation ran under projections.'
+  measured_result: Computed in the retest run as a report-only column (hybrid track); no gate. See results/anticipation/20261007T222616Z/report.md.
+  status: in force
+- id: R67-06
+  date: '2026-10-07'
+  area: process
+  question: Fix the bill-forward pricing error and the unadjusted-CPI distortion before the retest?
+  options:
+  - label: A
+    summary: Both fixes
+  - label: B
+    summary: Pricing fix only
+  - label: C
+    summary: Neither
+  chosen: A
+  decided_by: owner-on-recommendation
+  how_decided: 'Both are calculation corrections: the forward is priced from bill prices (P = 1 - d*t/360) instead
+    of discount yields, and unadjusted series use a seasonally neutral 6-month comparison a year apart.'
+  evidence: *id002
+  expected_result: 'Pricing fix: more tightening readings at high rates (1970s-80s). Unadjusted fix: removes calendar-month
+    swings of -1.08 to +0.61 points before 1972-07.'
+  measured_result: null
+  status: in force

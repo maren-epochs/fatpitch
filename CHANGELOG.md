@@ -2,6 +2,20 @@
 
 Versions are created for important changes only (owner, 2026-10-06). Each version = git tag `spec-vX.Y` + snapshot folder `versions\spec-vX.Y\` (spec files, registry, thesis table, scoring, holdout seal). Minor edits ride along until the next version.
 
+## spec-v0.4 — 2026-10-07
+
+Staged changes, each measured on its own (decision log `spec\decisions.yaml`, trials 3-9; predictions committed before each run).
+
+- R-66 regime probabilities: base mass 1.0 -> 0.1 (R66-01). With 1.0 a fully correct forecast could not beat always-easing (maximum probability 0.6).
+- R-14 policy direction: Fed cycle state - the last policy-rate move held until the opposite move (R14-04); policy-rate record = FF target range / FF target / Fed discount rate 1948-2002 (`spec\fed_discount_rate_events.yaml`). Balance-sheet component from announced QE/QT programmes (`spec\fomc_bs_events.yaml`, R14-01); rate move takes precedence (R14-02). R-17 QE state from the same table (R17-01). `policy.ff_change_window_m`, `policy.holdings_change_window_w` retired.
+- Fed-cycle check scorer: tied months take the engine's stated direction (SCORE-01, mechanical fix citing R-66).
+- Results (research split): Gate 1 RPS 0.249 -> 0.184, binding p 0.512 -> 0.266 (fail); Fed-cycle check 4/17 -> 14/17 cycles detected, pass; tightening requirement met throughout.
+- Hybrid track: R-67 anticipated policy turn (v1 D3 failed scoring.md 6e; v2 V2-B with a precision-weighted four-measure inflation composite, retest failed on hike lead only); R-68 inflation versus FOMC SEP projections (report-only). Anticipation test scoring.md 6e added with thresholds fixed before computation.
+- Data: core CPI, PCE, core PCE (ALFRED vintages), unadjusted core CPI, FOMC SEP projections 2007-11 onward, bill yields; catalogue entries for existing lake series.
+- Inflation measures: headline CPI for R-07/R-08/R-09; 2% target stays on CPI with the CPI-PCE bias reported; no payroll inputs (INFL-02, INFL-03, LAB-01).
+- Documentation: scoring.md Gate 1 set and power figures updated to corpus v0.3 (32 cases, 13 episodes); HOLDOUT.md notes the retired turning-point Gate 1 rows.
+- Registry: 129 parameters, 8 tunable. Process spec: 68 rules. Holdout v5 sealed, never opened.
+
 ## spec-v0.3 — 2026-10-07
 
 - Gate 1 set includes era-B (pre-2002) research regime cases (owner option C): 28 cases / 10 episodes (25 easing, 3 tightening); LOEO climatology over the combined set.

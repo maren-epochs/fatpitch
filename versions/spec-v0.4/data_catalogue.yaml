@@ -1,0 +1,3883 @@
+# Fat Pitch data catalogue: process.md input ids -> amber lake (read-only).
+# Consumed by fatpitch.lake.AmberLakeSource. Paths are relative to <AMBER_DATA>\lake.
+#
+# Fields
+#   title, rules (process.md rule ids), step (1 | 1b | later | label), freq (D W M Q A event)
+#   status       available | partial (coverage holes) | substitute (stand-in, see grade) | proxy_only | missing
+#   pit_method   vintage | first_release | release_calendar | lag_rule | fetch_time  (dominant method; the
+#                per-row method is returned in the snapshot frame)
+#   revised      true when the source revises history
+#   source       latest-revision lake table (kind table): path, date_col, value_col, filter, lag, vintage_col,
+#                grade_col / grade_by, unusable_if, year_col, value_map
+#   vintages     ordered vintage stores (kind alfred | rtdsm); the first whose first vintage is <= asof is used
+#   vintage_by_era  plain-language era rule for the chain above
+#   pre_vintage  unknown (default; rows returned usable=False) | usable  -- applies to `source` rows used before
+#                any vintage store exists
+#   view         first_release: earliest published value per period across `vintages`
+#   fallback     ordered: {id | source, proxy_grade, splice}. splice true = prepend fallback rows for periods
+#                before the first visible primary period; false = used only when the primary has no visible row
+#   proxy_grade  A native; B/C/D per library/research/data_practices.md 4.2 (D -> usable=False)
+#   lake         generated at build: rows, first/last period, first published_at (America/New_York) per store
+# Fallback grades not taken from amber's proxies/_registry.yaml were computed on the lake overlap (2026-10-07)
+# with the 4.2 thresholds on changes; the numbers are in each entry's notes.
+version: 2026-10-07.1
+lake_root_env: AMBER_DATA
+series:
+  M2SL:
+    title: M2 money stock (H.6), SA
+    rules:
+    - R-02
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/M2SL.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/M2SL.parquet
+      freq: M
+      time_from: fred/series/M2SL.parquet
+    - kind: rtdsm
+      path: longhist/rtdsm/m2.parquet
+    vintage_by_era: 'asof >= 1980-02-08 ALFRED; 1971-05-31 <= asof < 1980-02-08 Philadelphia Fed RTDSM (m2, quarterly
+      vintages, pre-1980 M2 definition); earlier: none'
+    pre_vintage: unknown
+    notes: 'RTDSM vintages are quarterly (mid-quarter data, stamped end of vintage month): between vintages the
+      latest months are absent. Pre-1971 values exist only as latest revision (post-1980 definition) and are returned
+      with usable=False.'
+    status: available
+    lake:
+      source:
+        rows: 812
+        first_period: '1959-01-31'
+        last_period: '2026-08-31'
+        first_published: 1959-02-13 16:30
+      alfred:
+        rows: 28591
+        first_period: '1959-01-31'
+        last_period: '2026-08-31'
+        first_published: 1980-02-08 16:30
+      rtdsm:
+        rows: 105506
+        first_period: '1959-01-31'
+        last_period: '2026-06-30'
+        first_published: 1971-05-31 23:59
+  INDPRO:
+    title: Industrial production index
+    rules:
+    - R-02
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/INDPRO.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/INDPRO.parquet
+      freq: M
+      time_from: fred/series/INDPRO.parquet
+    - kind: rtdsm
+      path: longhist/rtdsm/ipt.parquet
+    vintage_by_era: asof >= 1927-01-26 ALFRED (RTDSM ipt 1962-11 never reached)
+    pre_vintage: unknown
+    status: available
+    lake:
+      source:
+        rows: 1292
+        first_period: '1919-01-31'
+        last_period: '2026-08-31'
+        first_published: 1919-02-16 09:15
+      alfred:
+        rows: 38762
+        first_period: '1919-01-31'
+        last_period: '2026-08-31'
+        first_published: 1927-01-26 09:15
+      rtdsm:
+        rows: 478092
+        first_period: '1919-01-31'
+        last_period: '2026-08-31'
+        first_published: 1962-11-30 23:59
+  INDPRO_FR:
+    title: Industrial production, first release per period
+    rules:
+    - R-02
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: first_release
+    view: first_release
+    vintages:
+    - kind: alfred
+      path: fred/vintages/INDPRO.parquet
+      freq: M
+      time_from: fred/series/INDPRO.parquet
+    vintage_by_era: earliest ALFRED spell per period (1927-01-26 ->); periods before 1927 carry the 1927 initial
+      vintage, not a true first release
+    notes: process.md R-02 PIT line asks for first-release INDPRO; INDPRO (as-of vintage) is the within-vintage
+      alternative. Choice is a spec decision; both are served.
+    status: available
+    lake:
+      alfred:
+        rows: 38762
+        first_period: '1919-01-31'
+        last_period: '2026-08-31'
+        first_published: 1927-01-26 09:15
+  WALCL:
+    title: Fed total assets (H.4.1, Wednesday level)
+    rules:
+    - R-03
+    - R-12
+    step: '1'
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: fred/cenb/WALCL.parquet
+    fallback:
+    - id: US_CB_ASSETS_M
+      proxy_grade: B
+      splice: false
+    notes: 'H.4.1 Thursday 16:30 ET (amber h41_rule). Pre-2002-12-18 fallback: BIS monthly Fed total assets (overlap
+      2002-12..2026-07 monthly pct change corr 1.000, beta 1.00 -> B); monthly, not spliced.'
+    status: available
+    lake:
+      source:
+        rows: 1242
+        first_period: '2002-12-18'
+        last_period: '2026-09-30'
+        first_published: 2002-12-19 16:30
+  US_CB_ASSETS_M:
+    title: Fed total assets, BIS monthly
+    rules:
+    - R-03
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_US.parquet
+    notes: BIS central-bank total assets; amber lag_model publication times.
+    status: available
+    lake:
+      source:
+        rows: 1341
+        first_period: '1914-11-30'
+        last_period: '2026-07-31'
+        first_published: 1915-02-13 23:59
+  WTREGEN:
+    title: Treasury General Account (H.4.1)
+    rules:
+    - R-03
+    step: '1'
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: fred/cenb/WTREGEN.parquet
+    fallback:
+    - id: LDGUST
+      proxy_grade: D
+      splice: false
+    notes: 'Pre-2002 fallback LDGUST (legacy H.4.1 TGA, 1915-2018): overlap weekly pct corr 0.33, sign 0.68 -> D
+      (month-end corr 0.47, C); returned usable=False.'
+    status: available
+    lake:
+      source:
+        rows: 1242
+        first_period: '2002-12-18'
+        last_period: '2026-09-30'
+        first_published: 2002-12-19 16:30
+  LDGUST:
+    title: Legacy H.4.1 Treasury general account deposits
+    rules:
+    - R-03
+    step: '1'
+    freq: W
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/LDGUST.parquet
+    notes: Discontinued 2018-04-11.
+    status: available
+    lake:
+      source:
+        rows: 5385
+        first_period: '1915-01-08'
+        last_period: '2018-04-11'
+        first_published: 1915-01-15 23:59
+  RRPONTSYD:
+    title: Overnight reverse repo (Treasury), daily
+    rules:
+    - R-03
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/cenb/RRPONTSYD.parquet
+    gaps: 'sparse before 2013-09 (operation days only); none before 2003-02-07 (process.md: 0 before)'
+    notes: Engine treats absence before 2003-02-07 as 0 per process.md R-03; not filled here.
+    status: available
+    lake:
+      source:
+        rows: 3341
+        first_period: '2003-02-07'
+        last_period: '2026-10-06'
+        first_published: 2003-02-07 23:59
+  NETLIQ:
+    title: Net liquidity proxy (pre-2002, report only)
+    rules:
+    - R-03
+    step: '1'
+    freq: Q
+    status: proxy_only
+    pit_method: lag_rule
+    fallback:
+    - source:
+        kind: table
+        path: proxies/netliq_proxy_z1_minus_tga/netliq_proxy_z1_minus_tga.parquet
+        grade_col: proxy_grade
+      proxy_grade: C
+      splice: false
+    - source:
+        kind: table
+        path: proxies/netliq_proxy_base_minus_tga/netliq_proxy_base_minus_tga.parquet
+        grade_col: proxy_grade
+      proxy_grade: D
+      splice: false
+    - source:
+        kind: table
+        path: proxies/netliq_proxy_reserves/netliq_proxy_reserves.parquet
+        grade_col: proxy_grade
+      proxy_grade: D
+      splice: false
+    notes: 'No primary: R-03 is computed by the engine from WALCL, WTREGEN, RRPONTSYD (2002->). Amber proxies, graded
+      on WALCL-WTREGEN-RRPONTSYD changes: Z.1 central-bank assets - TGA quarterly 1945-2018 (C); monetary base -
+      TGA monthly (D); reserves monthly (D).'
+  TREAST:
+    title: Fed outright Treasury holdings (H.4.1)
+    rules:
+    - R-04
+    - R-14
+    step: '1'
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: fred/cenb/TREAST.parquet
+    fallback:
+    - id: BOGZ1FL713061103Q
+      proxy_grade: C
+      splice: false
+    notes: Pre-2002 fallback Z.1 central-bank Treasury securities (quarterly level; overlap quarterly pct corr 0.70,
+      sign 0.75 -> C).
+    status: available
+    lake:
+      source:
+        rows: 1242
+        first_period: '2002-12-18'
+        last_period: '2026-09-30'
+        first_published: 2002-12-19 16:30
+  BOGZ1FL713061103Q:
+    title: Z.1 central bank Treasury securities, level
+    rules:
+    - R-04
+    step: '1'
+    freq: Q
+    revised: true
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/BOGZ1FL713061103Q.parquet
+    notes: 'Z.1 revised; no vintage store in the lake: latest values with first-release/lag-rule timestamps.'
+    status: available
+    lake:
+      source:
+        rows: 305
+        first_period: '1945-12-31'
+        last_period: '2026-06-30'
+        first_published: 1946-03-13 23:59
+  WSHOMCB:
+    title: Fed MBS holdings (H.4.1)
+    rules:
+    - R-04
+    - R-14
+    step: '1'
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: fred/cenb/WSHOMCB.parquet
+    notes: Zero before 2009 purchases; absence before 2002-12-18 equals 0 by construction (no MBS held).
+    status: available
+    lake:
+      source:
+        rows: 1242
+        first_period: '2002-12-18'
+        last_period: '2026-09-30'
+        first_published: 2002-12-19 16:30
+  TFD_DEBT_HELD_PUBLIC:
+    title: Debt held by the public (Debt to the Penny)
+    rules:
+    - R-04
+    - R-63
+    step: '1'
+    freq: D
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: treasury_fiscal/debt_to_penny.parquet
+    fallback:
+    - id: FYGFDPUN
+      proxy_grade: C
+      splice: false
+    gaps: held-public split null 1993-04..1997-09 (total debt only)
+    notes: Next-business-day publication (dttp_release_rule). Pre-1997-09 fallback FYGFDPUN quarterly (overlap quarterly
+      pct corr 0.55, sign 0.84 -> C).
+    status: available
+    lake:
+      source:
+        rows: 5449
+        first_period: '1997-09-30'
+        last_period: '2026-10-05'
+        first_published: 1997-10-01 16:00
+  TFD_NET_ISSUANCE_13W:
+    title: Net change in debt held by public, 13 weeks (derived)
+    rules:
+    - R-04
+    - R-63
+    step: '1'
+    freq: D
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: treasury_fiscal/net_issuance_daily.parquet
+    notes: Amber-derived chg_13w of Debt to the Penny held-public; 2005->.
+    status: available
+    lake:
+      source:
+        rows: 5341
+        first_period: '2005-06-30'
+        last_period: '2026-10-05'
+        first_published: 2005-07-01 16:00
+  TFD_NET_MARKETABLE_M:
+    title: Net change in marketable debt, monthly (MSPD, derived)
+    rules:
+    - R-04
+    - R-63
+    step: '1'
+    freq: M
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: treasury_fiscal/net_issuance_monthly.parquet
+    notes: Amber-derived chg_1m of MSPD total marketable; 2001->.
+    status: available
+    lake:
+      source:
+        rows: 308
+        first_period: '2001-02-28'
+        last_period: '2026-09-30'
+        first_published: 2001-03-06 23:59
+  FYGFDPUN:
+    title: Federal debt held by the public, quarterly
+    rules:
+    - R-04
+    step: '1'
+    freq: Q
+    revised: true
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/FYGFDPUN.parquet
+    notes: 'process.md R-04 pre-1993 measure. Revised; no vintage store: latest values.'
+    status: available
+    lake:
+      source:
+        rows: 225
+        first_period: '1970-03-31'
+        last_period: '2026-03-31'
+        first_published: 1970-06-06 23:59
+  FEDFUNDS:
+    title: Effective fed funds, monthly average
+    rules:
+    - R-06
+    - R-08
+    - R-14
+    - R-23
+    step: '1'
+    freq: M
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/FEDFUNDS.parquet
+    status: available
+    lake:
+      source:
+        rows: 867
+        first_period: '1954-07-31'
+        last_period: '2026-09-30'
+        first_published: 1954-08-03 23:59
+  DFF:
+    title: Effective fed funds, daily
+    rules:
+    - R-06
+    - R-08
+    - R-23
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DFF.parquet
+    status: available
+    lake:
+      source:
+        rows: 26395
+        first_period: '1954-07-01'
+        last_period: '2026-10-05'
+        first_published: 1954-07-03 09:00
+  DFEDTARU:
+    title: Fed funds target (upper bound; point target before 2008-12-16)
+    rules:
+    - R-14
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/cenb/DFEDTARU.parquet
+    fallback:
+    - id: DFEDTAR
+      proxy_grade: A
+      splice: true
+    gaps: no target series before 1982-09-27 (use FEDFUNDS)
+    notes: Spliced with DFEDTAR (official predecessor, same quantity) for periods before 2008-12-16.
+    status: available
+    lake:
+      source:
+        rows: 6504
+        first_period: '2008-12-16'
+        last_period: '2026-10-06'
+        first_published: 2008-12-17 23:59
+  DFEDTAR:
+    title: Fed funds target (point), 1982-2008
+    rules:
+    - R-14
+    step: '1'
+    freq: D
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/DFEDTAR.parquet
+    status: available
+    lake:
+      source:
+        rows: 9577
+        first_period: '1982-09-27'
+        last_period: '2008-12-15'
+        first_published: 1982-09-28 23:59
+  DFEDTARL:
+    title: Fed funds target lower bound
+    rules:
+    - R-14
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/cenb/DFEDTARL.parquet
+    status: available
+    lake:
+      source:
+        rows: 6504
+        first_period: '2008-12-16'
+        last_period: '2026-10-06'
+        first_published: 2008-12-17 23:59
+  FED_DISCOUNT_RATE:
+    title: Federal Reserve discount rate changes (FRBNY basic rate), event table 1948-2002
+    rules:
+    - R-14
+    step: '1'
+    freq: event
+    revised: false
+    pit_method: release_calendar
+    source:
+      kind: spec_events_rate
+      path: spec/fed_discount_rate_events.yaml
+    status: available
+    gaps: no reader yet for kind spec_events_rate (columns announced, effective, rate, direction; not state)
+    notes: Project event table (path relative to the project root), built 2026-10-07 from FRED DISCOUNT (Board,
+      Federal Reserve Bulletin; FRBNY effective dates before 1975, first Reserve Bank after). period_end =
+      effective; published_at = announced = effective day 23:59 ET (conservative; announcements fall 0-2 days
+      before). Policy-rate direction for R-14 before DFEDTAR (1982-09-27); 82 changes 1950-01..1982-09-26.
+      Cross-checked against INTDSRUSM193N (396 months, max gap 0.05 pp).
+  CPIAUCSL:
+    title: CPI-U all items, SA
+    rules:
+    - R-06
+    - R-07
+    - R-08
+    - R-09
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/CPIAUCSL.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/CPIAUCSL.parquet
+      freq: M
+      time_from: fred/series/CPIAUCSL.parquet
+    vintage_by_era: 'asof >= 1972-07-21 ALFRED; earlier: CPIAUCNS (NSA, unrevised) fallback'
+    pre_vintage: unknown
+    fallback:
+    - id: CPIAUCNS
+      proxy_grade: C
+      splice: false
+    notes: SA factors revised each February; vintage required (process.md R-07). Pre-1972-07-21 fallback CPIAUCNS
+      (process.md R-07 names NSA for era B); overlap 1948-2026 monthly change of yoy corr 0.946, beta 0.98, sign
+      0.84 -> C. RTDSM cpi/pcpi vintages start 1994/1998 and are never reached.
+    status: available
+    lake:
+      source:
+        rows: 955
+        first_period: '1947-01-31'
+        last_period: '2026-08-31'
+        first_published: 1947-02-17 08:30
+      alfred:
+        rows: 3103
+        first_period: '1947-01-31'
+        last_period: '2026-08-31'
+        first_published: 1972-07-21 08:30
+  CPILFESL:
+    title: CPI-U less food and energy, SA
+    rules:
+    - R-06
+    - R-67
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/CPILFESL.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/CPILFESL.parquet
+      freq: M
+      time_from: fred/series/CPILFESL.parquet
+    vintage_by_era: 'asof >= 1996-12-12 ALFRED; earlier: no core CPI vintage (pre_vintage unknown)'
+    pre_vintage: unknown
+    notes: R-06 sensitivity (core CPI from 1957), R-67 inflation leg (6-month annualised vs 12-month). SA factors
+      revised each February; vintage required. ALFRED vintages start 1996-12-12; before that rows are unknown under
+      pre_vintage (no NSA core fallback catalogued). Catalogued 2026-10-07.
+    status: available
+    lake:
+      source:
+        rows: 835
+        first_period: '1957-01-31'
+        last_period: '2026-08-31'
+        first_published: 1957-02-15 08:30
+      alfred:
+        rows: 2259
+        first_period: '1957-01-31'
+        last_period: '2026-08-31'
+        first_published: 1996-12-12 08:30
+  CPILFENS:
+    title: CPI-U less food and energy, NSA
+    rules:
+    - R-06
+    - R-67
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/CPILFENS.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/CPILFENS.parquet
+      freq: M
+      time_from: fred/series/CPILFENS.parquet
+    vintage_by_era: 'asof >= 1996-12-12 ALFRED; earlier: latest values (pre_vintage unknown)'
+    pre_vintage: unknown
+    notes: R-06 sensitivity and R-67 inflation leg, core CPI without seasonal factors (12-month change needs no SA;
+      avoids the February SA-factor revisions of CPILFESL). NSA indexes are revised only for errors, so pre-1996
+      latest values are near first-release, but pre_vintage stays unknown pending an owner decision (usable would
+      be an interpretation). Source published_at 1957-1996 is the lag model (period end + median lag), 358
+      periods from ALFRED first release. ALFRED 358 vintages 1996-12-12..2026-09-11. Catalogued 2026-10-07.
+    status: available
+    lake:
+      source:
+        rows: 835
+        first_period: '1957-01-31'
+        last_period: '2026-08-31'
+        first_published: 1957-02-15 08:30
+      alfred:
+        rows: 847
+        first_period: '1957-01-31'
+        last_period: '2026-08-31'
+        first_published: 1996-12-12 08:30
+  PCEPI:
+    title: PCE chain-type price index, SA (BEA)
+    rules:
+    - R-06
+    - R-67
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/PCEPI.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/PCEPI.parquet
+      freq: M
+      time_from: fred/series/PCEPI.parquet
+    vintage_by_era: 'asof >= 2000-08-01 ALFRED; earlier: no PCE price vintage in the lake (pre_vintage unknown)'
+    pre_vintage: unknown
+    notes: R-06 sensitivity (PCE inflation as the Fed's target measure from 2012-01) and R-67 inflation leg. Revised
+      every month (two prior months), each July (annual update) and at comprehensive revisions (base year
+      changes, e.g. 2003-12, 2009-07, 2013-07, 2018-07, 2023-09); index levels differ across vintages, so growth
+      rates must be computed within one vintage. ALFRED 316 vintages 2000-08-01..2026-09-30; the lake has no
+      earlier PCE vintages (Philadelphia Fed RTDSM PCE coverage not checked; gap). Catalogued 2026-10-07.
+    status: available
+    lake:
+      source:
+        rows: 812
+        first_period: '1959-01-31'
+        last_period: '2026-08-31'
+        first_published: 1959-03-02 08:30
+      alfred:
+        rows: 8164
+        first_period: '1959-01-31'
+        last_period: '2026-08-31'
+        first_published: 2000-08-01 08:30
+  PCEPILFE:
+    title: PCE price index excluding food and energy (core PCE), SA (BEA)
+    rules:
+    - R-06
+    - R-67
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/PCEPILFE.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/PCEPILFE.parquet
+      freq: M
+      time_from: fred/series/PCEPILFE.parquet
+    vintage_by_era: 'asof >= 2000-08-01 ALFRED; earlier: no core PCE vintage in the lake (pre_vintage unknown)'
+    pre_vintage: unknown
+    notes: R-06 sensitivity and R-67 inflation leg (core PCE). Same revision pattern as PCEPI (monthly, annual,
+      comprehensive base-year changes); growth rates within one vintage. ALFRED 316 vintages 2000-08-01..2026-09-30.
+      Catalogued 2026-10-07.
+    status: available
+    lake:
+      source:
+        rows: 812
+        first_period: '1959-01-31'
+        last_period: '2026-08-31'
+        first_published: 1959-03-02 08:30
+      alfred:
+        rows: 8204
+        first_period: '1959-01-31'
+        last_period: '2026-08-31'
+        first_published: 2000-08-01 08:30
+  PAYEMS:
+    title: All employees, total nonfarm (CES), SA
+    rules: []
+    step: later
+    freq: M
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/PAYEMS.parquet
+      freq: M
+      release_time: '08:30'
+    vintage_by_era: 'asof >= 1955-05-06 ALFRED; earlier: none'
+    pre_vintage: unknown
+    notes: Report-only (no process.md rule reads it). ALFRED vintage store only (no fred/series/PAYEMS file in the
+      lake); release time 08:30 ET (Employment Situation). Catalogued 2026-10-07.
+    status: available
+    lake:
+      alfred:
+        rows: 14743
+        first_period: '1939-01-31'
+        last_period: '2026-09-30'
+        first_published: 1955-05-06 08:30
+  T5YIE:
+    title: 5-year breakeven inflation (5y nominal minus 5y TIPS, daily)
+    rules: []
+    step: later
+    freq: D
+    revised: false
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/T5YIE.parquet
+    notes: Report-only (market inflation expectation; no rule reads it). FRED-computed from H.15 yields; stamped
+      23:59 ET of the observation day (no release time known; H.15 publishes the next business day, so same-day
+      use is slightly early for a daily rule; gap). From 2003-01-02. Catalogued 2026-10-07.
+    status: available
+    lake:
+      source:
+        rows: 5945
+        first_period: '2003-01-02'
+        last_period: '2026-10-06'
+        first_published: 2003-01-02 23:59
+  MICH:
+    title: University of Michigan expected inflation, 1 year ahead (median, monthly)
+    rules: []
+    step: later
+    freq: M
+    revised: false
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/MICH.parquet
+    notes: Report-only (survey inflation expectation). Lake published_at follows the lake's lag model (median
+      first-release lag -3 days vs month end, i.e. the late-month final release); the mid-month preliminary is
+      not separated (gap). From 1978-01. Catalogued 2026-10-07.
+    status: available
+    lake:
+      source:
+        rows: 584
+        first_period: '1978-01-31'
+        last_period: '2026-08-31'
+        first_published: 1978-01-31 23:59
+  ICSA:
+    title: Initial jobless claims, SA (weekly, week ending Saturday)
+    rules: []
+    step: later
+    freq: W
+    revised: true
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/ICSA.parquet
+    notes: Report-only. Latest values with first-release stamps (Thursday 08:30 ET); seasonal factors are revised
+      annually and no full vintage store is kept (fred/vintages/ICSA.parquet holds only 128 spells from
+      2025-07, from the revisions view; not catalogued as a vintage source). From 1967-01-07. Catalogued 2026-10-07.
+    status: available
+    lake:
+      source:
+        rows: 3117
+        first_period: '1967-01-07'
+        last_period: '2026-09-26'
+        first_published: 1967-01-12 08:30
+  CCSA:
+    title: Continued claims (insured unemployment), SA (weekly)
+    rules: []
+    step: later
+    freq: W
+    revised: true
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/CCSA.parquet
+    notes: Report-only. Latest values with first-release stamps (08:30 ET, one week after ICSA for the same week);
+      seasonal factors revised annually; no vintage store. From 1967-01-07. Catalogued 2026-10-07.
+    status: available
+    lake:
+      source:
+        rows: 3116
+        first_period: '1967-01-07'
+        last_period: '2026-09-19'
+        first_published: 1967-01-19 08:30
+  CPIAUCNS:
+    title: CPI-U all items, NSA
+    rules:
+    - R-07
+    step: '1'
+    freq: M
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/CPIAUCNS.parquet
+    notes: NSA CPI is not revised after publication except rare corrections; ALFRED store for it starts 2024 and
+      is not needed. Latest values with ALFRED first-release / lag-rule timestamps.
+    status: available
+    lake:
+      source:
+        rows: 1363
+        first_period: '1913-01-31'
+        last_period: '2026-08-31'
+        first_published: 1913-02-20 08:30
+  UNRATE:
+    title: Unemployment rate
+    rules:
+    - R-06
+    - R-63
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/UNRATE.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/UNRATE.parquet
+      freq: M
+      time_from: fred/series/UNRATE.parquet
+    - kind: rtdsm
+      path: longhist/rtdsm/ruc.parquet
+    vintage_by_era: 'asof >= 1960-03-15 ALFRED (RTDSM ruc 1965-11 never reached); earlier: none'
+    pre_vintage: unknown
+    status: available
+    lake:
+      source:
+        rows: 944
+        first_period: '1948-01-31'
+        last_period: '2026-09-30'
+        first_published: 1948-02-05 08:30
+      alfred:
+        rows: 2198
+        first_period: '1948-01-31'
+        last_period: '2026-09-30'
+        first_published: 1960-03-15 08:30
+      rtdsm:
+        rows: 141146
+        first_period: '1948-01-31'
+        last_period: '2026-07-31'
+        first_published: 1965-11-30 23:59
+  UNRATE_FR:
+    title: Unemployment rate, first release per period
+    rules:
+    - R-06
+    step: '1'
+    freq: M
+    revised: true
+    pit_method: first_release
+    view: first_release
+    vintages:
+    - kind: alfred
+      path: fred/vintages/UNRATE.parquet
+      freq: M
+      time_from: fred/series/UNRATE.parquet
+    notes: 'process.md R-06 PIT line: UNRATE first release (first Friday).'
+    status: available
+    lake:
+      alfred:
+        rows: 2198
+        first_period: '1948-01-31'
+        last_period: '2026-09-30'
+        first_published: 1960-03-15 08:30
+  NROU:
+    title: CBO natural rate of unemployment (long-term)
+    rules:
+    - R-06
+    - R-63
+    step: '1'
+    freq: Q
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/NROU.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/NROU.parquet
+      freq: Q
+      time_from: fred/series/NROU.parquet
+    vintage_by_era: 'asof >= 2011-02-02 ALFRED (25 vintages); earlier: latest CBO vintage, usable (approximation
+      accepted in process.md 10.3, R-06)'
+    pre_vintage: usable
+    notes: Rows run to 2036 (CBO projections, known at publication). Pre-2011 rows are the latest vintage (vintage_id
+      prefix latest:), a look-ahead approximation the spec accepts; flag in fidelity reports.
+    status: available
+    lake:
+      source:
+        rows: 352
+        first_period: '1949-03-31'
+        last_period: '2036-12-31'
+        first_published: 1949-03-31 23:59
+      alfred:
+        rows: 3406
+        first_period: '1949-03-31'
+        last_period: '2036-12-31'
+        first_published: 2011-02-02 23:59
+  GDPPOT:
+    title: CBO real potential GDP
+    rules:
+    - R-06
+    step: '1'
+    freq: Q
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/GDPPOT.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/GDPPOT.parquet
+      freq: Q
+      time_from: fred/series/GDPPOT.parquet
+    vintage_by_era: 'asof >= 1991-01-30 ALFRED; earlier: none'
+    pre_vintage: unknown
+    notes: Auxiliary (PLAN D-1); not named in a process.md formula.
+    status: available
+    lake:
+      source:
+        rows: 352
+        first_period: '1949-03-31'
+        last_period: '2036-12-31'
+        first_published: 1949-03-31 23:59
+      alfred:
+        rows: 16605
+        first_period: '1949-03-31'
+        last_period: '2036-12-31'
+        first_published: 1991-01-30 23:59
+  GDP:
+    title: Nominal GDP
+    rules:
+    - R-11
+    - R-56
+    step: '1'
+    freq: Q
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/GDP.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/GDP.parquet
+      freq: Q
+      time_from: fred/series/GDP.parquet
+    - kind: rtdsm
+      path: longhist/rtdsm/noutput.parquet
+    vintage_by_era: 'asof >= 1991-12-04 ALFRED; 1965-11-30 <= asof < 1991-12-04 RTDSM noutput (quarterly vintages;
+      GNP before 1992); earlier: none'
+    pre_vintage: unknown
+    notes: RTDSM noutput is nominal GNP before the 1991 switch to GDP (Philadelphia Fed definition).
+    status: available
+    lake:
+      source:
+        rows: 318
+        first_period: '1947-03-31'
+        last_period: '2026-06-30'
+        first_published: 1947-04-29 08:30
+      alfred:
+        rows: 3018
+        first_period: '1946-03-31'
+        last_period: '2026-06-30'
+        first_published: 1991-12-04 08:30
+      rtdsm:
+        rows: 47415
+        first_period: '1947-03-31'
+        last_period: '2026-06-30'
+        first_published: 1965-11-30 23:59
+  DTB3:
+    title: 3-month Treasury bill, secondary market, discount basis
+    rules:
+    - R-67
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DTB3.parquet
+    status: available
+    notes: R-67 market part (hybrid track; 2x(DTB6 - DTB3)). Catalogued 2026-10-07.
+  DTB6:
+    title: 6-month Treasury bill, secondary market, discount basis
+    rules:
+    - R-67
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DTB6.parquet
+    status: available
+    notes: R-67 market part (hybrid track). Lake rows from 1958-12-09. Catalogued 2026-10-07.
+  DGS10:
+    title: 10-year CMT yield
+    rules:
+    - R-10
+    - R-17
+    - R-56
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DGS10.parquet
+    fallback:
+    - id: GS10
+      proxy_grade: B
+      splice: false
+    notes: Pre-1962 fallback GS10 monthly average (overlap monthly-mean change corr 1.000, beta 1.00 -> B).
+    status: available
+    lake:
+      source:
+        rows: 16175
+        first_period: '1962-01-02'
+        last_period: '2026-10-05'
+        first_published: 1962-01-03 23:59
+  DGS2:
+    title: 2-year CMT yield
+    rules:
+    - R-17
+    - R-23
+    step: 1b
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DGS2.parquet
+    status: available
+    lake:
+      source:
+        rows: 12583
+        first_period: '1976-06-01'
+        last_period: '2026-10-05'
+        first_published: 1976-06-02 23:59
+  DGS1:
+    title: 1-year CMT yield
+    rules:
+    - R-23
+    step: 1b
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DGS1.parquet
+    status: available
+    lake:
+      source:
+        rows: 16175
+        first_period: '1962-01-02'
+        last_period: '2026-10-05'
+        first_published: 1962-01-03 23:59
+  DGS3MO:
+    title: 3-month CMT yield
+    rules:
+    - R-17
+    step: 1b
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DGS3MO.parquet
+    status: available
+    lake:
+      source:
+        rows: 11273
+        first_period: '1981-09-01'
+        last_period: '2026-10-05'
+        first_published: 1981-09-02 23:59
+  GS10:
+    title: 10-year CMT yield, monthly average
+    rules:
+    - R-10
+    - R-17
+    step: '1'
+    freq: M
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/GS10.parquet
+    status: available
+    lake:
+      source:
+        rows: 882
+        first_period: '1953-04-30'
+        last_period: '2026-09-30'
+        first_published: 1953-05-03 23:59
+  TB3MS:
+    title: 3-month T-bill, monthly average
+    rules:
+    - R-17
+    step: 1b
+    freq: M
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/TB3MS.parquet
+    status: available
+    lake:
+      source:
+        rows: 1113
+        first_period: '1934-01-31'
+        last_period: '2026-09-30'
+        first_published: 1934-02-03 23:59
+  BAA:
+    title: Moody's Baa yield, monthly average
+    rules:
+    - R-17
+    step: 1b
+    freq: M
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/BAA.parquet
+    status: available
+    lake:
+      source:
+        rows: 1293
+        first_period: '1919-01-31'
+        last_period: '2026-09-30'
+        first_published: 1919-02-03 23:59
+  AAA:
+    title: Moody's Aaa yield, monthly average
+    rules:
+    - R-17
+    step: 1b
+    freq: M
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/AAA.parquet
+    status: available
+    lake:
+      source:
+        rows: 1293
+        first_period: '1919-01-31'
+        last_period: '2026-09-30'
+        first_published: 1919-02-03 23:59
+  DCOILWTICO:
+    title: WTI spot, daily
+    rules:
+    - R-10
+    - R-19
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DCOILWTICO.parquet
+    fallback:
+    - id: WTISPLC
+      proxy_grade: B
+      splice: false
+    notes: Pre-1986 fallback WTISPLC monthly (overlap monthly pct corr 0.998, beta 0.99 -> B).
+    status: available
+    lake:
+      source:
+        rows: 9512
+        first_period: '1986-01-02'
+        last_period: '2026-09-29'
+        first_published: 1986-01-08 23:59
+  WTISPLC:
+    title: WTI spot, monthly average
+    rules:
+    - R-10
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/WTISPLC.parquet
+    status: available
+    lake:
+      source:
+        rows: 968
+        first_period: '1946-01-31'
+        last_period: '2026-08-31'
+        first_published: 1946-02-06 23:59
+  USD_BROAD:
+    title: Trade-weighted USD, DTWEXBGS spliced with DTWEXM
+    rules:
+    - R-10
+    - R-19
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/derived/USD_BROAD_SPLICED.parquet
+      grade_by:
+        col: segment
+        map:
+          DTWEXM: C
+          DTWEXBGS: A
+    gaps: none before 1973-01-02; CBP synthetic DXY (1971->) not in the lake
+    notes: 'Amber derived: DTWEXM x 1.1835 before 2006-01-02 (ratio from the 2006 overlap: level scale only, changes
+      unaffected). DTWEXM vs DTWEXBGS 2006-2019 monthly pct corr 0.950, beta 1.13 -> C on the DTWEXM segment.'
+    status: available
+    lake:
+      source:
+        rows: 13522
+        first_period: '1973-01-02'
+        last_period: '2026-10-02'
+        first_published: 1973-01-08 23:59
+  DTWEXBGS:
+    title: Nominal broad USD index
+    rules:
+    - R-10
+    step: '1'
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DTWEXBGS.parquet
+    status: available
+    lake:
+      source:
+        rows: 5203
+        first_period: '2006-01-02'
+        last_period: '2026-10-02'
+        first_published: 2006-01-07 23:59
+  DTWEXM:
+    title: Nominal major-currencies USD index (discontinued 2019)
+    rules:
+    - R-10
+    step: '1'
+    freq: D
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/DTWEXM.parquet
+    status: available
+    lake:
+      source:
+        rows: 11834
+        first_period: '1973-01-02'
+        last_period: '2019-12-31'
+        first_published: 1973-01-08 23:59
+  RITTER_UNPROF_IPO:
+    title: Ritter share of IPOs with negative EPS (annual)
+    rules:
+    - R-11
+    step: '1'
+    freq: A
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: ritter/ipo_negative_eps.parquet
+      year_col: year
+      value_col: pct_neg_eps
+    notes: Annual Table 9; published_at interpreted (lag rule, Jan of year+1).
+    status: available
+    lake:
+      source:
+        rows: 46
+        first_period: '1980-12-31'
+        last_period: '2025-12-31'
+        first_published: 1981-01-31 18:59
+  SIFMA_HY_SHARE_A:
+    title: SIFMA HY share of US corporate issuance (annual)
+    rules:
+    - R-11
+    step: '1'
+    freq: A
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: sifma/corporate_issuance.parquet
+      filter:
+        freq: A
+      value_col: hy_share
+      vintage_col: vintage
+    status: available
+    lake:
+      source:
+        rows: 30
+        first_period: '1996-12-31'
+        last_period: '2025-12-31'
+        first_published: 1997-02-13 19:00
+  SIFMA_HY_SHARE_Q:
+    title: SIFMA HY share of US corporate issuance (quarterly)
+    rules:
+    - R-11
+    step: '1'
+    freq: Q
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: sifma/corporate_issuance.parquet
+      filter:
+        freq: Q
+      value_col: hy_share
+      vintage_col: vintage
+    gaps: quarterly only 2022->
+    status: available
+    lake:
+      source:
+        rows: 18
+        first_period: '2022-03-31'
+        last_period: '2026-09-30'
+        first_published: 2022-05-14 20:00
+  BCNSDODNS:
+    title: Nonfinancial corporate debt securities and loans (Z.1)
+    rules:
+    - R-11
+    step: '1'
+    freq: Q
+    revised: true
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/BCNSDODNS.parquet
+    gaps: annual before 1951-Q4
+    notes: 'Z.1 revised; no vintage store: latest values.'
+    status: available
+    lake:
+      source:
+        rows: 305
+        first_period: '1945-12-31'
+        last_period: '2026-06-30'
+        first_published: 1946-03-11 23:59
+  NCBCEBQ027S:
+    title: Nonfinancial corporate net equity issuance (Z.1 transactions)
+    rules:
+    - R-11
+    step: '1'
+    freq: Q
+    revised: true
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/NCBCEBQ027S.parquet
+    notes: 'Z.1 revised; no vintage store: latest values.'
+    status: available
+    lake:
+      source:
+        rows: 304
+        first_period: '1946-12-31'
+        last_period: '2026-06-30'
+        first_published: 1947-03-12 23:59
+  BAMLH0A0HYM2:
+    title: ICE BofA US HY OAS
+    rules:
+    - R-11
+    - R-17
+    step: '1'
+    freq: D
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: longhist/hy_oas/BAMLH0A0HYM2.parquet
+    gaps: none before 1996-12-31 (FRED keeps 3 years; earlier rows from Wayback FRED captures)
+    notes: Wayback-captured history 1996-2023 (lag_rule_conservative) spliced by amber with live ALFRED rows.
+    status: available
+    lake:
+      source:
+        rows: 7771
+        first_period: '1996-12-31'
+        last_period: '2026-10-02'
+        first_published: 1997-01-01 23:59
+  FINRA_MARGIN_DEBT:
+    title: FINRA margin debit balances
+    rules:
+    - R-11
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: finra_margin/margin_statistics.parquet
+      value_col: debit_balances
+    gaps: none before 1997-01 (NYSE margin history not in the lake)
+    status: available
+    lake:
+      source:
+        rows: 356
+        first_period: '1997-01-31'
+        last_period: '2026-08-31'
+        first_published: 1997-02-20 19:00
+  ECBASSETSW:
+    title: Eurosystem total assets, weekly
+    rules:
+    - R-12
+    step: '1'
+    freq: W
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/cenb/ECBASSETSW.parquet
+    fallback:
+    - id: EUROSYSTEM_TOTAL_ASSETS
+      proxy_grade: A
+      splice: true
+    - id: DE_CB_ASSETS
+      proxy_grade: D
+      splice: false
+    notes: '1999-2001 from the ECB weekly statement (same quantity; overlap change corr 1.000). Pre-1999 Bundesbank
+      (process.md R-12 ''pre-1999 EA = Bundesbank''): as an EA proxy, overlap 1999-2026 monthly pct corr 0.75 ->
+      D (usable=False here). DE_CB_ASSETS is served on its own as the Bundesbank region series.'
+    status: available
+    lake:
+      source:
+        rows: 1291
+        first_period: '2002-01-04'
+        last_period: '2026-09-25'
+        first_published: 2002-01-08 23:59
+  EUROSYSTEM_TOTAL_ASSETS:
+    title: Eurosystem total assets (ECB weekly statement)
+    rules:
+    - R-12
+    step: '1'
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: xregion/ecb/EUROSYSTEM_TOTAL_ASSETS.parquet
+    status: available
+    lake:
+      source:
+        rows: 1448
+        first_period: '1999-01-01'
+        last_period: '2026-09-25'
+        first_published: 1999-01-05 09:00
+  DE_CB_ASSETS:
+    title: Bundesbank total assets (BIS, monthly)
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_DE.parquet
+    status: available
+    lake:
+      source:
+        rows: 934
+        first_period: '1948-09-30'
+        last_period: '2026-06-30'
+        first_published: 1948-12-14 23:59
+  JPNASSETS:
+    title: Bank of Japan total assets
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/cenb/JPNASSETS.parquet
+    fallback:
+    - id: JP_BOJ_TOTAL_ASSETS
+      proxy_grade: A
+      splice: true
+    - id: JP_CB_ASSETS_BIS
+      proxy_grade: B
+      splice: false
+    notes: 1998-2001 BoJ statistics (same units; overlap change corr 1.000); before 1998 BIS monthly (overlap pct
+      corr 1.000 -> B; different units, not spliced).
+    status: available
+    lake:
+      source:
+        rows: 331
+        first_period: '2002-01-01'
+        last_period: '2026-08-01'
+        first_published: 2002-02-04 23:59
+  JP_BOJ_TOTAL_ASSETS:
+    title: BoJ total assets (BoJ statistics)
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/boj/JP_BOJ_TOTAL_ASSETS.parquet
+    status: available
+    lake:
+      source:
+        rows: 341
+        first_period: '1998-04-30'
+        last_period: '2026-08-31'
+        first_published: 1998-05-07 23:59
+  JP_CB_ASSETS_BIS:
+    title: BoJ total assets (BIS, monthly)
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_JP.parquet
+    status: available
+    lake:
+      source:
+        rows: 883
+        first_period: '1953-01-31'
+        last_period: '2026-07-31'
+        first_published: 1953-04-16 23:59
+  BOE_ASSETS:
+    title: Bank of England total assets (BIS, monthly)
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_GB.parquet
+    gaps: BoE weekly bank return (process.md R-12) not in the lake; monthly BIS series served instead
+    notes: Native BoE balance sheet at monthly frequency; weekly window (xregion.window_w) needs interpolation or
+      a monthly window.
+    lake:
+      source:
+        rows: 2183
+        first_period: '1844-09-30'
+        last_period: '2026-07-31'
+        first_published: 1844-12-14 23:59
+  CB_ASSETS_GDP_US:
+    title: Central-bank assets / GDP, US (BIS)
+    rules:
+    - R-12
+    step: '1'
+    freq: Q
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_GDP_US.parquet
+    status: available
+    lake:
+      source:
+        rows: 315
+        first_period: '1947-12-31'
+        last_period: '2026-06-30'
+        first_published: 1948-04-29 23:59
+  CB_ASSETS_GDP_XM:
+    title: Central-bank assets / GDP, euro area (BIS)
+    rules:
+    - R-12
+    step: '1'
+    freq: Q
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_GDP_XM.parquet
+    status: available
+    lake:
+      source:
+        rows: 110
+        first_period: '1998-12-31'
+        last_period: '2026-03-31'
+        first_published: 1999-04-30 23:59
+  CB_ASSETS_GDP_DE:
+    title: Central-bank assets / GDP, Germany (BIS)
+    rules:
+    - R-12
+    step: '1'
+    freq: Q
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_GDP_DE.parquet
+    status: available
+    lake:
+      source:
+        rows: 263
+        first_period: '1960-12-31'
+        last_period: '2026-06-30'
+        first_published: 1961-04-30 23:59
+  CB_ASSETS_GDP_GB:
+    title: Central-bank assets / GDP, UK (BIS)
+    rules:
+    - R-12
+    step: '1'
+    freq: Q
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_GDP_GB.parquet
+    status: available
+    lake:
+      source:
+        rows: 283
+        first_period: '1955-12-31'
+        last_period: '2026-06-30'
+        first_published: 1956-04-29 23:59
+  CB_ASSETS_GDP_JP:
+    title: Central-bank assets / GDP, Japan (BIS)
+    rules:
+    - R-12
+    step: '1'
+    freq: Q
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/bis/CB_TOTAL_ASSETS_GDP_JP.parquet
+    status: available
+    lake:
+      source:
+        rows: 282
+        first_period: '1956-03-31'
+        last_period: '2026-06-30'
+        first_published: 1956-07-29 23:59
+  ECB_DFR:
+    title: ECB deposit facility rate
+    rules:
+    - R-12
+    step: '1'
+    freq: D
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: xregion/ecb/ECB_DFR.parquet
+    fallback:
+    - id: DE_POLICY_RATE
+      proxy_grade: D
+      splice: false
+    notes: 'Pre-1999: Bundesbank policy rate (process.md R-12 region definition); as an EA proxy no overlap exists
+      (series ends 1998) -> D. DE_POLICY_RATE is served on its own.'
+    status: available
+    lake:
+      source:
+        rows: 10141
+        first_period: '1999-01-01'
+        last_period: '2026-10-06'
+        first_published: 1999-01-01 23:59
+  DE_POLICY_RATE:
+    title: Bundesbank policy rate (BIS, daily, to 1998)
+    rules:
+    - R-12
+    step: '1'
+    freq: D
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: xregion/bis/POLICY_RATE_DE.parquet
+    status: available
+    lake:
+      source:
+        rows: 18446
+        first_period: '1948-07-01'
+        last_period: '1998-12-31'
+        first_published: 1948-07-01 23:59
+  UK_BANK_RATE:
+    title: Bank Rate, daily
+    rules:
+    - R-12
+    step: '1'
+    freq: D
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: xregion/boe/UK_BANK_RATE_D.parquet
+    fallback:
+    - id: GB_POLICY_RATE_BIS
+      proxy_grade: A
+      splice: true
+    notes: 'Before 1975 BIS UK policy rate (identical on overlap: change corr 1.000).'
+    status: available
+    lake:
+      source:
+        rows: 13084
+        first_period: '1975-01-02'
+        last_period: '2026-10-05'
+        first_published: 1975-01-02 23:59
+  GB_POLICY_RATE_BIS:
+    title: UK policy rate (BIS, daily)
+    rules:
+    - R-12
+    step: '1'
+    freq: D
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: xregion/bis/POLICY_RATE_GB.parquet
+    status: available
+    lake:
+      source:
+        rows: 23447
+        first_period: '1946-01-01'
+        last_period: '2026-09-28'
+        first_published: 1946-01-01 23:59
+  JP_POLICY_RATE:
+    title: Japan policy rate (BIS, daily)
+    rules:
+    - R-12
+    step: '1'
+    freq: D
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: xregion/bis/POLICY_RATE_JP.parquet
+    gaps: no rows 1999-02-12 -> 2006-03 (zero-rate / QE period); JP_CALL_RATE_M covers it
+    notes: 'BIS policy-rate series (discount rate era, then call-rate target). BoJ call rate also: JP_CALL_RATE_M.'
+    status: available
+    lake:
+      source:
+        rows: 24894
+        first_period: '1946-01-01'
+        last_period: '2026-09-29'
+        first_published: 1946-01-01 23:59
+  JP_CALL_RATE_M:
+    title: BoJ uncollateralised overnight call rate, monthly
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: xregion/boj/JP_CALL_ON_UNCOLL_M.parquet
+    fallback:
+    - source:
+        kind: table
+        path: xregion/boj/JP_CALL_ON_COLL_M.parquet
+      proxy_grade: C
+      splice: true
+    notes: 'Before 1985-07 the collateralised call rate (spliced, interpreted grade C: different instrument, no
+      validation run).'
+    status: available
+    lake:
+      source:
+        rows: 495
+        first_period: '1985-07-31'
+        last_period: '2026-09-30'
+        first_published: 1985-08-03 23:59
+  IRLTLT01USM156N:
+    title: OECD long-term government bond yield, US
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/IRLTLT01USM156N.parquet
+    status: available
+    lake:
+      source:
+        rows: 881
+        first_period: '1953-04-30'
+        last_period: '2026-08-31'
+        first_published: 1953-05-13 23:59
+  IRLTLT01DEM156N:
+    title: OECD long-term government bond yield, DE
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/IRLTLT01DEM156N.parquet
+    status: available
+    lake:
+      source:
+        rows: 844
+        first_period: '1956-05-31'
+        last_period: '2026-08-31'
+        first_published: 1956-06-13 23:59
+  IRLTLT01GBM156N:
+    title: OECD long-term government bond yield, GB
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/IRLTLT01GBM156N.parquet
+    status: available
+    lake:
+      source:
+        rows: 800
+        first_period: '1960-01-31'
+        last_period: '2026-08-31'
+        first_published: 1960-02-15 23:59
+  IRLTLT01JPM156N:
+    title: OECD long-term government bond yield, JP
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/IRLTLT01JPM156N.parquet
+    status: available
+    lake:
+      source:
+        rows: 452
+        first_period: '1989-01-31'
+        last_period: '2026-08-31'
+        first_published: 1989-02-16 23:59
+  IRLTLT01FRM156N:
+    title: OECD long-term government bond yield, FR
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/IRLTLT01FRM156N.parquet
+    status: available
+    lake:
+      source:
+        rows: 800
+        first_period: '1960-01-31'
+        last_period: '2026-08-31'
+        first_published: 1960-02-15 23:59
+  IRLTLT01ITM156N:
+    title: OECD long-term government bond yield, IT
+    rules:
+    - R-12
+    step: '1'
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/IRLTLT01ITM156N.parquet
+    status: available
+    lake:
+      source:
+        rows: 426
+        first_period: '1991-03-31'
+        last_period: '2026-08-31'
+        first_published: 1991-05-02 23:59
+  FOMC_CALENDAR:
+    title: FOMC statement calendar (taper/decision events)
+    rules:
+    - R-14
+    - R-38
+    step: '1'
+    freq: event
+    status: missing
+    pit_method: release_calendar
+    notes: No historical FOMC event table in the lake (amber calendars are forward-looking). Gap; manual event flags
+      per process.md R-22. Balance-sheet programme events are covered by FOMC_BS_STATE.
+  FOMC_BS_STATE:
+    title: Fed balance-sheet programme state (announced purchases / runoff), FOMC and Board releases
+    rules:
+    - R-14
+    step: '1'
+    freq: event
+    revised: false
+    pit_method: release_calendar
+    source:
+      kind: spec_events
+      path: spec/fomc_bs_events.yaml
+    status: available
+    notes: Project event table (path relative to the project root, not the lake), built 2026-10-07 from
+      federalreserve.gov releases (spec/research_R14_balance_sheet.md section 2). value -1 EXPAND, 0 NONE,
+      +1 RUNOFF; period_end = effective date; published_at = release time ET. Baseline NONE row from 1914-11-16.
+  FOMC_SEP:
+    title: FOMC Summary of Economic Projections, Table 1 statistics per release (event table, 2007-10 onward)
+    rules:
+    - R-68
+    step: '1'
+    freq: event
+    revised: false
+    pit_method: release_calendar
+    source:
+      kind: spec_events_sep
+      path: spec/fomc_sep_events.yaml
+    status: partial
+    gaps: 'umbrella entry: kind spec_events_sep is read per variable x statistic through a filter
+      (fatpitch.lake.read_spec_events_sep; ids SEP_CORE_PCE_MEDIAN, SEP_CORE_PCE_CT_LOW, SEP_CORE_PCE_CT_HIGH);
+      this id itself has no filter and reads as empty. Medians exist only from 2015-09-17; fed funds central
+      tendency/range from 2015-09-17; fed funds dots_* 2012-01-25..2015-09-17 without 2012-12-12.'
+    notes: Project event table (path relative to the project root), built 2026-10-07 from federalreserve.gov
+      SEP Table 1 (minutes SEP addenda 2007-10..2020-09, projection-table pages 2020-12 onward) with ALFRED SEP
+      vintages as cross-check and as the source for 2022-03-16 (no Fed HTML table; confirmed by the 2022-06-15
+      table's March rows). 76 releases, 3,572 rows; current year, next year and longer run. published_at = minutes
+      release 14:00 ET to 2011-01 meeting; 2011-04-27 14:15 ET; then meeting day 14:00 ET (2012-04-25 and
+      2015-06-17 14:15 ET, time unstated). Statistics are never substituted for one another; pre-2015-09
+      medians do not exist. dots_* are computed from the published dot-plot tables (not Fed statistics). File
+      header lists verification counts and two flagged as-published values.
+    lake:
+      spec:
+        rows: 3572
+        first_period: '2007-10-31'
+        last_period: '2026-09-16'
+        first_published: 2007-11-20 14:00
+  SEP_CORE_PCE_MEDIAN:
+    title: FOMC SEP core PCE inflation (Q4/Q4) projection, median, by projection year (from FOMC_SEP)
+    rules:
+    - R-68
+    step: '1'
+    freq: event
+    revised: false
+    pit_method: release_calendar
+    source:
+      kind: spec_events_sep
+      path: spec/fomc_sep_events.yaml
+      filter:
+        variable: core_pce_inflation
+        statistic: median
+    status: available
+    notes: Rows of FOMC_SEP for one statistic; period_end = 31 Dec of horizon_year (longer-run rows dropped), so
+      the as-of view holds the latest release per projection year. Published from 2015-09-17 only.
+      R-68 input (decision R68-02). Catalogued 2026-10-07.
+  SEP_CORE_PCE_CT_LOW:
+    title: FOMC SEP core PCE inflation (Q4/Q4) projection, central tendency, low end, by projection year (from FOMC_SEP)
+    rules:
+    - R-68
+    step: '1'
+    freq: event
+    revised: false
+    pit_method: release_calendar
+    source:
+      kind: spec_events_sep
+      path: spec/fomc_sep_events.yaml
+      filter:
+        variable: core_pce_inflation
+        statistic: central_tendency_low
+    status: available
+    notes: Rows of FOMC_SEP for one statistic; period_end = 31 Dec of horizon_year (longer-run rows dropped), so
+      the as-of view holds the latest release per projection year. Published from 2007-11-20.
+      R-68 input (decision R68-02). Catalogued 2026-10-07.
+  SEP_CORE_PCE_CT_HIGH:
+    title: FOMC SEP core PCE inflation (Q4/Q4) projection, central tendency, high end, by projection year (from FOMC_SEP)
+    rules:
+    - R-68
+    step: '1'
+    freq: event
+    revised: false
+    pit_method: release_calendar
+    source:
+      kind: spec_events_sep
+      path: spec/fomc_sep_events.yaml
+      filter:
+        variable: core_pce_inflation
+        statistic: central_tendency_high
+    status: available
+    notes: Rows of FOMC_SEP for one statistic; period_end = 31 Dec of horizon_year (longer-run rows dropped), so
+      the as-of view holds the latest release per projection year. Published from 2007-11-20.
+      R-68 input (decision R68-02). Catalogued 2026-10-07.
+  PCECTPIMD:
+    title: FOMC SEP median, PCE inflation (Q4/Q4), by projection year
+    rules:
+    - R-68
+    step: '1'
+    freq: A
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/PCECTPIMD.parquet
+      freq: A
+      release_time: '14:15'
+    vintage_by_era: 'asof >= 2015-12-16 ALFRED; earlier: none (the 2015-09-17 median is in FOMC_SEP only)'
+    pre_vintage: unknown
+    notes: period_end = 31 Dec of the projection year; each SEP release is a vintage. ALFRED omits the first
+      published median (2015-09-17). release_time 14:15 ET covers the 14:00 releases conservatively. FOMC_SEP
+      is the verified source; this store is reader-ready. Catalogued 2026-10-07.
+    status: available
+    lake:
+      alfred:
+        rows: 94
+        first_period: '2015-12-31'
+        last_period: '2029-12-31'
+        first_published: 2015-12-16 14:15
+  JCXFEMD:
+    title: FOMC SEP median, core PCE inflation (Q4/Q4), by projection year
+    rules:
+    - R-68
+    step: '1'
+    freq: A
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/JCXFEMD.parquet
+      freq: A
+      release_time: '14:15'
+    vintage_by_era: 'asof >= 2015-12-16 ALFRED; earlier: none (the 2015-09-17 median is in FOMC_SEP only)'
+    pre_vintage: unknown
+    notes: As PCECTPIMD. Catalogued 2026-10-07.
+    status: available
+    lake:
+      alfred:
+        rows: 94
+        first_period: '2015-12-31'
+        last_period: '2029-12-31'
+        first_published: 2015-12-16 14:15
+  FEDTARMD:
+    title: FOMC SEP median, federal funds rate at year end (midpoint), by projection year
+    rules:
+    - R-68
+    step: '1'
+    freq: A
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/FEDTARMD.parquet
+      freq: A
+      release_time: '14:15'
+    vintage_by_era: 'asof >= 2015-12-16 ALFRED; earlier: none (2015-09-17 median and 2012-2015 dots_median in
+      FOMC_SEP)'
+    pre_vintage: unknown
+    notes: As PCECTPIMD. Before 2015-09 no median was published; FOMC_SEP carries dots_median computed from the
+      published dot plot (2012-01-25..2015-09-17, no 2012-12-12), tagged separately. Catalogued 2026-10-07.
+    status: available
+    lake:
+      alfred:
+        rows: 100
+        first_period: '2015-12-31'
+        last_period: '2029-12-31'
+        first_published: 2015-12-16 14:15
+  UNRATEMD:
+    title: FOMC SEP median, unemployment rate (Q4 average), by projection year
+    rules:
+    - R-68
+    step: '1'
+    freq: A
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/UNRATEMD.parquet
+      freq: A
+      release_time: '14:15'
+    vintage_by_era: 'asof >= 2015-12-16 ALFRED; earlier: none (the 2015-09-17 median is in FOMC_SEP only)'
+    pre_vintage: unknown
+    notes: As PCECTPIMD. Catalogued 2026-10-07.
+    status: available
+    lake:
+      alfred:
+        rows: 111
+        first_period: '2015-12-31'
+        last_period: '2029-12-31'
+        first_published: 2015-12-16 14:15
+  PCECTPI_SEP_CT:
+    title: FOMC SEP central tendency, PCE inflation (low PCECTPICTL / high PCECTPICTH), by projection year
+    rules:
+    - R-68
+    step: '1'
+    freq: A
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/PCECTPICTL.parquet
+      freq: A
+      release_time: '14:15'
+    vintage_by_era: 'asof >= 2007-11-20 ALFRED'
+    pre_vintage: unknown
+    notes: 'Low end only is read (PCECTPICTL); the high end is in fred/vintages/PCECTPICTH.parquet (170 rows, same
+      span). Known ALFRED defect: the 2015-12-16 release is missing from the central-tendency and range series
+      (2015-09-17 values carried to 2016-03-15); FOMC_SEP has the published values. Catalogued 2026-10-07.'
+    status: partial
+    lake:
+      alfred:
+        rows: 179
+        first_period: '2007-12-31'
+        last_period: '2029-12-31'
+        first_published: 2007-11-20 14:15
+  JCXFE_SEP_CT:
+    title: FOMC SEP central tendency, core PCE inflation (low JCXFECTL / high JCXFECTH), by projection year
+    rules:
+    - R-68
+    step: '1'
+    freq: A
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/JCXFECTL.parquet
+      freq: A
+      release_time: '14:15'
+    vintage_by_era: 'asof >= 2007-11-20 ALFRED'
+    pre_vintage: unknown
+    notes: 'Low end read (JCXFECTL); high end JCXFECTH (171 rows). Same 2015-12-16 ALFRED defect as
+      PCECTPI_SEP_CT. Catalogued 2026-10-07.'
+    status: partial
+    lake:
+      alfred:
+        rows: 169
+        first_period: '2007-12-31'
+        last_period: '2029-12-31'
+        first_published: 2007-11-20 14:15
+  UNRATE_SEP_CT:
+    title: FOMC SEP central tendency, unemployment rate (low UNRATECTL / high UNRATECTH), by projection year
+    rules:
+    - R-68
+    step: '1'
+    freq: A
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/UNRATECTL.parquet
+      freq: A
+      release_time: '14:15'
+    vintage_by_era: 'asof >= 2007-11-20 ALFRED'
+    pre_vintage: unknown
+    notes: 'Low end read (UNRATECTL); high end UNRATECTH (208 rows). Same 2015-12-16 ALFRED defect as
+      PCECTPI_SEP_CT (one value differs). Catalogued 2026-10-07.'
+    status: partial
+    lake:
+      alfred:
+        rows: 202
+        first_period: '2007-12-31'
+        last_period: '2029-12-31'
+        first_published: 2007-11-20 14:15
+  FEDTAR_SEP_CT:
+    title: FOMC SEP central tendency, federal funds rate (low FEDTARCTL / high FEDTARCTH), by projection year
+    rules:
+    - R-68
+    step: '1'
+    freq: A
+    revised: true
+    pit_method: vintage
+    vintages:
+    - kind: alfred
+      path: fred/vintages/FEDTARCTL.parquet
+      freq: A
+      release_time: '14:15'
+    vintage_by_era: 'asof >= 2015-12-16 ALFRED; earlier: none (2015-09-17 in FOMC_SEP)'
+    pre_vintage: unknown
+    notes: 'Low end read (FEDTARCTL); high end FEDTARCTH (98 rows). Catalogued 2026-10-07.'
+    status: available
+    lake:
+      alfred:
+        rows: 96
+        first_period: '2015-12-31'
+        last_period: '2029-12-31'
+        first_published: 2015-12-16 14:15
+  NFCI:
+    title: Chicago Fed National Financial Conditions Index
+    rules:
+    - R-58
+    step: '1'
+    freq: W
+    revised: true
+    pit_method: vintage
+    source:
+      kind: table
+      path: fred/series/NFCI.parquet
+    vintages:
+    - kind: alfred
+      path: fred/vintages/NFCI.parquet
+      freq: W
+      time_from: fred/series/NFCI.parquet
+    vintage_by_era: 'asof >= 2011-05-25 ALFRED (first publication of the index); earlier: index not published'
+    pre_vintage: unknown
+    notes: Values before 2011-05-25 are a backcast built with hindsight; returned usable=False (unknown).
+    status: available
+    lake:
+      source:
+        rows: 2908
+        first_period: '1971-01-08'
+        last_period: '2026-09-25'
+        first_published: 1971-01-13 08:30
+      alfred:
+        rows: 925555
+        first_period: '1971-01-08'
+        last_period: '2026-09-25'
+        first_published: 2011-05-25 08:30
+  FYFSGDA188S:
+    title: Federal surplus or deficit as % of GDP (annual)
+    rules:
+    - R-63
+    step: '1'
+    freq: A
+    status: missing
+    pit_method: lag_rule
+    notes: Not in the lake. Gap (R-63 fiscal term unknown).
+  FRENCH49:
+    title: Fama-French 49 industry portfolios
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    - R-60
+    step: 1b
+    freq: M
+    status: missing
+    pit_method: lag_rule
+    notes: Not in the lake (only 10- and 12-industry copies from CBP). Leading set Rtail, Trans, Banks, Steel/Mines,
+      Chips, BldMt/Cnstr cannot be formed. French-12 served as FRENCH12_* with proxy_grade D (no overlap with the
+      49 set to validate) and usable=False.
+  FRENCH12_NoDur:
+    title: French 12-industry monthly return, NoDur (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: NoDur
+      lag: &id001
+        anchor: month_end
+        days: 30
+        time: '23:59:59'
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Durbl:
+    title: French 12-industry monthly return, Durbl (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Durbl
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Manuf:
+    title: French 12-industry monthly return, Manuf (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Manuf
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Enrgy:
+    title: French 12-industry monthly return, Enrgy (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Enrgy
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Chems:
+    title: French 12-industry monthly return, Chems (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Chems
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_BusEq:
+    title: French 12-industry monthly return, BusEq (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: BusEq
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Telcm:
+    title: French 12-industry monthly return, Telcm (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Telcm
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Utils:
+    title: French 12-industry monthly return, Utils (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Utils
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Shops:
+    title: French 12-industry monthly return, Shops (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Shops
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Hlth:
+    title: French 12-industry monthly return, Hlth (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Hlth
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Money:
+    title: French 12-industry monthly return, Money (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Money
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FRENCH12_Other:
+    title: French 12-industry monthly return, Other (value-weighted, %)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: M
+    status: substitute
+    pit_method: lag_rule
+    proxy_grade: D
+    usable: false
+    source:
+      kind: table
+      path: cbp/french/12_Industry_Portfolios.parquet
+      date_col: date
+      value_col: Other
+      lag: *id001
+    notes: 'Posting date unknown: month-end + 30 days (process.md R-15). Latest French revision (history is restated
+      annually).'
+    lake:
+      source:
+        rows: 1201
+        first_period: '1926-07-31'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FF_MKT_RF_D:
+    title: Fama-French market excess return, daily (%)
+    rules:
+    - R-15
+    - R-19
+    step: 1b
+    freq: D
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: cbp/french/F-F_Research_Data_Factors_daily.parquet
+      date_col: date
+      value_col: Mkt-RF
+      lag: *id001
+    notes: Daily rows of month M visible from end of M + 30 days (monthly posting).
+    status: available
+    lake:
+      source:
+        rows: 26296
+        first_period: '1926-07-01'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  FF_RF_D:
+    title: Fama-French risk-free rate, daily (%)
+    rules:
+    - R-15
+    step: 1b
+    freq: D
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: cbp/french/F-F_Research_Data_Factors_daily.parquet
+      date_col: date
+      value_col: RF
+      lag: *id001
+    status: available
+    lake:
+      source:
+        rows: 26296
+        first_period: '1926-07-01'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  US_EQ_FUT_PROXY:
+    title: ES futures excess-return proxy (French Mkt-RF)
+    rules:
+    - R-19
+    step: 1b
+    freq: D
+    status: proxy_only
+    pit_method: lag_rule
+    proxy_grade: B
+    source:
+      kind: table
+      path: proxies/fut_ES/fut_ES.parquet
+      grade_col: proxy_grade
+    lake:
+      source:
+        rows: 26296
+        first_period: '1926-07-01'
+        last_period: '2026-07-31'
+        first_published: 1926-08-30 23:59
+  ETF_SPY:
+    title: SPY daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: SPY
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_IWM:
+    title: IWM daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: IWM
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_RSP:
+    title: RSP daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: RSP
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_XHB:
+    title: XHB daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: XHB
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_IYT:
+    title: IYT daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: IYT
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_XTN:
+    title: XTN daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: XTN
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_XRT:
+    title: XRT daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: XRT
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_KBE:
+    title: KBE daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: KBE
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_XME:
+    title: XME daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: XME
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  ETF_SMH:
+    title: SMH daily close (Alpaca SIP)
+    rules:
+    - R-15
+    - R-16
+    - R-59
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: alpaca_basic/bars_daily/*.parquet
+      date_col: date
+      value_col: close
+      filter:
+        symbol: SMH
+      lag:
+        days: 0
+        time: '18:00'
+    gaps: 2021-09-21 -> only; ETF history from launch (1993-2006) to 2021 not in the lake
+    notes: Visible 18:00 ET on the bar date (after the close). Adjustment basis as stored by amber; unverified.
+    lake:
+      source:
+        rows: 1265
+        first_period: '2021-09-21'
+        last_period: '2026-10-05'
+        first_published: 2021-09-21 18:00
+  SHILLER_SP:
+    title: S&P composite monthly price (Shiller)
+    rules:
+    - R-18
+    - R-61
+    step: 1b
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: longhist/shiller/ie_data.parquet
+      value_col: price
+    notes: Monthly average price; lag rule month-end + ~35 days (amber interpreted). Rows to the current month are
+      partial-month estimates.
+    status: available
+    lake:
+      source:
+        rows: 1870
+        first_period: '1871-01-31'
+        last_period: '2026-10-31'
+        first_published: 1871-03-07 23:59
+  SP500:
+    title: S&P 500 index, daily (FRED, 10 years only)
+    rules:
+    - R-18
+    step: 1b
+    freq: D
+    status: missing
+    pit_method: first_release
+    notes: Not in the lake; FRED carries 10 years only (process.md R-18). SHILLER_SP (monthly 1871->) and US_EQ_FUT_PROXY
+      (daily) cover the role.
+  NASDAQCOM:
+    title: NASDAQ composite, daily
+    rules:
+    - R-19
+    step: 1b
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/NASDAQCOM.parquet
+    status: available
+    lake:
+      source:
+        rows: 14034
+        first_period: '1971-02-05'
+        last_period: '2026-10-05'
+        first_published: 1971-02-05 23:59
+  GOLD_LBMA:
+    title: LBMA gold price, daily (USD)
+    rules:
+    - R-19
+    step: 1b
+    freq: D
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: proxies/_inputs/lbma_gold.parquet
+      lag:
+        days: 0
+        time: '23:59:59'
+    notes: 'No publication stamp in the lake: end of the fixing day (conservative).'
+    status: available
+    lake:
+      source:
+        rows: 14691
+        first_period: '1968-04-01'
+        last_period: '2026-09-25'
+        first_published: 1968-04-01 23:59
+  PCOPPUSDM:
+    title: Global copper price, monthly (IMF)
+    rules:
+    - R-19
+    step: 1b
+    freq: M
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/PCOPPUSDM.parquet
+    fallback:
+    - source:
+        kind: table
+        path: cbp/worldbank_cmo/monthly_prices.parquet
+        date_col: date
+        filter:
+          commodity: Copper
+        lag:
+          anchor: month_end
+          days: 7
+          time: '23:59:59'
+      proxy_grade: B
+      splice: false
+    notes: Pre-1992 fallback World Bank monthly copper (overlap pct corr 0.999, beta 1.00 -> B); visible month-end
+      + 7 days (Pink Sheet posts in the first business days).
+    status: available
+    lake:
+      source:
+        rows: 415
+        first_period: '1992-01-31'
+        last_period: '2026-07-31'
+        first_published: 1992-02-13 23:59
+  ZWEIG_EMA10:
+    title: 'Zweig breadth thrust input: 10-day EMA of adv/(adv+dec)'
+    rules:
+    - R-60
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: breadth/zweig_inputs.parquet
+      value_col: ema10
+      unusable_if: gap_flag
+    gaps: 2020-02-11 -> 2021-09-21 no free breadth (gap rows usable=False)
+    notes: 'Segments: NYSE (Unicorn) 1965-03-01..2020-02-10; S&P 500 members 2021-09-22 ->. Segment thresholds differ
+      (registry internals.breadth_thrust_spx_low/high).'
+    lake:
+      source:
+        rows: 15131
+        first_period: '1965-03-01'
+        last_period: '2026-10-05'
+        first_published: 1965-03-01 23:59
+  NYSE_ADV:
+    title: NYSE advancing issues (Unicorn archive)
+    rules:
+    - R-60
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: breadth/nyse_unicorn/nyse_daily.parquet
+      value_col: advances
+    gaps: frozen archive 1965-03-01 -> 2020-02-10
+    lake:
+      source:
+        rows: 13867
+        first_period: '1965-03-01'
+        last_period: '2020-02-10'
+        first_published: 1965-03-01 23:59
+  NYSE_DEC:
+    title: NYSE declining issues (Unicorn archive)
+    rules:
+    - R-60
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: breadth/nyse_unicorn/nyse_daily.parquet
+      value_col: declines
+    gaps: frozen archive 1965-03-01 -> 2020-02-10
+    lake:
+      source:
+        rows: 13867
+        first_period: '1965-03-01'
+        last_period: '2020-02-10'
+        first_published: 1965-03-01 23:59
+  NYSE_UPVOL:
+    title: NYSE up volume (Unicorn archive)
+    rules:
+    - R-60
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: breadth/nyse_unicorn/nyse_daily.parquet
+      value_col: up_volume
+    gaps: frozen archive 1965-03-01 -> 2020-02-10
+    lake:
+      source:
+        rows: 13867
+        first_period: '1965-03-01'
+        last_period: '2020-02-10'
+        first_published: 1965-03-01 23:59
+  NYSE_DNVOL:
+    title: NYSE down volume (Unicorn archive)
+    rules:
+    - R-60
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: breadth/nyse_unicorn/nyse_daily.parquet
+      value_col: down_volume
+    gaps: frozen archive 1965-03-01 -> 2020-02-10
+    lake:
+      source:
+        rows: 13867
+        first_period: '1965-03-01'
+        last_period: '2020-02-10'
+        first_published: 1965-03-01 23:59
+  SPX_PCT_ADV:
+    title: S&P 500 members advancing (%)
+    rules:
+    - R-60
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: breadth/spx_members/daily.parquet
+      value_col: pct_advancing
+    gaps: 2021-09-22 -> only
+    lake:
+      source:
+        rows: 1264
+        first_period: '2021-09-22'
+        last_period: '2026-10-05'
+        first_published: 2021-09-22 20:00
+  SPX_PCT_ABOVE_50DMA:
+    title: S&P 500 members above 50-day average (%)
+    rules:
+    - R-60
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: breadth/spx_members/daily.parquet
+      value_col: pct_above_50dma
+    gaps: 2021-09-22 -> only
+    lake:
+      source:
+        rows: 1216
+        first_period: '2021-11-30'
+        last_period: '2026-10-05'
+        first_published: 2021-11-30 20:00
+  SPX_PCT_ABOVE_200DMA:
+    title: S&P 500 members above 200-day average (%)
+    rules:
+    - R-60
+    step: 1b
+    freq: D
+    status: partial
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: breadth/spx_members/daily.parquet
+      value_col: pct_above_200dma
+    gaps: 2021-09-22 -> only
+    lake:
+      source:
+        rows: 1066
+        first_period: '2022-07-07'
+        last_period: '2026-10-05'
+        first_published: 2022-07-07 20:00
+  DEXUSUK:
+    title: FX spot noon buying rate, USD per GBP
+    rules:
+    - R-19
+    - R-28
+    - R-65
+    step: later
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DEXUSUK.parquet
+    status: available
+    lake:
+      source:
+        rows: 13981
+        first_period: '1971-01-04'
+        last_period: '2026-10-02'
+        first_published: 1971-01-09 23:59
+  DEXJPUS:
+    title: FX spot noon buying rate, JPY per USD
+    rules:
+    - R-19
+    - R-28
+    - R-65
+    step: later
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DEXJPUS.parquet
+    status: available
+    lake:
+      source:
+        rows: 13975
+        first_period: '1971-01-04'
+        last_period: '2026-10-02'
+        first_published: 1971-01-09 23:59
+  DEXUSEU:
+    title: FX spot noon buying rate, USD per EUR
+    rules:
+    - R-19
+    - R-28
+    - R-65
+    step: later
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DEXUSEU.parquet
+    status: available
+    lake:
+      source:
+        rows: 6960
+        first_period: '1999-01-04'
+        last_period: '2026-10-02'
+        first_published: 1999-01-09 23:59
+  DEXSZUS:
+    title: FX spot noon buying rate, CHF per USD
+    rules:
+    - R-19
+    - R-28
+    - R-65
+    step: later
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DEXSZUS.parquet
+    status: available
+    lake:
+      source:
+        rows: 13981
+        first_period: '1971-01-04'
+        last_period: '2026-10-02'
+        first_published: 1971-01-09 23:59
+  DEXCAUS:
+    title: FX spot noon buying rate, CAD per USD
+    rules:
+    - R-19
+    - R-28
+    - R-65
+    step: later
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DEXCAUS.parquet
+    status: available
+    lake:
+      source:
+        rows: 13987
+        first_period: '1971-01-04'
+        last_period: '2026-10-02'
+        first_published: 1971-01-09 23:59
+  DEXUSAL:
+    title: FX spot noon buying rate, USD per AUD
+    rules:
+    - R-19
+    - R-28
+    - R-65
+    step: later
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DEXUSAL.parquet
+    status: available
+    lake:
+      source:
+        rows: 13974
+        first_period: '1971-01-04'
+        last_period: '2026-10-02'
+        first_published: 1971-01-09 23:59
+  DEXUSNZ:
+    title: FX spot noon buying rate, USD per NZD
+    rules:
+    - R-19
+    - R-28
+    - R-65
+    step: later
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DEXUSNZ.parquet
+    status: available
+    lake:
+      source:
+        rows: 13965
+        first_period: '1971-01-04'
+        last_period: '2026-10-02'
+        first_published: 1971-01-09 23:59
+  DEXMXUS:
+    title: FX spot noon buying rate, MXN per USD
+    rules:
+    - R-19
+    - R-28
+    - R-65
+    step: later
+    freq: D
+    pit_method: first_release
+    source:
+      kind: table
+      path: fred/series/DEXMXUS.parquet
+    status: available
+    lake:
+      source:
+        rows: 8249
+        first_period: '1993-11-08'
+        last_period: '2026-10-02'
+        first_published: 1993-11-13 23:59
+  EXGEUS:
+    title: DEM per USD, monthly (to 2001)
+    rules:
+    - R-65
+    step: later
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/EXGEUS.parquet
+    status: available
+    lake:
+      source:
+        rows: 372
+        first_period: '1971-01-31'
+        last_period: '2001-12-31'
+        first_published: 1971-02-01 23:59
+  COT_6A:
+    title: CFTC legacy non-commercial net position, % of OI, 6A
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/6A.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1800
+        first_period: '1987-01-30'
+        last_period: '2026-09-29'
+        first_published: 1987-01-30 15:30
+  COT_6B:
+    title: CFTC legacy non-commercial net position, % of OI, 6B
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/6B.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1882
+        first_period: '1988-04-29'
+        last_period: '2026-09-29'
+        first_published: 1988-04-29 15:30
+  COT_6C:
+    title: CFTC legacy non-commercial net position, % of OI, 6C
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/6C.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_6E:
+    title: CFTC legacy non-commercial net position, % of OI, 6E
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/6E.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_6J:
+    title: CFTC legacy non-commercial net position, % of OI, 6J
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/6J.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_6M:
+    title: CFTC legacy non-commercial net position, % of OI, 6M
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/6M.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1638
+        first_period: '1995-05-23'
+        last_period: '2026-09-29'
+        first_published: 1995-05-26 15:30
+  COT_6N:
+    title: CFTC legacy non-commercial net position, % of OI, 6N
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/6N.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1156
+        first_period: '1999-01-05'
+        last_period: '2026-09-29'
+        first_published: 1999-01-08 15:30
+  COT_6S:
+    title: CFTC legacy non-commercial net position, % of OI, 6S
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/6S.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1935
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_CL:
+    title: CFTC legacy non-commercial net position, % of OI, CL
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/CL.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1935
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_ES:
+    title: CFTC legacy non-commercial net position, % of OI, ES
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ES.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_GC:
+    title: CFTC legacy non-commercial net position, % of OI, GC
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/GC.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1936
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_HG:
+    title: CFTC legacy non-commercial net position, % of OI, HG
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/HG.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1851
+        first_period: '1989-07-31'
+        last_period: '2026-09-29'
+        first_published: 1989-08-04 15:30
+  COT_NQ:
+    title: CFTC legacy non-commercial net position, % of OI, NQ
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/NQ.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1591
+        first_period: '1996-04-16'
+        last_period: '2026-09-29'
+        first_published: 1996-04-19 15:30
+  COT_RTY:
+    title: CFTC legacy non-commercial net position, % of OI, RTY
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/RTY.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1253
+        first_period: '2002-08-13'
+        last_period: '2026-09-29'
+        first_published: 2002-08-16 15:30
+  COT_SI:
+    title: CFTC legacy non-commercial net position, % of OI, SI
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/SI.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1936
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_ZB:
+    title: CFTC legacy non-commercial net position, % of OI, ZB
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ZB.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_ZN:
+    title: CFTC legacy non-commercial net position, % of OI, ZN
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ZN.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_ZF:
+    title: CFTC legacy non-commercial net position, % of OI, ZF
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ZF.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1880
+        first_period: '1988-05-31'
+        last_period: '2026-09-29'
+        first_published: 1988-06-03 15:30
+  COT_ZT:
+    title: CFTC legacy non-commercial net position, % of OI, ZT
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ZT.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1829
+        first_period: '1990-06-29'
+        last_period: '2026-09-29'
+        first_published: 1990-06-29 15:30
+  COT_ZC:
+    title: CFTC legacy non-commercial net position, % of OI, ZC
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ZC.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_ZS:
+    title: CFTC legacy non-commercial net position, % of OI, ZS
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ZS.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_ZW:
+    title: CFTC legacy non-commercial net position, % of OI, ZW
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ZW.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_DX:
+    title: CFTC legacy non-commercial net position, % of OI, DX
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/DX.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1871
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_NG:
+    title: CFTC legacy non-commercial net position, % of OI, NG
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/NG.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1833
+        first_period: '1990-04-12'
+        last_period: '2026-09-29'
+        first_published: 1990-04-13 15:30
+  COT_ZQ:
+    title: CFTC legacy non-commercial net position, % of OI, ZQ
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/ZQ.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1871
+        first_period: '1988-10-14'
+        last_period: '2026-09-29'
+        first_published: 1988-10-14 15:30
+  COT_SR3:
+    title: CFTC legacy non-commercial net position, % of OI, SR3
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/SR3.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 427
+        first_period: '2018-07-24'
+        last_period: '2026-09-29'
+        first_published: 2018-07-27 15:30
+  COT_VX:
+    title: CFTC legacy non-commercial net position, % of OI, VX
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/VX.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1115
+        first_period: '2004-07-27'
+        last_period: '2026-09-29'
+        first_published: 2004-07-30 15:30
+  COT_BTC:
+    title: CFTC legacy non-commercial net position, % of OI, BTC
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/BTC.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 443
+        first_period: '2018-04-10'
+        last_period: '2026-09-29'
+        first_published: 2018-04-13 15:30
+  COT_HO:
+    title: CFTC legacy non-commercial net position, % of OI, HO
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/HO.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1935
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_RB:
+    title: CFTC legacy non-commercial net position, % of OI, RB
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/RB.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1935
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  COT_LE:
+    title: CFTC legacy non-commercial net position, % of OI, LE
+    rules:
+    - R-31
+    step: later
+    freq: W
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: cftc/cot_hist/roots/legacy/LE.parquet
+    notes: Tuesday positions, released Friday 15:30 ET (cftc_release_rule).
+    status: available
+    lake:
+      source:
+        rows: 1937
+        first_period: '1986-01-15'
+        last_period: '2026-09-29'
+        first_published: 1986-01-17 15:30
+  NBER_CYCLES:
+    title: NBER peaks (+1) and troughs (-1)
+    rules:
+    - labels
+    step: label
+    freq: event
+    pit_method: release_calendar
+    source:
+      kind: table
+      path: longhist/nber/cycles.parquet
+      value_map:
+        col: event
+        map:
+          peak: 1.0
+          trough: -1.0
+    notes: Labels only, never engine inputs. published_at = committee announcement (from 1980); earlier dates interpreted
+      (pre-committee).
+    status: available
+    lake:
+      source:
+        rows: 70
+        first_period: '1800-01-31'
+        last_period: '2020-04-30'
+        first_published: 1802-01-31 23:59
+  USREC:
+    title: NBER recession indicator (monthly)
+    rules:
+    - labels
+    step: label
+    freq: M
+    pit_method: lag_rule
+    source:
+      kind: table
+      path: fred/series/USREC.parquet
+    notes: Revised after announcements; labels only.
+    status: available
+    lake:
+      source:
+        rows: 2062
+        first_period: '1854-12-31'
+        last_period: '2026-09-30'
+        first_published: 1855-01-01 23:59
