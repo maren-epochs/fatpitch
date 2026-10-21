@@ -1,0 +1,327 @@
+# Open decisions (rulebook "Open decisions" section; tools/build_rulebook.py).
+# Each entry states the problem, the evidence gathered so far, the options with what each would change, and a
+# recommendation. Figures marked "counterfactual" are recomputed from votes recorded in an existing run
+# (results/versions/a2a5fc8/20261007T103009Z-a2a5fc80, trial 9) - no new run, no new trial; they are in-sample
+# and the sealed holdout remains the only unbiased test. When a decision is taken it moves to spec/decisions.yaml.
+version: 2026-10-07.1
+open:
+- id: OD-01
+  title: When the policy vote and the liquidity vote disagree, how much should each count?
+  opened: '2026-10-07'
+  area: process
+  summary: Half of the scored cases are 50/50 splits between the Fed-cycle vote and the liquidity vote, and those
+    splits cause 57% of the remaining Gate 1 loss.
+  body: |
+    **The problem.** The regime odds (rule R-66) are built from two votes. The first is R-14, the Fed cycle state: the direction of the last policy-rate move, held until a move the other way. The second is the liquidity family: M2 growth against industrial production before 2020 (R-02), and Fed balance sheet net of the Treasury account and reverse repo, plus Fed purchases against Treasury issuance, from 2020 (R-03 and R-04). Each outcome starts with a small weight of 0.1 and each vote adds 1. When the two votes agree the engine is confident (0.91). When they disagree the odds split evenly, for example 0.48 easing and 0.48 tightening, and the call goes to R-14 by the tie rule.
+
+    A split costs a lot under the scoring rule. On a case where his read was easing, an easing/tightening split scores 0.25 and an easing/neutral split scores 0.137, while the climatology reference scores about 0.05 on every easing episode because easing is what he usually read. Gate 1 asks the engine to beat climatology episode by episode, so every split on an easing episode is very likely a lost episode.
+
+    **The evidence.** In the 32 Gate 1 cases of the latest run, 16 are splits. They account for 3.54 of the total 6.22 score loss (57%). The other 16 are confident: 13 right, 3 wrong (1981-12, 2024-05-07 and 2024-09-18; the last two are covered by OD-02 and OD-03). In the 16 splits, R-14 matched his read 14 times, the liquidity vote once (2016-05-04), and neither once (2005-12-30, when the Fed was hiking and he called policy easy; see OD-03).
+
+    | Where the splits fall | Cases | R-14 said | Liquidity said | His read |
+    |---|---|---|---|---|
+    | 1981-06, 1987-06 | 2 | tightening | easing (M2 ahead of output) | tightening |
+    | 2014-06 to 2015-04 | 5 | easing (rates at zero) | neutral | easing |
+    | 2016-05 | 1 | tightening (Dec 2015 hike) | easing | easing |
+    | 2021-02, 2022-03 | 2 | easing | neutral / tightening | easing |
+    | 2024-10, 2024-11 | 2 | easing (after the first cut) | tightening (QT and issuance) | easing |
+    | 2026-01 to 2026-09 | 3 | easing | neutral / tightening | easing |
+    | 2005-12 | 1 | tightening | neutral | easing |
+
+    The pattern is consistent: liquidity measures turn on balance-sheet and issuance flows that keep moving through a Fed cycle, while his reads follow the Fed's stance. His own words support both votes ("I'm a liquidity guy", 2019-06-07; "stay long until the Fed tightens", 2014-07-16), so the question is weighting, not inclusion.
+
+    **What each option would do** (counterfactual on the 32 cases; the current setting is option D):
+
+    | Option | Episode-mean score | Episodes beating climatology | 2014-15 | 2024 | 2025-26 | 2016 | 1981 |
+    |---|---|---|---|---|---|---|---|
+    | D. Keep equal votes | 0.184 | 7 of 13 | 0.137 | 0.562 | 0.213 | 0.250 | 0.562 |
+    | A. Fed-cycle vote counts double | 0.165 | 8 of 13 | 0.067 | 0.517 | 0.103 | 0.425 | 0.517 |
+    | B. Disagreement adds to "on hold" | 0.183 | 7 of 13 | 0.137 | 0.506 | 0.137 | 0.572 | 0.506 |
+    | C. Fed-cycle vote only | 0.163 | 10 of 13 | 0.015 | 0.399 | 0.015 | 0.784 | 0.399 |
+
+    Option C scores best in-sample but removes liquidity from the odds altogether. That contradicts a stated core of the process, and it makes the engine close to the "realised Fed direction" reference already used in the Fed-cycle check, so the engine's added value would have to come from elsewhere. Option A keeps liquidity as a voice that raises confidence when it agrees and lowers it when it disagrees, without ever outweighing the Fed cycle. It still loses the 2016 episode, where liquidity was right. Option B changes little.
+
+    **The risk.** Every figure here was computed after seeing case outcomes, so any choice is fitted to the research split. The trial count rises with each run and the Holm/Bonferroni correction tightens. The holdout (8 sealed episodes) is the only test this choice cannot have seen. A weight of 2 has no source; it is a convention ("the rule that defines direction counts more than a confirming rule"), which should be recorded as such.
+
+    **What is needed to decide.** Whether liquidity should be able to oppose the Fed cycle in the odds (options D, B) or only modulate confidence (A), or should leave the odds (C). One version run (about 10 minutes) after the choice would confirm the counterfactual, including the sign-flip p-value, which the counterfactual does not compute.
+  options:
+  - label: A
+    title: Fed-cycle vote counts double
+    summary: Liquidity raises or lowers confidence but never outweighs the Fed cycle.
+    consequence: Counterfactual 8/13 episodes, mean 0.165; 2016 gets worse. Weight 2 is a convention with no source.
+  - label: B
+    title: Disagreement adds to on hold
+    summary: A disagreeing liquidity vote counts toward "on hold" instead of the opposite direction.
+    consequence: Counterfactual 7/13, mean 0.183; little change.
+  - label: C
+    title: Fed-cycle vote only
+    summary: Remove liquidity from the odds; it stays as reported evidence.
+    consequence: Counterfactual 10/13, mean 0.163; contradicts "I am a liquidity guy" and nearly duplicates the
+      realised-direction reference.
+  - label: D
+    title: Keep equal votes
+    summary: No change.
+    consequence: 7/13, mean 0.184; Gate 1 p 0.266.
+  recommendation:
+    label: A
+    reason: Keeps both of his stated drivers while letting the Fed cycle lead, which is what 14 of 16 split cases
+      show; the one-run confirmation is cheap.
+  evidence:
+  - results/versions/LEADERBOARD.md
+  - spec/process.md
+  - spec/decisions.yaml
+- id: OD-02
+  title: Rate moves become visible one to two days late
+  opened: '2026-10-07'
+  area: data
+  summary: The engine sees each Fed rate change at the end of the day after it takes effect, not at the 2 p.m. announcement;
+    it misses the 2024 cut-day case, and 13 end-of-month moves become visible only the next month (9 of them correctable).
+  body: |
+    **The problem.** R-14 reads the fed funds target from FRED (DFEDTARU, DFEDTAR). Each row is dated to the day the new target takes effect and stamped as published at 23:59 that day. Since 2008 the target takes effect the day after the FOMC decision, so a decision announced at 2 p.m. on day D becomes visible to the engine only after the close on D+1, and is first used at the D+2 close. Before 2008 the effective day was usually the decision day, so the lag is one day. R-14's own timing line says "FOMC statement 14:00 ET on decision day", so the data treatment contradicts the rule as written.
+
+    **The evidence.** Of 337 target changes in the lake, 321 are stamped one day after their effective date and 16 on the same day. On the 2024-09-18 cut day the engine still reads tightening at the close (score 0.874 on his easing read), and switches only on 2024-09-20. In the Fed-cycle check, which samples month-ends, 13 moves made in the last days of a month were not visible until the next month. These include the first hikes of June 1999 and June 2004, which explains why those two cycles show a one-month lag in the detection table.
+
+    **A complication.** Before 4 February 1994 the FOMC did not announce target changes. Markets inferred them from open-market operations, usually the same or the next day. For those years a next-day visibility is close to what an observer could know, and moving it earlier would introduce look-ahead. The fix therefore applies only from February 1994, when announcements began.
+
+    **What a fix needs.** A dated table of FOMC decisions with announcement times, built from federalreserve.gov (statements and press-release times), like the balance-sheet programme table already built. Each target change from 1994 onward would be stamped at its announcement (2:00 or 2:15 p.m. ET; intermeeting moves at their own release times, such as 2001-01-03 and 2008-10-08). The work is mechanical and cites the rule's own timing text, so it does not change the design.
+
+    **What it would change.** The 2024-09-18 case moves from a confident miss (0.874) to a split (0.25 under the current odds, about 0.12 under OD-01 option A). In the Fed-cycle check, the 1999 and 2004 first hikes move from one month late to on time, and seven other moves from 1994 on (1996-01, 2001-01, 2005-06, 2006-01, 2007-10, 2008-04, 2019-10) become visible within their own month. The four end-of-month moves before 1994 (1983-03, 1987-04, 1991-04, 1991-10) stay as they are. No other Gate 1 case falls on a decision day. Results for older cycles (pre-1994) do not change.
+
+    **Options.** A: build the FOMC decision table and stamp target changes at announcement from 1994-02 (recommended; mechanical, cites R-14). B: shift every target change to the previous business day at 14:00 without a table; simpler but wrong for intermeeting moves and for pre-1994 years. C: accept the lag and document it.
+
+    **Who else is affected.** The reference models used in Gate 1 and the Fed-cycle check do not read the target series: the realised-direction reference uses the monthly average fed funds rate (FEDFUNDS), published the following month, and the other references use no rate data. The fix therefore changes the engine only, which is what the comparison should measure. The anticipation test (hybrid track) reads daily fed funds (DFF), which is published the next business day and is not affected.
+
+    **How the fix would be verified.** Each row of the new table would carry the federalreserve.gov release URL and its stated time, as the balance-sheet programme table does (27 rows, 2008 to 2025, each linked). A test would check that a change announced at 2:00 p.m. is visible at the 4:00 p.m. close of the same day and not before, and that no change before 1994-02-04 moves. A cross-check against the effective dates in DFEDTAR and DFEDTARU would flag any decision without a matching change, or the reverse. Expected size: 92 target changes from 1994-02-04 to 2026, including intermeeting moves (for example 1998-10-15, 2001-01-03, 2001-04-18, 2001-09-17, 2008-01-22, 2008-10-08, 2020-03-03 and 2020-03-15).
+
+    **Why this is not a design change.** The decision rule stays the same: direction of the last move, held until the opposite move. Only the moment a move becomes known changes, and it moves to the time the rule's own text names. A design change would alter what the rule does with the information.
+  options:
+  - label: A
+    title: FOMC decision table from 1994
+    summary: Stamp each target change at its announcement time, from the first announced move (1994-02-04).
+    consequence: Fixes the cut-day case and 9 month-end delays; no change before 1994; one data build.
+  - label: B
+    title: Blanket one-day shift
+    summary: Move every change to the prior business day at 14:00.
+    consequence: Wrong for intermeeting moves and introduces look-ahead before 1994.
+  - label: C
+    title: Accept the lag
+    summary: Document it as a known limitation.
+    consequence: The 2024-09-18 case stays a confident miss.
+  recommendation:
+    label: A
+    reason: It is a correction to match the rule's own timing text, limited to the years the Fed announced its
+      moves.
+  evidence:
+  - spec/process.md
+  - spec/research_2024_easing_read.md
+  - spec/fomc_bs_events.yaml
+- id: OD-03
+  title: His "easing" reads while the Fed was still tightening or on hold
+  opened: '2026-10-07'
+  area: evaluation
+  summary: Three scored reads (2005-12, 2024-05, and 2024-09 before OD-02) call policy easy while the Fed's last
+    move was a hike; they reflect a judgement that policy was too loose or a forecast of cuts, not a Fed that was
+    cutting.
+  body: |
+    **The problem.** The Gate 1 target for each case is his read of the policy regime. In most cases that read follows what the Fed was doing. In a few it does not. On 2005-12-30 ("riding policy") the Fed was in the middle of a hiking cycle, yet his read is easing. On 2024-05-07 the last move was the July 2023 hike and QT was running, yet his read is easing. The engine reads tightening at both dates, confidently in 2024 (score 0.874) and as a split in 2005 (0.572).
+
+    **The evidence.** The only pre-cut 2024 source is the CNBC interview of 2024-05-07. In it he criticises the December 2023 dovish pivot ("fumbled on the five-yard line"), says forward guidance and the pivot set financial conditions "on fire again", and says the Fed should keep the option to hike. That is a judgement that policy was too loose plus an expectation of cuts, not a description of a Fed that was easing. The 2005 read has the same character: rates rising, but in his view still too low. The 2003-12 read ("Fed too loose") is the same kind of statement, but there the Fed had been cutting, so R-14 agrees and the case scores well.
+
+    Every faithful rule reads early 2024 the way the engine does: R-14 tightening (last move a hike, QT in force), liquidity negative from March 2024, the policy-error gap (R-06) between −0.2 and −1.9 points (never past its −2.0 threshold), financial conditions (R-58) "loose" throughout, including late 2023 when he read tightening.
+
+    **What the options mean.**
+    - A. Accept these misses as reads of policy stance or of future moves. Stance belongs to R-06 (policy error), which does not set direction, and forecasts belong to the hybrid track (R-67, R-68). Record them in the anticipation report. Nothing in the faithful track changes.
+    - B. Add the Fed's own projections (median year-end fed funds rate from the dot plot) as a third vote in the odds. In 2024 the median for year-end 2024 was 4.6% in March and 5.1% in June, below or near the 5.375% midpoint, which would raise the easing odds to about 0.33 without changing the call; it would also lean easing in early 2019. This brings a forecast into the faithful track, against decision R67-02.
+    - C. Give R-14 a "pivot" state that flips on a Fed signal before the first cut. It would fix 2024 but reverses the cycle-state decision of the same day (R14-04) and fits one episode.
+    - D. Count financial conditions (R-58) as a direction vote. Rejected by the evidence: on the latest NFCI vintage, conditions read loose in 63% of the 2015–18 hiking weeks and tight in 85% of the 2007–08 cutting weeks.
+    - E. Re-examine the labels: if a read is about stance ("policy too loose"), score it against R-06 instead of the direction vote. This changes how cases are scored, so it would be a corpus change logged as such, decided without looking at engine results for those cases.
+
+    **The weight of the problem.** These reads cost about 2.3 of the 6.2 total loss (2024-05 0.874, 2005-12 0.572, plus 2024-09-18 until OD-02 is fixed). The 2024 episode cannot beat climatology in the faithful track under any odds rule, because the 2024-05 case alone pushes its mean above climatology's 0.059.
+
+    **What is needed to decide.** Whether a "too loose" read should count as easing for scoring at all (E), or stay as a known limit of a direction rule (A).
+  options:
+  - label: A
+    title: Accept as stance or forecast
+    summary: Leave the faithful track as it is; record these reads in the hybrid anticipation report.
+    consequence: No change; EP20 and the 2005 case stay losses.
+  - label: B
+    title: Fed projections as a third vote
+    summary: Add the dot-plot median as a vote in the odds.
+    consequence: Partial 2024 gain, no change of call, leans easing in early 2019; brings a forecast into the faithful
+      track.
+  - label: C
+    title: Pivot state in R-14
+    summary: Flip R-14 on a Fed signal before the first move.
+    consequence: Fits one episode; reverses R14-04.
+  - label: E
+    title: Score stance reads against R-06
+    summary: Mark reads that are about policy being too loose or too tight and score them against the policy-error
+      rule.
+    consequence: Corpus change, decided blind to engine results; may remove a source of structural misses.
+  recommendation:
+    label: A
+    reason: The evidence is one interview per episode; changing the faithful rules for it would fit noise. Option
+      E is worth a separate blind label review.
+  evidence:
+  - spec/research_2024_easing_read.md
+  - spec/process.md
+- id: OD-04
+  title: What to do with anticipation (R-67) after the redesign failed
+  opened: '2026-10-07'
+  area: process
+  summary: Both R-67 designs failed the lead-time test; the redesign's cut side merely equals the plain 2-year-yield
+    rule and its hike side calls later than that rule.
+  body: |
+    **The problem.** R-67 tries to call Fed turns before the first move, in the hybrid track only. The first design (bill forward, inflation check) caught 61% of hikes and 17% of cuts, against 78% and 61% for a naive "2-year Treasury yield minus fed funds" rule. The redesign put the 2-year path first and added an inflation composite and a stress leg. Its retest caught 83% of hikes (15 of 18) and 61% of cuts (11 of 18), but its median lead on hikes was 1.0 month against 1.5 for the naive rule, so it failed one criterion. On cuts it passed every criterion but produced exactly the naive rule's hits, lead and nearly the same false alarms, so the added legs contributed nothing measurable.
+
+    **The protocol in force.** Before the retest, it was agreed that a failure would not be followed by a third design on the same history (decision R67-05), because each redesign on the same 18 turns is a further fit to them. Both tests already count in the trial log.
+
+    **What is known about why.** The likely reason the hike lead is shorter (not yet verified turn by turn) is that the redesign's guards and fill-ins sometimes start the hike reading later than the raw 2-year spread, which turns as soon as the spread crosses 50 basis points. The cut side equals the naive rule because the 2-year leg decides almost every cut and the stress leg rarely fires first. The inflation composite is absent before 1997 (only one usable measure), so it cannot help in most of the sample.
+
+    **Options.**
+    - A. Keep R-67 v2 as a warning flag only, reported next to the regime call, never feeding the odds. No further design on this history. Revisit only when new turns occur (the next Fed turn is a true out-of-sample test) or when new data arrive.
+    - B. Adopt the naive 2-year rule as the hybrid anticipation signal. It did better on hikes and equal on cuts, has one constant (50 basis points), and is easy to explain. It was not designed as the rule, and his record is to trade against such pricing, which is why it stays hybrid.
+    - C. Retire anticipation from the hybrid track until free fed funds futures history exists (free history currently starts around 2024).
+    - D. Allow a third design. This breaks the agreed protocol and would need to be reported as a further in-sample fit.
+
+    **What each means for the rest of the project.** None of these options touches the faithful track or Gate 1. Option B would make the hybrid track's anticipation signal simple and transparent; option A keeps the more complex signal without claiming it adds value; option C reduces maintenance.
+
+    **What is needed to decide.** Whether a simple signal that matches or beats the designed one should replace it (B), or whether the project prefers to keep the designed signal for transparency about what was tried (A).
+
+    **The numbers in full.** Hit rate is the share of Fed turns where the signal pointed the right way at the last month-end before the first move. Lead is the number of months the signal had pointed that way. False alarms are months per year with a signal and no move of that direction within six months.
+
+    | Signal | Hikes: hit / lead / false alarms | Cuts: hit / lead / false alarms |
+    |---|---|---|
+    | R-67 v1 (bill forward first) | 61% / 1.0 / 1.44 | 17% / 1.0 / 0.36 |
+    | R-67 v2 (2-year first, fill-ins) | 83% / 1.0 / 2.61 | 61% / 1.0 / 0.39 |
+    | Naive 2-year minus fed funds | 78% / 1.5 / 2.03 | 61% / 1.0 / 0.36 |
+    | Naive 6-month bill minus fed funds | 28% / 1.0 / 0.32 | 89% / 1.5 / 1.69 |
+    | Realised Fed direction | 6% / 1.0 / 2.04 | 11% / 1.0 / 2.58 |
+
+    By era, v2 caught hikes in 4 of 6 turns in 1959–81, 4 of 5 in 1982–93, 4 of 4 in 1994–2008 and 3 of 3 after 2009; cuts in 5 of 7, 1 of 5, 3 of 4 and 2 of 2. The weak spot is cuts in 1982–93, where neither design nor the naive rule does well. The 6-month bill rule catches nearly every cut but almost no hikes, which suggests the bill curve inverts ahead of cuts in a way the 2-year spread does not; that observation came from the test results, so using it would be another in-sample choice.
+  options:
+  - label: A
+    title: Keep v2 as a flag
+    summary: Report it, never feed the odds; no third design; revisit at the next real Fed turn.
+    consequence: No further fitting; complexity stays.
+  - label: B
+    title: Adopt the 2-year rule
+    summary: Use the naive 2-year minus fed funds rule as the hybrid signal.
+    consequence: Better on hikes, equal on cuts, one constant; hybrid only.
+  - label: C
+    title: Retire anticipation for now
+    summary: Remove from the hybrid track until futures history exists.
+    consequence: Less to maintain; no anticipation signal.
+  - label: D
+    title: Third design
+    summary: Try again on the same turns.
+    consequence: Breaks the protocol; further in-sample fit.
+  recommendation:
+    label: B
+    reason: The plain rule did at least as well on every measure that matters and is easier to explain; both stay
+      in the hybrid track.
+  evidence:
+  - spec/decisions.yaml
+  - spec/research_R67_v2_R68.md
+  - spec/scoring.md
+- id: OD-05
+  title: When to lock the rules and pre-register
+  opened: '2026-10-07'
+  area: versions
+  summary: The project is in research mode with nine engine trials and two anticipation trials logged; each further
+    trial raises the bar for the final multiple-testing correction, and the holdout can be opened only once.
+  body: |
+    **The problem.** The plan calls for the specification, the thesis table and the case-corpus hash to be registered before any case is scored. Registration has been deferred deliberately because the rules are still changing ("we are still in research mode"). In the meantime every scoring run is logged as an exploratory trial: nine engine runs (trials 1 to 9) and two anticipation runs so far. The leaderboard adjusts each Gate 1 p-value over all logged trials (Holm and Bonferroni), so the adjusted p-values are already 1.000.
+
+    **Why it matters now.** Two things argue for setting a point at which the rules freeze. First, the more trials, the harder any eventual research-split result is to interpret. Second, the sealed holdout (8 episodes, opened once at the end) is the only unbiased test, and every decision in this log was taken after seeing research results. The holdout keeps its value only if the version that faces it is chosen by a rule fixed in advance, not by picking the best of many.
+
+    **Options.**
+    - A. Freeze after OD-01 to OD-03 are decided: implement them, run once, register that version (spec, registry, thesis table, corpus hash, scoring code fingerprint), then build steps 2–7 under registration. The holdout stays sealed until steps 2–7 exist.
+    - B. Register now (spec-v0.4) and treat OD-01 to OD-03 as registered design changes with new reports.
+    - C. Stay in research mode until steps 2–7 are built; register only then.
+    - D. Decide now which single version will face the holdout (for example "the last registered version before step 7"), without registering yet.
+
+    **What is needed to decide.** How many more design rounds are expected on steps 1 and 1b before moving to steps 2–7, and whether a rule for choosing the holdout version should be written now (D) regardless.
+
+    **What registration would contain.** The project's registration module records, for each item, a content hash and a timestamp: the process specification (spec/process.md), the parameter registry and its hash, the thesis table, the case-corpus manifest hash, and the fingerprint of the scoring code (the files that compute scores, held constant across versions). Every later scoring run then goes through a run log that names the registered items it used. A time-stamping service for the registration is listed but not yet chosen.
+
+    **The holdout's capacity.** The holdout holds 8 of 23 episodes. With 8 episodes, the smallest attainable one-sided p-value of the episode sign-flip test is 1/256, so the holdout can confirm a strong effect but not a marginal one, and it is reported with a Bayes factor rather than re-gated. It can be used once: any second look turns it into a research set.
+
+    **Current trial count and its cost.** With nine engine trials, the Bonferroni factor on a research p-value is 9; the best research p so far (0.266) would need to be below about 0.011 to stay under 0.10 after adjustment. Each additional exploratory run on steps 1 and 1b raises that factor. Freezing step 1 does not stop research; it moves research to steps 2–7, which have their own gates (Gate 2, thesis recall) and their own trials.
+
+    **Risks of each path.** Registering too early (B) means paperwork for each of the open decisions OD-01 to OD-03. Registering too late (C) leaves the choice of the final version open to the temptation of picking the best of many. Option D costs nothing and removes that temptation now.
+  options:
+  - label: A
+    title: Freeze after OD-01 to OD-03
+    summary: Decide, run once, register, then build steps 2-7 under registration.
+    consequence: Stops the trial count growing on step 1; holdout stays sealed.
+  - label: B
+    title: Register spec-v0.4 now
+    summary: Further changes become registered design changes.
+    consequence: Formal from now on; more paperwork per change.
+  - label: C
+    title: Stay in research mode
+    summary: Register only when steps 2-7 exist.
+    consequence: Flexible; trial count keeps growing.
+  - label: D
+    title: Fix the holdout-selection rule now
+    summary: Write down which version will face the holdout, before more trials.
+    consequence: Protects the holdout without freezing research.
+  recommendation:
+    label: D
+    reason: It protects the one unbiased test immediately at no cost; registration can follow at the freeze point
+      in A.
+  evidence:
+  - spec/PREREG.md
+  - spec/HOLDOUT.md
+  - results/versions/LEADERBOARD.md
+- id: OD-06
+  title: Missing data behind three rules
+  opened: '2026-10-07'
+  area: data
+  summary: The fiscal rule (R-63) reads nothing because the deficit series has no rows; the leading-industries rule
+    (R-15) runs only on ETFs from about 2000; core inflation has no real-time history before 1997.
+  body: |
+    **The problem.** Several stated rules are silent for most of history because their inputs are missing or unusable in the lake, and "unknown" never counts. The engine therefore under-uses parts of his process, and the gap is uneven across eras.
+
+    **The gaps.**
+
+    | Rule | What is missing | Effect today |
+    |---|---|---|
+    | R-63 fiscal supply | Deficit-to-GDP series (FRED FYFSGDA188S) has no rows in the lake | Unknown at every date, including 2023 when he said deficits drove his bond trade |
+    | R-15 / R-16 leading industries | Ken French 49-industry returns (free, 1926 on) not in the lake | Runs on sector ETFs only, from about 2000; absent for the 1980s and 1990s episodes |
+    | R-06 core check, R-67 inflation | Core CPI real-time history before 1996-12; PCE vintages before 2000-08 | Core view absent before 1997 |
+    | R-59 narrowing leadership | Needs the 49-industry file | Unknown at every date |
+    | R-06 natural rate of unemployment | CBO vintages 1990-2011 stale | Policy-error gap unreliable in that window |
+
+    **Options.** A: acquire the deficit series and the French 49-industry file with posting dates first (both free, both feed stated rules; the second also enables R-59), then CBO vintages. B: acquire everything listed. C: leave the gaps and report them.
+
+    **What is needed to decide.** Priority only; all sources are free and the work is automated. The French file needs a posting-date rule (month-end plus about a month) because the library has no exact posting times.
+
+    **Sources and timing rules.** The deficit series is the annual federal surplus or deficit as a share of GDP from the Office of Management and Budget via FRED; it is published with the budget documents, so a conservative point-in-time rule is the end of the publication month; the Monthly Treasury Statement can fill the gap within the year. The Ken French 49-industry returns are free downloads updated monthly; the library's data-practices note proposes month-end plus about one month as the posting time, since exact posting dates are not archived. CBO natural-rate vintages are published with each budget outlook; the Philadelphia Fed and ALFRED keep some of them.
+
+    **Which episodes gain.** R-63 matters for 2023 (he said deficits drove his short bond trade) and the 2024–26 episodes. The 49-industry file restores R-15, R-16 and R-59 for the 1987 crash, the 1991 easing and the 2000 rates episode, where only liquidity and the Fed cycle speak today. Core inflation before 1997 matters only for the hybrid R-67 and the report-only core check in R-06.
+
+    **Effort.** Each source follows the same pattern already used for core CPI and the discount rate: fetch, store with publication times, add a catalogue entry, verify against a second source, and add a fixture test. None needs a paid subscription. The deficit series and the industry file are each about one agent session.
+
+    **Why it matters for the evaluation.** Unknown inputs never count as a fail, so a silent rule does not lower scores directly. It does make the engine lean on the two votes that are always present, the Fed cycle and liquidity, which is part of why their disagreements (OD-01) dominate the results. Filling these gaps gives the engine more of the evidence he described before any further change to how the votes are weighed.
+  options:
+  - label: A
+    title: Deficit series and industry returns first
+    summary: Fill the two gaps that silence stated rules across whole eras.
+    consequence: Enables R-63, R-59 and pre-2000 R-15; one data build.
+  - label: B
+    title: Everything
+    summary: Also CBO natural-rate vintages and older core inflation.
+    consequence: Longer build.
+  - label: C
+    title: Leave and report
+    summary: Document the gaps.
+    consequence: Rules stay silent where data are missing.
+  recommendation:
+    label: A
+    reason: Largest gain per unit of work; both feed rules he stated.
+  evidence:
+  - spec/data_coverage.md
+  - spec/data_catalogue.yaml
+  - spec/research_2024_easing_read.md

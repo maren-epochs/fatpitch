@@ -101,6 +101,45 @@ def parse_md_table(lines: list[str]) -> list[list[str]]:
     return rows
 
 
+def md_block(text: str) -> str:
+    """Small Markdown subset for open-decision bodies: paragraphs, pipe tables, '-' lists, **bold**, `code`."""
+    out, para, lst, tbl = [], [], [], []
+
+    def flush():
+        if para:
+            out.append("<p>" + inline_md(" ".join(para)) + "</p>")
+            para.clear()
+        if lst:
+            out.append("<ul>" + "".join(f"<li>{inline_md(x)}</li>" for x in lst) + "</ul>")
+            lst.clear()
+        if tbl:
+            rows = parse_md_table(tbl)
+            if rows:
+                head = "".join(f"<th>{c}</th>" for c in rows[0])
+                body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows[1:])
+                out.append(f'<div class="tablewrap"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
+            tbl.clear()
+
+    for ln in text.splitlines():
+        st = ln.strip()
+        if not st:
+            flush()
+        elif st.startswith("|"):
+            if para or lst:
+                flush()
+            tbl.append(st)
+        elif st.startswith("- "):
+            if para or tbl:
+                flush()
+            lst.append(st[2:])
+        else:
+            if tbl or lst:
+                flush()
+            para.append(st)
+    flush()
+    return "".join(out)
+
+
 def parse_process(lib: dict[str, dict]) -> dict:
     text = (SPEC / "process.md").read_text(encoding="utf-8")
     steps, rules, conflicts, gaps = [], [], [], []
@@ -184,6 +223,10 @@ def main() -> None:
     used = {s["key"] for r in proc["rules"] for s in r["sources"]}
     dec_path = SPEC / "decisions.yaml"
     decisions = (yaml.safe_load(dec_path.read_text(encoding="utf-8")) or {}).get("decisions", []) if dec_path.exists() else []
+    od_path = SPEC / "open_decisions.yaml"
+    open_dec = (yaml.safe_load(od_path.read_text(encoding="utf-8")) or {}).get("open", []) if od_path.exists() else []
+    for o in open_dec:
+        o["body_html"] = md_block(o.pop("body", ""))
     data = {
         "steps": proc["steps"],
         "rules": proc["rules"],
@@ -195,13 +238,14 @@ def main() -> None:
         "transitions": transitions,
         "sources": {k: v for k, v in lib.items() if k in used},
         "decisions": decisions,
+        "open_decisions": open_dec,
     }
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     template = (Path(__file__).parent / "rulebook_template.html").read_text(encoding="utf-8")
-    built = _dt.date.today().isoformat()
+    built = _dt.datetime.now(_dt.UTC).astimezone().date().isoformat()
     out.write_text(template.replace("__BUILT__", built).replace("__DATA__", payload), encoding="utf-8")
     print(f"rules {len(proc['rules'])}, params {len(registry)}, transitions {len(transitions)}, "
-          f"sources cited {len(used)}, decisions {len(decisions)} -> {out}")
+          f"sources cited {len(used)}, decisions {len(decisions)}, open {len(open_dec)} -> {out}")
 
 
 if __name__ == "__main__":

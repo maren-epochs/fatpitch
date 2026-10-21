@@ -210,6 +210,24 @@ td .tag { white-space: normal; }
 .ev code { font-size: 11.5px; }
 @media (max-width: 640px) { .er { grid-template-columns: minmax(0, 1fr); } .opts li { grid-template-columns: 26px minmax(0, 1fr); } .opts li .ch { grid-column: 2; } }
 
+/* open decisions */
+.odlist { display: flex; flex-direction: column; gap: 14px; }
+.od { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--interp); border-radius: 6px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; scroll-margin-top: 80px; }
+.od .dh { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12px; color: var(--muted); }
+.od .dh .did { font: 600 12.5px var(--font-mono); color: var(--fg); }
+.od h3 { font-size: 18px; }
+.od .sum { color: var(--muted); font-size: 14px; }
+.od .odbody { display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+.od .odbody p, .od .odbody li { max-width: 80ch; }
+.od .odbody ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.od .odbody table { font-size: 12.5px; }
+.od details > summary { cursor: pointer; font: 600 13px var(--font-body); color: var(--accent); }
+.od details[open] > summary { margin-bottom: 8px; }
+.pill.open { color: var(--interp); border-color: var(--interp); }
+.odopts td:first-child { font: 600 12px var(--font-mono); white-space: nowrap; }
+.odopts tr.rec td { background: var(--accent-soft); }
+.odrec { font-size: 13.5px; border: 1px solid var(--accent); border-radius: 5px; padding: 9px 11px; }
+
 .note { font-size: 13px; color: var(--muted); }
 .disclaimer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
 
@@ -231,6 +249,7 @@ td .tag { white-space: normal; }
   <nav class="rail" aria-label="Sections">
     <div class="brand">Fat Pitch Rulebook</div>
     <a href="#overview">Overview</a>
+    <a href="#open">Open decisions</a>
     <a href="#decisions">Decisions</a>
     <a href="#method">How criteria are set</a>
     <a href="#review">Review: our numbers</a>
@@ -251,6 +270,12 @@ td .tag { white-space: normal; }
       <div class="stats" id="stats"></div>
       <div class="pipeline" id="pipeline" aria-label="Seven-step process"></div>
       <p class="note">Bar colour inside each step shows the mix of rule tags: green = stated by him, amber = interpreted, red = from the Automated Alpha article (weight 0).</p>
+    </section>
+
+    <section id="open" class="stack">
+      <h2>Open decisions</h2>
+      <p>Problems found and not yet decided. Each one states the problem, the evidence gathered so far, the options with what each would change, and a recommendation. Figures labelled counterfactual were recomputed from votes recorded in an existing run, with no new run; they are in-sample, and the sealed holdout remains the only unbiased test. A decision taken here moves to the decision log below with its prediction.</p>
+      <div class="odlist" id="odList"></div>
     </section>
 
     <section id="decisions" class="stack">
@@ -595,6 +620,23 @@ td .tag { white-space: normal; }
   };
   const reg = {}; D.registry.forEach(p => { reg[p.id] = p; });
 
+  // open decisions
+  const OD = D.open_decisions || [];
+  document.getElementById("odList").innerHTML = OD.map(o => {
+    const rec = o.recommendation || {};
+    const rows = (o.options || []).map(x => `<tr class="${String(x.label) === String(rec.label) ? "rec" : ""}"><td>${esc(x.label)}</td><td><strong>${esc(x.title)}</strong><br>${esc(x.summary)}</td><td>${esc(x.consequence)}</td></tr>`).join("");
+    const ev = (o.evidence || []).map(e => `<code>${esc(e)}</code>`).join(" ");
+    return `<article class="od" id="${esc(o.id)}">
+      <div class="dh"><span class="did">${esc(o.id)}</span><span class="tag tunable">${esc(o.area)}</span><span class="pill open">open since ${esc(o.opened)}</span></div>
+      <h3>${esc(o.title)}</h3>
+      <p class="sum">${esc(o.summary)}</p>
+      <details open><summary>Problem, evidence and options</summary><div class="odbody">${o.body_html || ""}</div></details>
+      <div class="tablewrap"><table class="odopts"><thead><tr><th>Option</th><th>What it does</th><th>What it would change</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="odrec"><span class="lbl">Recommended: ${esc(rec.label)}</span>${esc(rec.reason)}</p>
+      ${ev ? `<div class="ev">${ev}</div>` : ""}
+    </article>`;
+  }).join("") || `<p class="note">No open decisions.</p>`;
+
   // decisions
   const DEC = (D.decisions || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
   const AREAS = [...new Set(DEC.map(d => d.area))].sort();
@@ -646,7 +688,7 @@ td .tag { white-space: normal; }
   document.getElementById("stats").innerHTML = [
     [D.rules.length, "rules"], [n("stated"), "stated by him"], [n("interpreted"), "interpreted"],
     [n("interpreted-from-article"), "article-only, weight 0"], [D.registry.length, "parameters"],
-    [tunable, "tunable"], [D.transitions.length, "thesis rows"], [Object.keys(D.sources).length, "sources cited"], [(D.decisions || []).length, "recorded decisions"]
+    [tunable, "tunable"], [D.transitions.length, "thesis rows"], [Object.keys(D.sources).length, "sources cited"], [(D.decisions || []).length, "recorded decisions"], [(D.open_decisions || []).length, "open decisions"]
   ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
 
   // pipeline
